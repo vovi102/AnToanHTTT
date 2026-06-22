@@ -18,5 +18,20 @@ python3.11 -m venv .venv
 .venv/bin/rbac-guard --help
 ```
 
-Các lệnh vận hành và kịch bản demo sẽ được bổ sung cùng từng chức năng đã kiểm thử.
+## Chạy demo
 
+```bash
+.venv/bin/rbac-guard init-db --db demo.db --seed data/rbac_seed.json
+.venv/bin/rbac-guard check-access --db demo.db --user teller01 --resource accounts --action read
+.venv/bin/rbac-guard analyze --db demo.db --log data/logs_demo.csv --config config/default.toml --output artifacts
+.venv/bin/rbac-guard evaluate --alerts artifacts/alerts.json --events data/logs_demo.csv --output artifacts/metrics.json
+```
+
+`analyze` tạo `alerts.csv`, `alerts.json` và `run_metadata.json`. `evaluate` tạo
+`metrics.json` từ nhãn kỳ vọng trong dataset; không chỉnh sửa các artifact bằng tay.
+
+## Cổng chất lượng lõi
+
+```bash
+.venv/bin/pytest -q --cov=rbac_guard --cov-report=term-missing --cov-fail-under=85
+```

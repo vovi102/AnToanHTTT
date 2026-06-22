@@ -36,6 +36,15 @@ def test_cli_initializes_checks_and_analyzes(tmp_path: Path) -> None:
         "--output",
         str(output_dir),
     )
+    evaluated = _run(
+        "evaluate",
+        "--alerts",
+        str(output_dir / "alerts.json"),
+        "--events",
+        "data/logs_demo.csv",
+        "--output",
+        str(output_dir / "metrics.json"),
+    )
 
     assert initialized.returncode == 0
     assert checked.returncode == 0
@@ -43,6 +52,8 @@ def test_cli_initializes_checks_and_analyzes(tmp_path: Path) -> None:
     assert analyzed.returncode == 0
     assert "60 valid events" in analyzed.stdout
     assert (output_dir / "alerts.json").exists()
+    assert evaluated.returncode == 0
+    assert (output_dir / "metrics.json").exists()
 
 
 def test_cli_returns_code_two_without_traceback_for_bad_input(tmp_path: Path) -> None:

@@ -5,6 +5,7 @@ from pathlib import Path
 import sqlite3
 import sys
 
+from rbac_guard.metrics import evaluate_artifacts
 from rbac_guard.parser import InputFileError
 from rbac_guard.rbac import RBACRepository
 from rbac_guard.service import analyze
@@ -29,6 +30,11 @@ def _parser() -> argparse.ArgumentParser:
     analyze_command.add_argument("--log", type=Path, required=True)
     analyze_command.add_argument("--config", type=Path, required=True)
     analyze_command.add_argument("--output", type=Path, required=True)
+
+    evaluate = commands.add_parser("evaluate", help="evaluate alerts against labeled events")
+    evaluate.add_argument("--alerts", type=Path, required=True)
+    evaluate.add_argument("--events", type=Path, required=True)
+    evaluate.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -53,6 +59,13 @@ def main(argv: list[str] | None = None) -> int:
                 f"Analyzed {result.metadata.valid_rows} valid events; "
                 f"{result.metadata.invalid_rows} invalid rows; "
                 f"{result.metadata.alert_count} alerts"
+            )
+        elif arguments.command == "evaluate":
+            metrics = evaluate_artifacts(arguments.events, arguments.alerts, arguments.output)
+            macro = metrics["macro_average"]
+            print(
+                f"Macro precision={macro['precision']:.4f}; "
+                f"recall={macro['recall']:.4f}; f1={macro['f1']:.4f}"
             )
         return 0
     except (FileNotFoundError, InputFileError, KeyError, sqlite3.Error, ValueError) as error:
