@@ -1,0 +1,35 @@
+{
+  "users": [
+    {"username": "admin01", "status": "active"},
+    {"username": "teller01", "status": "active"},
+    {"username": "auditor01", "status": "active"},
+    {"username": "disabled01", "status": "disabled"}
+  ],
+  "roles": [
+    {"name": "administrator"},
+    {"name": "teller"},
+    {"name": "auditor"}
+  ],
+  "permissions": [
+    {"resource": "accounts", "action": "read"},
+    {"resource": "accounts", "action": "update"},
+    {"resource": "users", "action": "delete"},
+    {"resource": "audit_logs", "action": "read"}
+  ],
+  "user_roles": [
+    {"username": "admin01", "role": "administrator"},
+    {"username": "teller01", "role": "teller"},
+    {"username": "auditor01", "role": "auditor"},
+    {"username": "disabled01", "role": "teller"}
+  ],
+  "role_permissions": [
+    {"role": "administrator", "resource": "accounts", "action": "read"},
+    {"role": "administrator", "resource": "accounts", "action": "update"},
+    {"role": "administrator", "resource": "users", "action": "delete"},
+    {"role": "administrator", "resource": "audit_logs", "action": "read"},
+    {"role": "teller", "resource": "accounts", "action": "read"},
+    {"role": "teller", "resource": "accounts", "action": "update"},
+    {"role": "auditor", "resource": "accounts", "action": "read"},
+    {"role": "auditor", "resource": "audit_logs", "action": "read"}
+  ]
+}
