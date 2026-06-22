@@ -1,0 +1,9 @@
+[password_guessing]
+failures = 5
+window_seconds = 300
+
+[severity]
+medium = 30
+high = 60
+critical = 85
+
