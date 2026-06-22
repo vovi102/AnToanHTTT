@@ -2,8 +2,17 @@
 
 from collections import defaultdict, deque
 import re
+from typing import Protocol
 
 from rbac_guard.models import Event, Finding
+
+
+class PermissionChecker(Protocol):
+    def has_permission(self, username: str, resource: str, action: str) -> bool: ...
+
+
+class DetectionRule(Protocol):
+    def evaluate(self, events: tuple[Event, ...]) -> tuple[Finding, ...]: ...
 
 
 class SQLInjectionRule:
@@ -114,3 +123,51 @@ class PasswordGuessingRule:
                 findings.append(finding)
 
         return tuple(sorted(findings, key=lambda item: (item.timestamp, item.rule_id)))
+
+
+class UnauthorizedAccessRule:
+    """Compare access and authorization events with RBAC permissions."""
+
+    def __init__(self, checker: PermissionChecker):
+        self.checker = checker
+
+    def evaluate(self, events: tuple[Event, ...]) -> tuple[Finding, ...]:
+        findings: list[Finding] = []
+        for event in events:
+            if event.event_type not in {"access", "authorization"} or event.user is None:
+                continue
+            granted = self.checker.has_permission(event.user, event.resource, event.action)
+            if granted and event.status != "denied":
+                continue
+            findings.append(
+                Finding(
+                    rule_id="RBAC-UNAUTHORIZED",
+                    risk_type="unauthorized_access",
+                    event_ids=(event.event_id,),
+                    timestamp=event.timestamp,
+                    user=event.user,
+                    ip=event.ip,
+                    resource=event.resource,
+                    action=event.action,
+                    evidence=(
+                        f"permission={event.resource}:{event.action}; "
+                        f"rbac_granted={str(granted).lower()}; log_status={event.status}"
+                    ),
+                    confidence=0.95 if not granted else 0.85,
+                    rbac_denied=True,
+                )
+            )
+        return tuple(findings)
+
+
+class DetectionEngine:
+    """Run independent rules and return deterministic findings."""
+
+    def __init__(self, rules: tuple[DetectionRule, ...]):
+        self.rules = rules
+
+    def detect(self, events: tuple[Event, ...]) -> tuple[Finding, ...]:
+        findings = [finding for rule in self.rules for finding in rule.evaluate(events)]
+        return tuple(
+            sorted(findings, key=lambda item: (item.timestamp, item.risk_type, item.rule_id))
+        )

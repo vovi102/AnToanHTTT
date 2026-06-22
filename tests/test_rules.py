@@ -1,9 +1,16 @@
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pytest
 
 from rbac_guard.models import Event
-from rbac_guard.rules import PasswordGuessingRule, SQLInjectionRule
+from rbac_guard.rbac import RBACRepository
+from rbac_guard.rules import (
+    DetectionEngine,
+    PasswordGuessingRule,
+    SQLInjectionRule,
+    UnauthorizedAccessRule,
+)
 
 
 @pytest.fixture
@@ -26,6 +33,14 @@ def event_factory():
         return Event(**values)
 
     return make_event
+
+
+@pytest.fixture
+def project_rbac(tmp_path: Path) -> RBACRepository:
+    repository = RBACRepository(tmp_path / "rules-rbac.db")
+    repository.initialize()
+    repository.seed(Path("data/rbac_seed.json"))
+    return repository
 
 
 @pytest.mark.parametrize(
@@ -111,3 +126,60 @@ def test_password_rule_sorts_events_before_evaluation(event_factory) -> None:
     assert PasswordGuessingRule(5, 300).evaluate(reversed_events) == PasswordGuessingRule(
         5, 300
     ).evaluate(events)
+
+
+def test_unauthorized_rule_ignores_granted_access(event_factory, project_rbac) -> None:
+    event = event_factory(user="teller01", resource="accounts", action="read", status="allowed")
+
+    assert UnauthorizedAccessRule(project_rbac).evaluate((event,)) == ()
+
+
+@pytest.mark.parametrize(
+    ("user", "resource", "action", "status"),
+    [
+        ("teller01", "users", "delete", "allowed"),
+        ("disabled01", "accounts", "read", "allowed"),
+        ("teller01", "accounts", "read", "denied"),
+    ],
+)
+def test_unauthorized_rule_detects_denied_or_ungranted_access(
+    event_factory, project_rbac, user: str, resource: str, action: str, status: str
+) -> None:
+    event = event_factory(user=user, resource=resource, action=action, status=status)
+
+    findings = UnauthorizedAccessRule(project_rbac).evaluate((event,))
+
+    assert len(findings) == 1
+    assert findings[0].risk_type == "unauthorized_access"
+    assert findings[0].rbac_denied is True
+    assert f"permission={resource}:{action}" in findings[0].evidence
+
+
+def test_unauthorized_rule_ignores_authentication_and_anonymous_events(
+    event_factory, project_rbac
+) -> None:
+    authentication = event_factory(event_type="authentication", status="failed")
+    anonymous = event_factory(user=None, status="denied")
+
+    assert UnauthorizedAccessRule(project_rbac).evaluate((authentication, anonymous)) == ()
+
+
+def test_detection_engine_merges_findings_in_stable_order(event_factory, project_rbac) -> None:
+    sqli = event_factory(
+        event_id="sqli", request="1 UNION SELECT password FROM users", status="allowed"
+    )
+    unauthorized = event_factory(
+        event_id="denied",
+        timestamp=datetime.fromisoformat("2026-06-22T09:01:00+07:00"),
+        user="teller01",
+        resource="users",
+        action="delete",
+    )
+    engine = DetectionEngine((SQLInjectionRule(), UnauthorizedAccessRule(project_rbac)))
+
+    findings = engine.detect((unauthorized, sqli))
+
+    assert [(finding.timestamp, finding.risk_type) for finding in findings] == [
+        (sqli.timestamp, "sql_injection"),
+        (unauthorized.timestamp, "unauthorized_access"),
+    ]
