@@ -35,3 +35,15 @@ python3.11 -m venv .venv
 ```bash
 .venv/bin/pytest -q --cov=rbac_guard --cov-report=term-missing --cov-fail-under=85
 ```
+
+## Web UI tùy chọn
+
+Sau khi cài extra `web`, khởi động giao diện chỉ đọc:
+
+```bash
+.venv/bin/pip install -e '.[web]'
+.venv/bin/streamlit run src/rbac_guard/web.py
+```
+
+UI cho phép tải CSV/JSON, chạy cùng application service với CLI, lọc cảnh báo,
+xem thống kê theo risk type/severity và tải kết quả. UI không chỉnh sửa RBAC hoặc luật.
