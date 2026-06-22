@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rbac-guard"
+version = "0.1.0"
+description = "RBAC and rule-based security log analysis proof of concept"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-cov>=5"]
+web = ["streamlit>=1.35", "pandas>=2.2"]
+
+[project.scripts]
+rbac-guard = "rbac_guard.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+
