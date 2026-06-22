@@ -1,0 +1,64 @@
+"""Command-line interface for RBAC Guard."""
+
+import argparse
+from pathlib import Path
+import sqlite3
+import sys
+
+from rbac_guard.parser import InputFileError
+from rbac_guard.rbac import RBACRepository
+from rbac_guard.service import analyze
+
+
+def _parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="rbac-guard")
+    commands = parser.add_subparsers(dest="command", required=True)
+
+    init_db = commands.add_parser("init-db", help="initialize and seed the RBAC database")
+    init_db.add_argument("--db", type=Path, required=True)
+    init_db.add_argument("--seed", type=Path, required=True)
+
+    check = commands.add_parser("check-access", help="check one RBAC permission")
+    check.add_argument("--db", type=Path, required=True)
+    check.add_argument("--user", required=True)
+    check.add_argument("--resource", required=True)
+    check.add_argument("--action", required=True)
+
+    analyze_command = commands.add_parser("analyze", help="analyze a CSV or JSON log")
+    analyze_command.add_argument("--db", type=Path, required=True)
+    analyze_command.add_argument("--log", type=Path, required=True)
+    analyze_command.add_argument("--config", type=Path, required=True)
+    analyze_command.add_argument("--output", type=Path, required=True)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    arguments = _parser().parse_args(argv)
+    try:
+        if arguments.command == "init-db":
+            repository = RBACRepository(arguments.db)
+            repository.initialize()
+            repository.seed(arguments.seed)
+            print(f"Initialized RBAC database: {arguments.db}")
+        elif arguments.command == "check-access":
+            granted = RBACRepository(arguments.db).has_permission(
+                arguments.user, arguments.resource, arguments.action
+            )
+            print("ALLOWED" if granted else "DENIED")
+        elif arguments.command == "analyze":
+            result = analyze(
+                arguments.db, arguments.log, arguments.config, arguments.output
+            )
+            print(
+                f"Analyzed {result.metadata.valid_rows} valid events; "
+                f"{result.metadata.invalid_rows} invalid rows; "
+                f"{result.metadata.alert_count} alerts"
+            )
+        return 0
+    except (FileNotFoundError, InputFileError, KeyError, sqlite3.Error, ValueError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
