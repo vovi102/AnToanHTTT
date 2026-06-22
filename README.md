@@ -36,6 +36,9 @@ python3.11 -m venv .venv
 .venv/bin/pytest -q --cov=rbac_guard --cov-report=term-missing --cov-fail-under=85
 ```
 
+Coverage gate đo các module lõi; `cli.py` được kiểm tra qua subprocess test và
+`web.py` qua helper test cùng smoke test Streamlit.
+
 ## Web UI tùy chọn
 
 Sau khi cài extra `web`, khởi động giao diện chỉ đọc:

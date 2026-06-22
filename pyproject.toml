@@ -20,3 +20,5 @@ rbac-guard = "rbac_guard.cli:main"
 testpaths = ["tests"]
 addopts = "-q --strict-markers"
 
+[tool.coverage.run]
+omit = ["src/rbac_guard/cli.py", "src/rbac_guard/web.py"]

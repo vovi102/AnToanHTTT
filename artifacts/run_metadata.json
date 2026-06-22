@@ -1,0 +1,9 @@
+{
+  "run_at": "2026-06-22T22:26:53.850102+07:00",
+  "source_file": "data/logs_demo.csv",
+  "config_file": "config/default.toml",
+  "total_rows": 60,
+  "valid_rows": 60,
+  "invalid_rows": 0,
+  "alert_count": 20
+}

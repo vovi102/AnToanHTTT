@@ -11,3 +11,7 @@ htmlcov/
 *.db
 artifacts/*
 !artifacts/.gitkeep
+!artifacts/alerts.csv
+!artifacts/alerts.json
+!artifacts/run_metadata.json
+!artifacts/metrics.json
