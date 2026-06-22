@@ -1,0 +1,61 @@
+event_id,timestamp,event_type,user,ip,resource,action,status,request,details,expected_label
+evt-001,2026-06-22T08:00:00+07:00,authentication,teller01,10.0.0.1,session,login,success,POST /login,normal login,benign
+evt-002,2026-06-22T08:01:00+07:00,authentication,auditor01,10.0.0.2,session,login,success,POST /login,normal login,benign
+evt-003,2026-06-22T08:02:00+07:00,authentication,admin01,10.0.0.3,session,login,success,POST /login,normal login,benign
+evt-004,2026-06-22T08:03:00+07:00,authentication,teller01,10.0.0.1,session,logout,success,POST /logout,normal logout,benign
+evt-005,2026-06-22T08:04:00+07:00,authentication,auditor01,10.0.0.2,session,logout,success,POST /logout,normal logout,benign
+evt-006,2026-06-22T08:05:00+07:00,authentication,admin01,10.0.0.3,session,logout,success,POST /logout,normal logout,benign
+evt-007,2026-06-22T08:06:00+07:00,authentication,teller01,10.0.0.1,session,login,success,POST /login,normal login,benign
+evt-008,2026-06-22T08:07:00+07:00,authentication,auditor01,10.0.0.2,session,login,success,POST /login,normal login,benign
+evt-009,2026-06-22T08:08:00+07:00,authentication,admin01,10.0.0.3,session,login,success,POST /login,normal login,benign
+evt-010,2026-06-22T08:09:00+07:00,authentication,teller01,10.0.0.1,session,login,success,POST /login,normal login,benign
+evt-011,2026-06-22T09:00:00+07:00,access,,203.0.113.11,accounts,read,denied,' OR 1=1 --,tautology attempt,sql_injection
+evt-012,2026-06-22T09:01:00+07:00,access,,203.0.113.12,accounts,read,denied,1 UNION SELECT password FROM users,union attempt,sql_injection
+evt-013,2026-06-22T09:02:00+07:00,access,,203.0.113.13,accounts,read,denied,1; DROP TABLE users,stacked query,sql_injection
+evt-014,2026-06-22T09:03:00+07:00,access,,203.0.113.14,accounts,read,denied,admin'--,comment attempt,sql_injection
+evt-015,2026-06-22T09:04:00+07:00,access,,203.0.113.15,accounts,read,denied,' OR 'a'='a,tautology attempt,sql_injection
+evt-016,2026-06-22T09:05:00+07:00,access,,203.0.113.16,accounts,read,denied,0 UNION SELECT account_no FROM accounts,union attempt,sql_injection
+evt-017,2026-06-22T09:06:00+07:00,access,,203.0.113.17,accounts,read,denied,2; DELETE FROM accounts,stacked query,sql_injection
+evt-018,2026-06-22T09:07:00+07:00,access,,203.0.113.18,accounts,read,denied,user' #,comment attempt,sql_injection
+evt-019,2026-06-22T09:08:00+07:00,access,,203.0.113.19,accounts,read,denied,' OR 2>1 --,tautology attempt,sql_injection
+evt-020,2026-06-22T09:09:00+07:00,access,,203.0.113.20,accounts,read,denied,5 UNION SELECT role FROM users,union attempt,sql_injection
+evt-021,2026-06-22T10:00:00+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,burst failure 1,password_guessing
+evt-022,2026-06-22T10:00:20+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,burst failure 2,password_guessing
+evt-023,2026-06-22T10:00:40+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,burst failure 3,password_guessing
+evt-024,2026-06-22T10:01:00+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,burst failure 4,password_guessing
+evt-025,2026-06-22T10:01:20+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,burst failure 5,password_guessing
+evt-026,2026-06-22T10:01:40+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,burst failure 6,password_guessing
+evt-027,2026-06-22T10:02:00+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,burst failure 7,password_guessing
+evt-028,2026-06-22T10:02:20+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,burst failure 8,password_guessing
+evt-029,2026-06-22T10:02:40+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,burst failure 9,password_guessing
+evt-030,2026-06-22T10:03:00+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,burst failure 10,password_guessing
+evt-031,2026-06-22T11:00:00+07:00,authentication,user01,192.0.2.31,session,login,failed,POST /login,isolated failure,benign
+evt-032,2026-06-22T11:10:00+07:00,authentication,user02,192.0.2.32,session,login,failed,POST /login,isolated failure,benign
+evt-033,2026-06-22T11:20:00+07:00,authentication,user03,192.0.2.33,session,login,failed,POST /login,isolated failure,benign
+evt-034,2026-06-22T11:30:00+07:00,authentication,user04,192.0.2.34,session,login,failed,POST /login,isolated failure,benign
+evt-035,2026-06-22T11:40:00+07:00,authentication,user05,192.0.2.35,session,login,failed,POST /login,isolated failure,benign
+evt-036,2026-06-22T11:50:00+07:00,authentication,user06,192.0.2.36,session,login,failed,POST /login,isolated failure,benign
+evt-037,2026-06-22T12:00:00+07:00,authentication,user07,192.0.2.37,session,login,failed,POST /login,isolated failure,benign
+evt-038,2026-06-22T12:10:00+07:00,authentication,user08,192.0.2.38,session,login,failed,POST /login,isolated failure,benign
+evt-039,2026-06-22T12:20:00+07:00,authentication,user09,192.0.2.39,session,login,failed,POST /login,isolated failure,benign
+evt-040,2026-06-22T12:30:00+07:00,authentication,user10,192.0.2.40,session,login,failed,POST /login,isolated failure,benign
+evt-041,2026-06-22T13:00:00+07:00,access,teller01,10.0.0.1,accounts,read,allowed,GET /accounts/1,authorized access,benign
+evt-042,2026-06-22T13:01:00+07:00,access,teller01,10.0.0.1,accounts,update,allowed,PUT /accounts/1,authorized access,benign
+evt-043,2026-06-22T13:02:00+07:00,access,auditor01,10.0.0.2,audit_logs,read,allowed,GET /audit,authorized access,benign
+evt-044,2026-06-22T13:03:00+07:00,access,admin01,10.0.0.3,users,delete,allowed,DELETE /users/9,authorized access,benign
+evt-045,2026-06-22T13:04:00+07:00,authorization,teller01,10.0.0.1,accounts,read,allowed,RBAC check,authorized check,benign
+evt-046,2026-06-22T13:05:00+07:00,authorization,teller01,10.0.0.1,accounts,update,allowed,RBAC check,authorized check,benign
+evt-047,2026-06-22T13:06:00+07:00,authorization,auditor01,10.0.0.2,audit_logs,read,allowed,RBAC check,authorized check,benign
+evt-048,2026-06-22T13:07:00+07:00,authorization,admin01,10.0.0.3,accounts,read,allowed,RBAC check,authorized check,benign
+evt-049,2026-06-22T13:08:00+07:00,access,auditor01,10.0.0.2,accounts,read,allowed,GET /accounts/2,authorized access,benign
+evt-050,2026-06-22T13:09:00+07:00,access,admin01,10.0.0.3,audit_logs,read,allowed,GET /audit,authorized access,benign
+evt-051,2026-06-22T14:00:00+07:00,access,teller01,10.0.0.1,users,delete,denied,DELETE /users/2,missing permission,unauthorized_access
+evt-052,2026-06-22T14:01:00+07:00,access,auditor01,10.0.0.2,accounts,update,denied,PUT /accounts/2,missing permission,unauthorized_access
+evt-053,2026-06-22T14:02:00+07:00,access,disabled01,10.0.0.4,accounts,read,denied,GET /accounts/3,inactive user,unauthorized_access
+evt-054,2026-06-22T14:03:00+07:00,authorization,missing,10.0.0.5,accounts,read,denied,RBAC check,unknown user,unauthorized_access
+evt-055,2026-06-22T14:04:00+07:00,access,teller01,10.0.0.1,audit_logs,read,denied,GET /audit,missing permission,unauthorized_access
+evt-056,2026-06-22T14:05:00+07:00,access,auditor01,10.0.0.2,users,delete,denied,DELETE /users/3,missing permission,unauthorized_access
+evt-057,2026-06-22T14:06:00+07:00,authorization,disabled01,10.0.0.4,accounts,update,denied,RBAC check,inactive user,unauthorized_access
+evt-058,2026-06-22T14:07:00+07:00,access,missing,10.0.0.5,audit_logs,read,denied,GET /audit,unknown user,unauthorized_access
+evt-059,2026-06-22T14:08:00+07:00,access,teller01,10.0.0.1,users,delete,denied,DELETE /users/4,missing permission,unauthorized_access
+evt-060,2026-06-22T14:09:00+07:00,access,auditor01,10.0.0.2,accounts,update,denied,PUT /accounts/4,missing permission,unauthorized_access

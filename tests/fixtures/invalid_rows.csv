@@ -1,0 +1,2 @@
+event_id,timestamp,event_type,user,ip,resource,action,status,request,details,expected_label
+bad-001,not-a-timestamp,access,teller01,10.0.0.1,accounts,read,allowed,GET /accounts,invalid timestamp,benign

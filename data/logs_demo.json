@@ -1,0 +1,54 @@
+[
+  {
+    "event_id": "json-001",
+    "timestamp": "2026-06-22T08:00:00+07:00",
+    "event_type": "authentication",
+    "user": "teller01",
+    "ip": "10.0.0.1",
+    "resource": "session",
+    "action": "login",
+    "status": "success",
+    "request": "POST /login",
+    "details": "normal login",
+    "expected_label": "benign"
+  },
+  {
+    "event_id": "json-002",
+    "timestamp": "2026-06-22T09:00:00+07:00",
+    "event_type": "access",
+    "user": "",
+    "ip": "203.0.113.11",
+    "resource": "accounts",
+    "action": "read",
+    "status": "denied",
+    "request": "' OR 1=1 --",
+    "details": "tautology attempt",
+    "expected_label": "sql_injection"
+  },
+  {
+    "event_id": "json-003",
+    "timestamp": "2026-06-22T10:00:00+07:00",
+    "event_type": "authentication",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "status": "failed",
+    "request": "POST /login",
+    "details": "failed login sample",
+    "expected_label": "password_guessing"
+  },
+  {
+    "event_id": "json-004",
+    "timestamp": "2026-06-22T14:00:00+07:00",
+    "event_type": "access",
+    "user": "teller01",
+    "ip": "10.0.0.1",
+    "resource": "users",
+    "action": "delete",
+    "status": "denied",
+    "request": "DELETE /users/2",
+    "details": "missing permission",
+    "expected_label": "unauthorized_access"
+  }
+]
