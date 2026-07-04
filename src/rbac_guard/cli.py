@@ -30,6 +30,11 @@ def _parser() -> argparse.ArgumentParser:
     analyze_command.add_argument("--log", type=Path, required=True)
     analyze_command.add_argument("--config", type=Path, required=True)
     analyze_command.add_argument("--output", type=Path, required=True)
+    analyze_command.add_argument(
+        "--context-risk",
+        action="store_true",
+        help="enable context-aware risk findings and incident reports",
+    )
 
     evaluate = commands.add_parser("evaluate", help="evaluate alerts against labeled events")
     evaluate.add_argument("--alerts", type=Path, required=True)
@@ -53,13 +58,20 @@ def main(argv: list[str] | None = None) -> int:
             print("ALLOWED" if granted else "DENIED")
         elif arguments.command == "analyze":
             result = analyze(
-                arguments.db, arguments.log, arguments.config, arguments.output
+                arguments.db,
+                arguments.log,
+                arguments.config,
+                arguments.output,
+                context_risk=arguments.context_risk,
             )
-            print(
+            message = (
                 f"Analyzed {result.metadata.valid_rows} valid events; "
                 f"{result.metadata.invalid_rows} invalid rows; "
                 f"{result.metadata.alert_count} alerts"
             )
+            if arguments.context_risk:
+                message += f"; {len(result.incidents)} incidents"
+            print(message)
         elif arguments.command == "evaluate":
             metrics = evaluate_artifacts(arguments.events, arguments.alerts, arguments.output)
             macro = metrics["macro_average"]

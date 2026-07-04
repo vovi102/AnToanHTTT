@@ -72,3 +72,28 @@ def test_cli_returns_code_two_without_traceback_for_bad_input(tmp_path: Path) ->
     assert result.returncode == 2
     assert "error:" in result.stderr.lower()
     assert "traceback" not in result.stderr.lower()
+
+
+def test_cli_analyze_supports_context_risk(tmp_path: Path) -> None:
+    db_path = tmp_path / "rbac.db"
+    output_dir = tmp_path / "artifacts"
+
+    initialized = _run("init-db", "--db", str(db_path), "--seed", "data/rbac_seed.json")
+    analyzed = _run(
+        "analyze",
+        "--db",
+        str(db_path),
+        "--log",
+        "data/logs_demo.csv",
+        "--config",
+        "config/default.toml",
+        "--output",
+        str(output_dir),
+        "--context-risk",
+    )
+
+    assert initialized.returncode == 0
+    assert analyzed.returncode == 0
+    assert "incidents" in analyzed.stdout
+    assert (output_dir / "context_findings.json").exists()
+    assert (output_dir / "incidents.json").exists()

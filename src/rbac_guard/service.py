@@ -5,7 +5,8 @@ from datetime import datetime
 from pathlib import Path
 
 from rbac_guard.config import load_config
-from rbac_guard.models import Alert, RowError, RunMetadata
+from rbac_guard.context import BehaviorProfiler, build_incidents
+from rbac_guard.models import Alert, ContextFinding, Incident, RowError, RunMetadata
 from rbac_guard.parser import parse_events
 from rbac_guard.rbac import RBACRepository
 from rbac_guard.reporting import write_reports
@@ -23,6 +24,8 @@ class AnalysisResult:
     alerts: tuple[Alert, ...]
     metadata: RunMetadata
     row_errors: tuple[RowError, ...]
+    context_findings: tuple[ContextFinding, ...] = ()
+    incidents: tuple[Incident, ...] = ()
 
 
 def analyze(
@@ -31,6 +34,7 @@ def analyze(
     config_path: Path,
     output_dir: Path,
     run_at: datetime | None = None,
+    context_risk: bool = False,
 ) -> AnalysisResult:
     """Parse, detect, score and report a log collection."""
     config = load_config(config_path)
@@ -46,6 +50,13 @@ def analyze(
     findings = engine.detect(parsed.events)
     scorer = RiskScorer(config)
     alerts = tuple(scorer.score(finding) for finding in findings)
+    context_findings: tuple[ContextFinding, ...] = ()
+    incidents: tuple[Incident, ...] = ()
+    if context_risk or config.context_enabled:
+        context_findings = BehaviorProfiler(config).analyze(parsed.events)
+        context_alerts = tuple(scorer.score_context(finding) for finding in context_findings)
+        alerts = tuple(sorted(alerts + context_alerts, key=lambda item: item.timestamp))
+        incidents = build_incidents(alerts, config.context_window_seconds, scorer)
     metadata = RunMetadata(
         run_at=run_at or datetime.now().astimezone(),
         source_file=str(log_path),
@@ -55,5 +66,11 @@ def analyze(
         invalid_rows=len(parsed.errors),
         alert_count=len(alerts),
     )
-    write_reports(output_dir, alerts, metadata)
-    return AnalysisResult(alerts=alerts, metadata=metadata, row_errors=parsed.errors)
+    write_reports(output_dir, alerts, metadata, context_findings, incidents)
+    return AnalysisResult(
+        alerts=alerts,
+        metadata=metadata,
+        row_errors=parsed.errors,
+        context_findings=context_findings,
+        incidents=incidents,
+    )
