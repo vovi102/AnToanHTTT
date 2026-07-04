@@ -7,3 +7,13 @@ medium = 30
 high = 60
 critical = 85
 
+[context]
+enabled = false
+business_start_hour = 8
+business_end_hour = 18
+window_seconds = 300
+new_ip_bonus = 10
+after_hours_bonus = 8
+rare_resource_bonus = 8
+repeated_denial_bonus = 12
+session_chain_bonus = 15
