@@ -2,8 +2,9 @@ from datetime import datetime
 from pathlib import Path
 
 from rbac_guard.config import load_config
-from rbac_guard.context import BehaviorProfiler
-from rbac_guard.models import Event
+from rbac_guard.context import BehaviorProfiler, build_incidents
+from rbac_guard.models import Alert, Event
+from rbac_guard.scoring import RiskScorer
 
 
 def _event(
@@ -89,3 +90,53 @@ def test_profiler_flags_repeated_denials_in_window() -> None:
     assert denial.event_ids == ("evt-1", "evt-2", "evt-3")
     assert "denials_in_window=3" in denial.evidence
     assert denial.bonus == 12
+
+
+def test_build_incidents_groups_related_alerts_by_user_ip_and_window() -> None:
+    config = load_config(Path("config/default.toml"))
+    alerts = (
+        Alert(
+            alert_id="alert-1",
+            timestamp=datetime.fromisoformat("2026-06-22T09:00:00+07:00"),
+            rule_id="CTX-NEW-IP",
+            risk_type="context_anomaly",
+            user="teller01",
+            ip="198.51.100.50",
+            resource="session",
+            action="login",
+            evidence="new_ip_for_user=true",
+            risk_score=51,
+            severity="Medium",
+            event_ids=("evt-1",),
+            context_signals=("CTX-NEW-IP",),
+            context_evidence=("new_ip_for_user=true",),
+        ),
+        Alert(
+            alert_id="alert-2",
+            timestamp=datetime.fromisoformat("2026-06-22T09:03:00+07:00"),
+            rule_id="RBAC-UNAUTHORIZED",
+            risk_type="unauthorized_access",
+            user="teller01",
+            ip="198.51.100.50",
+            resource="users",
+            action="delete",
+            evidence="permission=users:delete",
+            risk_score=84,
+            severity="High",
+            event_ids=("evt-2",),
+        ),
+    )
+
+    incidents = build_incidents(alerts, config.context_window_seconds, RiskScorer(config))
+
+    assert len(incidents) == 1
+    incident = incidents[0]
+    assert incident.user == "teller01"
+    assert incident.ip == "198.51.100.50"
+    assert incident.risk_score == 99
+    assert incident.severity == "Critical"
+    assert incident.risk_types == ("context_anomaly", "unauthorized_access")
+    assert incident.event_ids == ("evt-1", "evt-2")
+    assert incident.alert_ids == ("alert-1", "alert-2")
+    assert "teller01 from 198.51.100.50" in incident.summary
+    assert "new_ip_for_user=true" in incident.evidence

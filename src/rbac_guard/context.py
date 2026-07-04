@@ -1,9 +1,11 @@
 """Context-aware behavior profiling and incident helpers."""
 
 from collections import defaultdict, deque
+import hashlib
 
 from rbac_guard.config import AppConfig
-from rbac_guard.models import ContextFinding, Event
+from rbac_guard.models import Alert, ContextFinding, Event, Incident
+from rbac_guard.scoring import RiskScorer
 
 
 class BehaviorProfiler:
@@ -141,3 +143,76 @@ class BehaviorProfiler:
             confidence=confidence,
             bonus=bonus,
         )
+
+
+def build_incidents(
+    alerts: tuple[Alert, ...], window_seconds: int, scorer: RiskScorer
+) -> tuple[Incident, ...]:
+    """Group related alerts by user/IP and nearby timestamps."""
+    grouped: dict[tuple[str | None, str], list[Alert]] = defaultdict(list)
+    for alert in sorted(alerts, key=lambda item: item.timestamp):
+        grouped[(alert.user, alert.ip)].append(alert)
+
+    incidents: list[Incident] = []
+    for group_alerts in grouped.values():
+        segment: list[Alert] = []
+        for alert in group_alerts:
+            gap_exceeded = bool(
+                segment
+                and (alert.timestamp - segment[-1].timestamp).total_seconds() > window_seconds
+            )
+            if gap_exceeded:
+                incidents.append(_incident_from_segment(segment, scorer))
+                segment = []
+            segment.append(alert)
+        if segment:
+            incidents.append(_incident_from_segment(segment, scorer))
+
+    return tuple(sorted(incidents, key=lambda item: (item.start_time, item.incident_id)))
+
+
+def _incident_from_segment(segment: list[Alert], scorer: RiskScorer) -> Incident:
+    event_ids = _ordered_unique(
+        event_id for alert in segment for event_id in alert.event_ids
+    )
+    alert_ids = tuple(alert.alert_id for alert in segment)
+    evidence = _ordered_unique(
+        item
+        for alert in segment
+        for item in ((alert.evidence,) + alert.context_evidence)
+        if item
+    )
+    risk_types = tuple(sorted({alert.risk_type for alert in segment}))
+    chain_bonus = scorer.config.session_chain_bonus if len(segment) > 1 else 0
+    risk_score = min(100, max(alert.risk_score for alert in segment) + chain_bonus)
+    digest = hashlib.sha256(":".join(alert_ids).encode("utf-8")).hexdigest()[:12]
+    first = segment[0]
+    last = segment[-1]
+    return Incident(
+        incident_id=f"incident-{digest}",
+        user=first.user,
+        ip=first.ip,
+        start_time=first.timestamp,
+        end_time=last.timestamp,
+        severity=scorer.severity(risk_score),
+        risk_score=risk_score,
+        risk_types=risk_types,
+        event_ids=event_ids,
+        alert_ids=alert_ids,
+        summary=(
+            f"{first.user or 'unknown'} from {first.ip} triggered "
+            f"{len(segment)} alerts across {', '.join(risk_types)}"
+        ),
+        evidence=evidence,
+    )
+
+
+def _ordered_unique(values) -> tuple[str, ...]:
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        ordered.append(value)
+    return tuple(ordered)

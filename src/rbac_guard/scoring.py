@@ -3,13 +3,14 @@
 import hashlib
 
 from rbac_guard.config import AppConfig
-from rbac_guard.models import Alert, Finding
+from rbac_guard.models import Alert, ContextFinding, Finding
 
 
 BASE_SCORES = {
     "sql_injection": 45,
     "password_guessing": 40,
     "unauthorized_access": 50,
+    "context_anomaly": 25,
 }
 
 
@@ -48,4 +49,31 @@ class RiskScorer:
             risk_score=risk_score,
             severity=self.severity(risk_score),
             event_ids=finding.event_ids,
+            base_score=base,
+        )
+
+    def score_context(self, finding: ContextFinding) -> Alert:
+        base = BASE_SCORES[finding.risk_type]
+        confidence_points = round(20 * finding.confidence)
+        risk_score = min(100, max(0, base + confidence_points + finding.bonus))
+        digest = hashlib.sha256(
+            f"{finding.signal_id}:{':'.join(finding.event_ids)}".encode("utf-8")
+        ).hexdigest()[:12]
+        return Alert(
+            alert_id=f"alert-{digest}",
+            timestamp=finding.timestamp,
+            rule_id=finding.signal_id,
+            risk_type=finding.risk_type,
+            user=finding.user,
+            ip=finding.ip,
+            resource=finding.resource,
+            action=finding.action,
+            evidence=finding.evidence,
+            risk_score=risk_score,
+            severity=self.severity(risk_score),
+            event_ids=finding.event_ids,
+            base_score=base,
+            context_bonus=finding.bonus,
+            context_signals=(finding.signal_id,),
+            context_evidence=(finding.evidence,),
         )
