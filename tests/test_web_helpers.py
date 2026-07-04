@@ -1,4 +1,4 @@
-from rbac_guard.web import count_alerts, filter_alert_rows
+from rbac_guard.web import count_alerts, filter_alert_rows, filter_incident_rows
 
 
 ALERTS = [
@@ -18,3 +18,30 @@ def test_count_alerts_groups_by_requested_field() -> None:
         "unauthorized_access": 1,
     }
     assert count_alerts([], "severity") == {}
+
+
+def test_filter_incident_rows_applies_user_severity_risk_and_signal() -> None:
+    rows = [
+        {
+            "incident_id": "i1",
+            "user": "teller01",
+            "severity": "Critical",
+            "risk_types": ["context_anomaly", "unauthorized_access"],
+            "context_signals": ["CTX-NEW-IP"],
+        },
+        {
+            "incident_id": "i2",
+            "user": "auditor01",
+            "severity": "High",
+            "risk_types": ["context_anomaly"],
+            "context_signals": ["CTX-AFTER-HOURS"],
+        },
+    ]
+
+    assert filter_incident_rows(
+        rows,
+        users={"teller01"},
+        risk_types={"unauthorized_access"},
+        severities={"Critical"},
+        context_signals={"CTX-NEW-IP"},
+    ) == [rows[0]]

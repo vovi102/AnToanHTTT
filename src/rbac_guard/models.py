@@ -88,6 +88,7 @@ class Incident:
     severity: str
     risk_score: int
     risk_types: tuple[str, ...]
+    context_signals: tuple[str, ...]
     event_ids: tuple[str, ...]
     alert_ids: tuple[str, ...]
     summary: str

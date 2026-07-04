@@ -52,6 +52,28 @@ def test_profiler_flags_new_ip_after_user_baseline_exists() -> None:
     assert findings[0].bonus == 10
 
 
+def test_profiler_flags_new_ip_only_once_per_observed_ip() -> None:
+    findings = _profiler().analyze(
+        (
+            _event("evt-1", "2026-06-22T09:00:00+07:00", ip="10.0.0.1"),
+            _event(
+                "evt-2",
+                "2026-06-22T09:05:00+07:00",
+                ip="198.51.100.50",
+                status="failed",
+            ),
+            _event(
+                "evt-3",
+                "2026-06-22T09:06:00+07:00",
+                ip="198.51.100.50",
+                status="failed",
+            ),
+        )
+    )
+
+    assert [finding.signal_id for finding in findings] == ["CTX-NEW-IP"]
+
+
 def test_profiler_flags_after_hours_activity() -> None:
     findings = _profiler().analyze(
         (_event("evt-1", "2026-06-22T22:15:00+07:00"),)
@@ -136,6 +158,7 @@ def test_build_incidents_groups_related_alerts_by_user_ip_and_window() -> None:
     assert incident.risk_score == 99
     assert incident.severity == "Critical"
     assert incident.risk_types == ("context_anomaly", "unauthorized_access")
+    assert incident.context_signals == ("CTX-NEW-IP",)
     assert incident.event_ids == ("evt-1", "evt-2")
     assert incident.alert_ids == ("alert-1", "alert-2")
     assert "teller01 from 198.51.100.50" in incident.summary

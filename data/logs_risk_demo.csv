@@ -1,0 +1,15 @@
+event_id,timestamp,event_type,user,ip,resource,action,status,request,details,expected_label
+risk-001,2026-06-22T09:00:00+07:00,authentication,teller01,10.0.0.1,session,login,success,POST /login,baseline teller login,benign
+risk-002,2026-06-22T09:01:00+07:00,access,teller01,10.0.0.1,accounts,read,success,GET /accounts,baseline teller account read,benign
+risk-003,2026-06-22T09:02:00+07:00,authentication,auditor01,10.0.0.2,session,login,success,POST /login,baseline auditor login,benign
+risk-004,2026-06-22T09:03:00+07:00,access,auditor01,10.0.0.2,audit_logs,read,success,GET /audit_logs,baseline auditor audit read,benign
+risk-005,2026-06-22T22:00:00+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,new ip after-hours failed login,context_anomaly
+risk-006,2026-06-22T22:01:00+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,second failed login,password_guessing
+risk-007,2026-06-22T22:02:00+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,third failed login,password_guessing
+risk-008,2026-06-22T22:03:00+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,fourth failed login,password_guessing
+risk-009,2026-06-22T22:04:00+07:00,authentication,teller01,198.51.100.50,session,login,failed,POST /login,fifth failed login,password_guessing
+risk-010,2026-06-22T22:05:00+07:00,authorization,teller01,198.51.100.50,users,delete,denied,DELETE /users/42,unauthorized delete after failed logins,unauthorized_access
+risk-011,2026-06-22T11:00:00+07:00,access,auditor01,10.0.0.2,accounts,read,success,GET /accounts,rbac allowed but unusual resource,context_anomaly
+risk-012,2026-06-22T11:10:00+07:00,authorization,auditor01,10.0.0.2,accounts,update,denied,PATCH /accounts/7,first denied update,unauthorized_access
+risk-013,2026-06-22T11:11:00+07:00,authorization,auditor01,10.0.0.2,accounts,update,denied,PATCH /accounts/8,second denied update,unauthorized_access
+risk-014,2026-06-22T11:12:00+07:00,authorization,auditor01,10.0.0.2,accounts,update,denied,PATCH /accounts/9,third denied update,unauthorized_access

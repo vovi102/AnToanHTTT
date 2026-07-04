@@ -30,6 +30,19 @@ python3.11 -m venv .venv
 `analyze` tạo `alerts.csv`, `alerts.json` và `run_metadata.json`. `evaluate` tạo
 `metrics.json` từ nhãn kỳ vọng trong dataset; không chỉnh sửa các artifact bằng tay.
 
+## Demo nâng cấp: context-aware risk
+
+Chạy phân tích rủi ro có ngữ cảnh hành vi:
+
+```bash
+.venv/bin/rbac-guard analyze --db demo.db --log data/logs_risk_demo.csv --config config/default.toml --output artifacts --context-risk
+```
+
+Chế độ này giữ các alert rule-based hiện có và sinh thêm
+`context_findings.json`, `incidents.csv`, `incidents.json`. Dataset
+`logs_risk_demo.csv` có các kịch bản IP lạ, ngoài giờ làm việc, truy cập tài
+nguyên hiếm, repeated denials và chuỗi sự kiện cần gom thành incident.
+
 ## Cổng chất lượng lõi
 
 ```bash
@@ -50,3 +63,5 @@ Sau khi cài extra `web`, khởi động giao diện chỉ đọc:
 
 UI cho phép tải CSV/JSON, chạy cùng application service với CLI, lọc cảnh báo,
 xem thống kê theo risk type/severity và tải kết quả. UI không chỉnh sửa RBAC hoặc luật.
+Khi bật context-aware risk analysis, UI hiển thị thêm bảng incident và bộ lọc
+theo user, risk type, severity và context signal.

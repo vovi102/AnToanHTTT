@@ -117,8 +117,8 @@ class BehaviorProfiler:
     ) -> None:
         if event.user is None:
             return
+        known_ips[event.user].add(event.ip)
         if event.status == "success":
-            known_ips[event.user].add(event.ip)
             if event.event_type in {"access", "authorization"}:
                 known_resources[event.user].add(event.resource)
 
@@ -183,6 +183,9 @@ def _incident_from_segment(segment: list[Alert], scorer: RiskScorer) -> Incident
         if item
     )
     risk_types = tuple(sorted({alert.risk_type for alert in segment}))
+    context_signals = _ordered_unique(
+        signal for alert in segment for signal in alert.context_signals
+    )
     chain_bonus = scorer.config.session_chain_bonus if len(segment) > 1 else 0
     risk_score = min(100, max(alert.risk_score for alert in segment) + chain_bonus)
     digest = hashlib.sha256(":".join(alert_ids).encode("utf-8")).hexdigest()[:12]
@@ -197,6 +200,7 @@ def _incident_from_segment(segment: list[Alert], scorer: RiskScorer) -> Incident
         severity=scorer.severity(risk_score),
         risk_score=risk_score,
         risk_types=risk_types,
+        context_signals=context_signals,
         event_ids=event_ids,
         alert_ids=alert_ids,
         summary=(

@@ -78,6 +78,7 @@ def test_write_reports_writes_context_and_incident_artifacts(tmp_path: Path) -> 
         severity="Critical",
         risk_score=99,
         risk_types=("context_anomaly", "unauthorized_access"),
+        context_signals=("CTX-NEW-IP",),
         event_ids=("evt-1", "evt-2"),
         alert_ids=("alert-1", "alert-2"),
         summary="teller01 from 198.51.100.50 triggered 2 alerts",
@@ -93,4 +94,5 @@ def test_write_reports_writes_context_and_incident_artifacts(tmp_path: Path) -> 
 
     assert context_rows[0]["signal_id"] == "CTX-NEW-IP"
     assert incident_rows[0]["event_ids"] == ["evt-1", "evt-2"]
+    assert incident_rows[0]["context_signals"] == ["CTX-NEW-IP"]
     assert csv_rows[0]["risk_types"] == "context_anomaly|unauthorized_access"

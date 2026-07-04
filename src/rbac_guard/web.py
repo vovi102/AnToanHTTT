@@ -29,12 +29,37 @@ def count_alerts(rows: Iterable[dict[str, Any]], field: str) -> dict[str, int]:
     return counts
 
 
+def filter_incident_rows(
+    rows: Iterable[dict[str, Any]],
+    users: set[str],
+    risk_types: set[str],
+    severities: set[str],
+    context_signals: set[str],
+) -> list[dict[str, Any]]:
+    filtered: list[dict[str, Any]] = []
+    for row in rows:
+        row_risks = set(row.get("risk_types", []))
+        row_signals = set(row.get("context_signals", []))
+        user = str(row.get("user") or "")
+        if users and user not in users:
+            continue
+        if risk_types and not (row_risks & risk_types):
+            continue
+        if severities and row.get("severity") not in severities:
+            continue
+        if context_signals and not (row_signals & context_signals):
+            continue
+        filtered.append(row)
+    return filtered
+
+
 def main() -> None:
     st.set_page_config(page_title="RBAC Guard", layout="wide")
     st.title("RBAC Guard – Security Log Analysis")
     uploaded = st.file_uploader("Log CSV/JSON", type=["csv", "json"])
     db_path = Path(st.text_input("SQLite RBAC database", "demo.db"))
     config_path = Path(st.text_input("Configuration", "config/default.toml"))
+    context_risk = st.checkbox("Context-aware risk analysis")
 
     if st.button("Analyze", type="primary", disabled=uploaded is None):
         try:
@@ -44,15 +69,30 @@ def main() -> None:
                 log_path = temporary_path / uploaded.name
                 log_path.write_bytes(uploaded.getvalue())
                 output_dir = temporary_path / "artifacts"
-                result = analyze(db_path, log_path, config_path, output_dir)
+                result = analyze(
+                    db_path, log_path, config_path, output_dir, context_risk=context_risk
+                )
                 st.session_state["alerts"] = json.loads(
                     (output_dir / "alerts.json").read_text(encoding="utf-8")
                 )
+                st.session_state["incidents"] = (
+                    json.loads((output_dir / "incidents.json").read_text(encoding="utf-8"))
+                    if (output_dir / "incidents.json").exists()
+                    else []
+                )
                 st.session_state["alerts_csv"] = (output_dir / "alerts.csv").read_bytes()
                 st.session_state["alerts_json"] = (output_dir / "alerts.json").read_bytes()
+                if (output_dir / "incidents.csv").exists():
+                    st.session_state["incidents_csv"] = (
+                        output_dir / "incidents.csv"
+                    ).read_bytes()
+                    st.session_state["incidents_json"] = (
+                        output_dir / "incidents.json"
+                    ).read_bytes()
                 st.success(
                     f"{result.metadata.valid_rows} valid events; "
-                    f"{result.metadata.alert_count} alerts"
+                    f"{result.metadata.alert_count} alerts; "
+                    f"{len(result.incidents)} incidents"
                 )
         except (AssertionError, FileNotFoundError, KeyError, ValueError) as error:
             st.error(str(error) or "No input file was provided")
@@ -81,6 +121,55 @@ def main() -> None:
     st.download_button(
         "Download JSON", st.session_state["alerts_json"], "alerts.json", "application/json"
     )
+
+    incidents = st.session_state.get("incidents", [])
+    if incidents:
+        st.subheader("Incidents")
+        user_options = sorted({str(row.get("user") or "") for row in incidents})
+        incident_risk_options = sorted(
+            {risk for row in incidents for risk in row.get("risk_types", [])}
+        )
+        incident_severity_options = sorted({row["severity"] for row in incidents})
+        signal_options = sorted(
+            {signal for row in incidents for signal in row.get("context_signals", [])}
+        )
+        selected_users = set(st.multiselect("Incident user", user_options, default=user_options))
+        selected_incident_risks = set(
+            st.multiselect(
+                "Incident risk type",
+                incident_risk_options,
+                default=incident_risk_options,
+            )
+        )
+        selected_incident_severities = set(
+            st.multiselect(
+                "Incident severity",
+                incident_severity_options,
+                default=incident_severity_options,
+            )
+        )
+        selected_signals = set(
+            st.multiselect("Context signal", signal_options, default=signal_options)
+        )
+        filtered_incidents = filter_incident_rows(
+            incidents,
+            selected_users,
+            selected_incident_risks,
+            selected_incident_severities,
+            selected_signals,
+        )
+        st.dataframe(pd.DataFrame(filtered_incidents), use_container_width=True, hide_index=True)
+        st.download_button(
+            "Download Incidents CSV",
+            st.session_state["incidents_csv"],
+            "incidents.csv",
+        )
+        st.download_button(
+            "Download Incidents JSON",
+            st.session_state["incidents_json"],
+            "incidents.json",
+            "application/json",
+        )
 
 
 if __name__ == "__main__":

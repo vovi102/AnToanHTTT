@@ -38,6 +38,7 @@ INCIDENT_FIELDS = [
     "severity",
     "risk_score",
     "risk_types",
+    "context_signals",
     "event_ids",
     "alert_ids",
     "summary",
@@ -66,6 +67,7 @@ def _incident_record(incident: Incident) -> dict[str, Any]:
     record["start_time"] = incident.start_time.isoformat()
     record["end_time"] = incident.end_time.isoformat()
     record["risk_types"] = list(incident.risk_types)
+    record["context_signals"] = list(incident.context_signals)
     record["event_ids"] = list(incident.event_ids)
     record["alert_ids"] = list(incident.alert_ids)
     record["evidence"] = list(incident.evidence)
@@ -126,6 +128,7 @@ def write_reports(
                 {
                     **record,
                     "risk_types": "|".join(record["risk_types"]),
+                    "context_signals": "|".join(record["context_signals"]),
                     "event_ids": "|".join(record["event_ids"]),
                     "alert_ids": "|".join(record["alert_ids"]),
                     "evidence": "|".join(record["evidence"]),
