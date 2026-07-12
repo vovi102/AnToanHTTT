@@ -1,0 +1,122 @@
+\section{Phương pháp}
+\label{sec:methodology}
+
+\subsection{Ký hiệu và chuẩn hóa sự kiện}
+\label{subsec:event-normalization}
+
+Gọi $e=(id,t,u,ip,r,a,s,q)$ là một event đã được parser chấp nhận, lần lượt
+gồm định danh, thời gian, người dùng (có thể rỗng), địa chỉ IP, tài nguyên,
+hành động, trạng thái và chuỗi request. Parser chỉ nhận CSV hoặc mảng JSON có
+đủ các trường của schema; dòng sai định dạng được ghi nhận là lỗi dòng và không
+đi vào các bước phát hiện. Trường \texttt{expected\_label} vẫn bắt buộc trong
+dataset demo để đánh giá, nhưng không xuất hiện trong hàm phát hiện hay hàm
+chấm điểm.
+
+Mỗi phát hiện $f$ mang một loại rủi ro, các event IDs nguồn, evidence và độ tin
+cậy $c\in[0,1]$. Bộ chấm điểm chuyển $f$ thành alert $a_f$; do đó alert luôn
+giữ liên kết trở lại event thay vì chỉ chứa một nhãn tổng quát.
+
+\subsection{Kiểm tra quyền RBAC}
+\label{subsec:rbac-checking}
+
+Với username $u$, tài nguyên $r$ và hành động $a$, predicate quyền của nguyên
+mẫu là
+\begin{equation}
+  P(u,r,a)=1 \Longleftrightarrow \exists \rho:\ (u,\rho)\in UR
+  \ \land\ (\rho,(r,a))\in RP\ \land\ \mathrm{active}(u),
+  \label{eq:rbac-permission}
+\end{equation}
+trong đó $UR$ là gán người dùng--vai trò và $RP$ là gán vai trò--quyền trong
+SQLite. Predicate này được truy vấn cho các event có \texttt{event\_type} là
+\texttt{access} hoặc \texttt{authorization} và có người dùng. Luật
+\texttt{RBAC-UNAUTHORIZED} phát hiện khi
+\begin{equation}
+  \neg P(u,r,a)\ \lor\ (s=\texttt{denied}).
+  \label{eq:unauthorized-rule}
+\end{equation}
+Vì vậy, cả một yêu cầu không được RBAC cấp quyền lẫn một event log ghi nhận bị
+từ chối đều được giữ lại làm bằng chứng. Đây là kiểm tra hậu kiểm trong pipeline,
+không phải điểm quyết định cấp quyền trực tuyến.
+
+\subsection{Phát hiện theo luật}
+\label{subsec:detection-rules}
+
+\textbf{SQL injection.} Với mỗi request, nguyên mẫu kiểm tra tuần tự một danh
+sách biểu thức chính quy cho tautology, \texttt{union select}, truy vấn xếp
+chồng và SQL comment. Mỗi event sinh nhiều nhất một finding, tại mẫu đầu tiên
+khớp; evidence chứa tên mẫu và phần request đã cắt ngắn. Các chỉ báo này là
+heuristic có thể giải thích, không phải bộ phòng vệ SQL injection hoàn chỉnh
+\citep{OWASPSQLi}.
+
+\textbf{Đoán mật khẩu.} Các event \texttt{authentication} được sắp xếp theo
+thời gian và phân nhóm theo $(u,ip)$. Trong từng nhóm, một đoạn thất bại kết
+thúc khi có đăng nhập thành công hoặc khi khoảng cách giữa hai event liên tiếp
+lớn hơn cửa sổ $W_p$. Một finding \texttt{AUTH-PASSWORD-GUESSING} được tạo nếu
+trong đoạn có một cửa sổ trượt đạt ít nhất $N_p$ event thất bại. Với cấu hình
+thực nghiệm, $N_p=5$ và $W_p=300$ giây. Finding giữ toàn bộ event IDs của đoạn
+để evidence có thể được rà soát.
+
+\textbf{Truy cập trái phép.} Luật trong \eqref{eq:unauthorized-rule} chạy độc
+lập với hai luật trên. Các finding sau đó được sắp xếp xác định theo thời gian,
+loại rủi ro và rule ID trước khi đưa vào bước chấm điểm.
+
+\subsection{Tín hiệu rủi ro theo ngữ cảnh}
+\label{subsec:context-signals}
+
+Khi tùy chọn context-risk được bật, profiler duyệt event theo thời gian và chỉ
+học baseline từ các event đã quan sát trước đó. Bốn tín hiệu có thể giải thích
+là: (i) \texttt{CTX-AFTER-HOURS} nếu giờ event nằm ngoài $[h_s,h_e)$; (ii)
+\texttt{CTX-NEW-IP} nếu IP chưa từng thấy cho người dùng nhưng baseline IP đã
+có; (iii) \texttt{CTX-RARE-RESOURCE} nếu event là access/authorization và tài
+nguyên chưa từng được người dùng truy cập thành công; và (iv)
+\texttt{CTX-REPEATED-DENIAL} khi đúng event từ chối thứ ba của cùng $(u,ip)$
+nằm trong cửa sổ $W_c$. Các giá trị mặc định là $h_s=8$, $h_e=18$ và
+$W_c=300$ giây. Sau khi xử lý một event, profiler mới thêm IP vào baseline và
+chỉ thêm tài nguyên khi event thành công; nhờ đó event đầu tiên không tự tạo tín
+hiệu IP/tài nguyên mới.
+
+\subsection{Chấm điểm và phân mức}
+\label{subsec:risk-scoring}
+
+Với finding theo luật, điểm alert được tính xác định bằng
+\begin{equation}
+  R_f=\min\{100,\ B_k+\operatorname{round}(20c)
+  +\min(15,3\max(0,n-1))+15d\},
+  \label{eq:rule-score}
+\end{equation}
+trong đó $B_k\in\{45,40,50\}$ lần lượt cho SQL injection, password guessing
+và unauthorized access; $n$ là số lần lặp của finding và $d=1$ khi RBAC từ
+chối, ngược lại bằng 0. Với context finding, công thức là
+\begin{equation}
+  R_c=\min\{100,\ 25+\operatorname{round}(20c)+b_s\},
+  \label{eq:context-score}
+\end{equation}
+trong đó $b_s$ là bonus theo signal (mặc định 10 cho IP mới, 8 cho ngoài giờ và
+tài nguyên hiếm, 12 cho từ chối lặp lại). Theo cấu hình, mức Medium, High và
+Critical bắt đầu tại 30, 60 và 85; điểm thấp hơn 30 là Low.
+
+\subsection{Gom nhóm incident}
+\label{subsec:incident-grouping}
+
+Các alert chỉ được gom thành incident khi context-risk được bật. Như
+Hình~\ref{fig:event-alert-incident}, thuật toán phân vùng alert theo $(u,ip)$,
+sắp xếp mỗi phân vùng theo timestamp và bắt đầu đoạn mới nếu khoảng cách với
+alert ngay trước lớn hơn $W_c$. Với một đoạn $G$, điểm incident là
+\begin{equation}
+  R_I=\min\{100,\max_{a\in G}R_a + 15\,\mathbf{1}(|G|>1)\}.
+  \label{eq:incident-score}
+\end{equation}
+Incident thu thập theo thứ tự không lặp các event IDs, alert IDs, evidence,
+loại rủi ro và signal ngữ cảnh của đoạn. Hai trường \texttt{start\_time} và
+\texttt{end\_time} là thời gian alert đầu/cuối của đoạn, không phải một timeline
+pháp chứng chi tiết.
+
+\begin{figure}[t]
+  \centering
+  \resizebox{0.98\linewidth}{!}{\input{figures/event_alert_incident.tex}}
+  \caption{Luồng từ event sang alert và incident. Alert được phân vùng theo cặp
+  người dùng--IP rồi sắp xếp theo thời gian. Trong mỗi phân vùng, một khoảng
+  cách lớn hơn cửa sổ $W$ tạo incident mới; các trường thời gian chỉ là
+  start/end của đoạn, không phải timeline pháp chứng chi tiết.}
+  \label{fig:event-alert-incident}
+\end{figure}

@@ -1,0 +1,24 @@
+% Quy tắc build_incidents trong src/rbac_guard/context.py.
+\begin{tikzpicture}[
+  font=\footnotesize,
+  >=Latex,
+  node distance=8mm and 11mm,
+  entity/.style={draw, rounded corners=2pt, align=center, minimum height=12mm,
+    text width=29mm, fill=blue!7},
+  grouping/.style={draw, rounded corners=2pt, align=center, minimum height=13mm,
+    text width=34mm, fill=orange!14},
+  result/.style={draw, rounded corners=2pt, align=center, minimum height=15mm,
+    text width=34mm, fill=green!11},
+  flow/.style={->, line width=.55pt}
+]
+  \node[entity] (events) {Event\\ID, thời gian, user, IP,\\request, trạng thái};
+  \node[entity, right=of events] (alerts) {Alert\\rule/signal, evidence,\\điểm, mức độ, event IDs};
+  \node[grouping, right=of alerts] (partition) {Phân vùng theo\\$(user, IP)$; sắp xếp\\theo thời gian};
+  \node[grouping, below=of partition] (segment) {Tạo đoạn mới khi\\khoảng cách $> W$;\\$W=300$ giây trong cấu hình};
+  \node[result, right=16mm of segment] (incident) {Incident\\IDs alert/event, evidence,\\start/end, điểm, mức độ};
+
+  \draw[flow] (events) -- node[above, align=center] {luật và\\ngữ cảnh} (alerts);
+  \draw[flow] (alerts) -- (partition);
+  \draw[flow] (partition) -- (segment);
+  \draw[flow] (segment) -- node[above, align=center, font=\scriptsize] {max alert +\\bonus chuỗi} (incident);
+\end{tikzpicture}

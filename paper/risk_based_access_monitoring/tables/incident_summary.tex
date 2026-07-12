@@ -1,0 +1,22 @@
+\begin{table*}[t]
+  \centering
+  \small
+  \caption{Tóm tắt incident tái sinh từ \texttt{artifacts/cp3-context/incidents.json}. Thời gian là hai mốc \texttt{start\_time} và \texttt{end\_time} do chương trình ghi nhận, không phải timeline chi tiết.}
+  \label{tab:incident-summary}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{llllp{5.2cm}}
+    \toprule
+    Incident & Khoảng thời gian & Severity & Sự kiện/cảnh báo & Evidence đã ghi nhận \\
+    \midrule
+    \texttt{incident-36b0fb3f2301} & 11:00--11:00 & Medium & 1 / 1 &
+    Tài nguyên hiếm: \texttt{auditor01} truy cập \texttt{accounts}. \\
+    \texttt{incident-08588ec64267} & 11:10--11:12 & Critical & 3 / 4 &
+    Ba truy cập \texttt{accounts:update} bị từ chối trong cửa sổ 300 giây;
+    kèm tín hiệu CTX-REPEATED-DENIAL. \\
+    \texttt{incident-38dfcb846bfe} & 22:00--22:05 & Critical & 6 / 10 &
+    Ngoài giờ, IP mới, chuỗi năm lần đoán mật khẩu, truy cập \texttt{users:delete}
+    bị từ chối và tài nguyên hiếm. \\
+    \bottomrule
+  \end{tabular}%
+  }
+\end{table*}

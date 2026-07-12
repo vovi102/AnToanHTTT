@@ -1,0 +1,348 @@
+[
+  {
+    "alert_id": "alert-c25f3b77e421",
+    "timestamp": "2026-06-22T11:00:00+07:00",
+    "rule_id": "CTX-RARE-RESOURCE",
+    "risk_type": "context_anomaly",
+    "user": "auditor01",
+    "ip": "10.0.0.2",
+    "resource": "accounts",
+    "action": "read",
+    "evidence": "rare_resource_for_user=true; user=auditor01; resource=accounts",
+    "risk_score": 47,
+    "severity": "Medium",
+    "event_ids": [
+      "risk-011"
+    ],
+    "base_score": 25,
+    "context_bonus": 8,
+    "context_signals": [
+      "CTX-RARE-RESOURCE"
+    ],
+    "context_evidence": [
+      "rare_resource_for_user=true; user=auditor01; resource=accounts"
+    ]
+  },
+  {
+    "alert_id": "alert-eaf59d8db58d",
+    "timestamp": "2026-06-22T11:10:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "auditor01",
+    "ip": "10.0.0.2",
+    "resource": "accounts",
+    "action": "update",
+    "evidence": "permission=accounts:update; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "risk-012"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-95181f748522",
+    "timestamp": "2026-06-22T11:11:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "auditor01",
+    "ip": "10.0.0.2",
+    "resource": "accounts",
+    "action": "update",
+    "evidence": "permission=accounts:update; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "risk-013"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-f4e49394873f",
+    "timestamp": "2026-06-22T11:12:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "auditor01",
+    "ip": "10.0.0.2",
+    "resource": "accounts",
+    "action": "update",
+    "evidence": "permission=accounts:update; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "risk-014"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-14a80291ae49",
+    "timestamp": "2026-06-22T11:12:00+07:00",
+    "rule_id": "CTX-REPEATED-DENIAL",
+    "risk_type": "context_anomaly",
+    "user": "auditor01",
+    "ip": "10.0.0.2",
+    "resource": "accounts",
+    "action": "update",
+    "evidence": "denials_in_window=3; window_seconds=300",
+    "risk_score": 54,
+    "severity": "Medium",
+    "event_ids": [
+      "risk-012",
+      "risk-013",
+      "risk-014"
+    ],
+    "base_score": 25,
+    "context_bonus": 12,
+    "context_signals": [
+      "CTX-REPEATED-DENIAL"
+    ],
+    "context_evidence": [
+      "denials_in_window=3; window_seconds=300"
+    ]
+  },
+  {
+    "alert_id": "alert-24a043e74df3",
+    "timestamp": "2026-06-22T22:00:00+07:00",
+    "rule_id": "CTX-AFTER-HOURS",
+    "risk_type": "context_anomaly",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "after_hours=true; hour=22; business_hours=08:00-18:00",
+    "risk_score": 48,
+    "severity": "Medium",
+    "event_ids": [
+      "risk-005"
+    ],
+    "base_score": 25,
+    "context_bonus": 8,
+    "context_signals": [
+      "CTX-AFTER-HOURS"
+    ],
+    "context_evidence": [
+      "after_hours=true; hour=22; business_hours=08:00-18:00"
+    ]
+  },
+  {
+    "alert_id": "alert-703e9ade670f",
+    "timestamp": "2026-06-22T22:00:00+07:00",
+    "rule_id": "CTX-NEW-IP",
+    "risk_type": "context_anomaly",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "new_ip_for_user=true; user=teller01; ip=198.51.100.50",
+    "risk_score": 51,
+    "severity": "Medium",
+    "event_ids": [
+      "risk-005"
+    ],
+    "base_score": 25,
+    "context_bonus": 10,
+    "context_signals": [
+      "CTX-NEW-IP"
+    ],
+    "context_evidence": [
+      "new_ip_for_user=true; user=teller01; ip=198.51.100.50"
+    ]
+  },
+  {
+    "alert_id": "alert-65c7edc9255f",
+    "timestamp": "2026-06-22T22:01:00+07:00",
+    "rule_id": "CTX-AFTER-HOURS",
+    "risk_type": "context_anomaly",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "after_hours=true; hour=22; business_hours=08:00-18:00",
+    "risk_score": 48,
+    "severity": "Medium",
+    "event_ids": [
+      "risk-006"
+    ],
+    "base_score": 25,
+    "context_bonus": 8,
+    "context_signals": [
+      "CTX-AFTER-HOURS"
+    ],
+    "context_evidence": [
+      "after_hours=true; hour=22; business_hours=08:00-18:00"
+    ]
+  },
+  {
+    "alert_id": "alert-7ba3a03e7dc1",
+    "timestamp": "2026-06-22T22:02:00+07:00",
+    "rule_id": "CTX-AFTER-HOURS",
+    "risk_type": "context_anomaly",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "after_hours=true; hour=22; business_hours=08:00-18:00",
+    "risk_score": 48,
+    "severity": "Medium",
+    "event_ids": [
+      "risk-007"
+    ],
+    "base_score": 25,
+    "context_bonus": 8,
+    "context_signals": [
+      "CTX-AFTER-HOURS"
+    ],
+    "context_evidence": [
+      "after_hours=true; hour=22; business_hours=08:00-18:00"
+    ]
+  },
+  {
+    "alert_id": "alert-31f60fe34dfc",
+    "timestamp": "2026-06-22T22:03:00+07:00",
+    "rule_id": "CTX-AFTER-HOURS",
+    "risk_type": "context_anomaly",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "after_hours=true; hour=22; business_hours=08:00-18:00",
+    "risk_score": 48,
+    "severity": "Medium",
+    "event_ids": [
+      "risk-008"
+    ],
+    "base_score": 25,
+    "context_bonus": 8,
+    "context_signals": [
+      "CTX-AFTER-HOURS"
+    ],
+    "context_evidence": [
+      "after_hours=true; hour=22; business_hours=08:00-18:00"
+    ]
+  },
+  {
+    "alert_id": "alert-f48d20e60293",
+    "timestamp": "2026-06-22T22:04:00+07:00",
+    "rule_id": "AUTH-PASSWORD-GUESSING",
+    "risk_type": "password_guessing",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "count=5; first=2026-06-22T22:00:00+07:00; last=2026-06-22T22:04:00+07:00; user=teller01; ip=198.51.100.50",
+    "risk_score": 68,
+    "severity": "High",
+    "event_ids": [
+      "risk-005",
+      "risk-006",
+      "risk-007",
+      "risk-008",
+      "risk-009"
+    ],
+    "base_score": 40,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-f3d29f802c40",
+    "timestamp": "2026-06-22T22:04:00+07:00",
+    "rule_id": "CTX-AFTER-HOURS",
+    "risk_type": "context_anomaly",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "after_hours=true; hour=22; business_hours=08:00-18:00",
+    "risk_score": 48,
+    "severity": "Medium",
+    "event_ids": [
+      "risk-009"
+    ],
+    "base_score": 25,
+    "context_bonus": 8,
+    "context_signals": [
+      "CTX-AFTER-HOURS"
+    ],
+    "context_evidence": [
+      "after_hours=true; hour=22; business_hours=08:00-18:00"
+    ]
+  },
+  {
+    "alert_id": "alert-b400bee63981",
+    "timestamp": "2026-06-22T22:05:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "users",
+    "action": "delete",
+    "evidence": "permission=users:delete; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "risk-010"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-989f1262df82",
+    "timestamp": "2026-06-22T22:05:00+07:00",
+    "rule_id": "CTX-AFTER-HOURS",
+    "risk_type": "context_anomaly",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "users",
+    "action": "delete",
+    "evidence": "after_hours=true; hour=22; business_hours=08:00-18:00",
+    "risk_score": 48,
+    "severity": "Medium",
+    "event_ids": [
+      "risk-010"
+    ],
+    "base_score": 25,
+    "context_bonus": 8,
+    "context_signals": [
+      "CTX-AFTER-HOURS"
+    ],
+    "context_evidence": [
+      "after_hours=true; hour=22; business_hours=08:00-18:00"
+    ]
+  },
+  {
+    "alert_id": "alert-9593b962c096",
+    "timestamp": "2026-06-22T22:05:00+07:00",
+    "rule_id": "CTX-RARE-RESOURCE",
+    "risk_type": "context_anomaly",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "users",
+    "action": "delete",
+    "evidence": "rare_resource_for_user=true; user=teller01; resource=users",
+    "risk_score": 47,
+    "severity": "Medium",
+    "event_ids": [
+      "risk-010"
+    ],
+    "base_score": 25,
+    "context_bonus": 8,
+    "context_signals": [
+      "CTX-RARE-RESOURCE"
+    ],
+    "context_evidence": [
+      "rare_resource_for_user=true; user=teller01; resource=users"
+    ]
+  }
+]

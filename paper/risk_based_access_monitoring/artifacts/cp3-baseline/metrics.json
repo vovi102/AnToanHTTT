@@ -1,0 +1,36 @@
+{
+  "by_risk_type": {
+    "sql_injection": {
+      "tp": 9,
+      "fp": 0,
+      "fn": 1,
+      "tn": 50,
+      "precision": 1.0,
+      "recall": 0.9,
+      "f1": 0.9474
+    },
+    "password_guessing": {
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "tn": 50,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "unauthorized_access": {
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "tn": 50,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  },
+  "macro_average": {
+    "precision": 1.0,
+    "recall": 0.9667,
+    "f1": 0.9825
+  }
+}

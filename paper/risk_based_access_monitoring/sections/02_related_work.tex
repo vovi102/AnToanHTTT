@@ -1,0 +1,77 @@
+\section{Các nghiên cứu liên quan}
+\label{sec:related-work}
+
+\subsection{Kiểm soát truy cập dựa trên vai trò}
+\label{subsec:rbac}
+
+RBAC là một mô hình kiểm soát truy cập được sử dụng rộng rãi, trong đó quyền
+được gán cho vai trò thay vì gán trực tiếp cho người dùng. Mô hình RBAC ban đầu
+do Ferraiolo và Kuhn đề xuất \citep{Ferraiolo1992RBAC} cùng họ mô hình RBAC96
+của Sandhu và cộng sự \citep{Sandhu1996RBAC} cung cấp nền tảng khái niệm cho
+quan hệ người dùng--vai trò--quyền được sử dụng trong nguyên mẫu này. Nghiên cứu
+này sử dụng RBAC lõi, chưa xét phân cấp vai trò hoặc ràng buộc phân tách nhiệm
+vụ.
+
+\subsection{Quản lý nhật ký bảo mật}
+\label{subsec:log-management}
+
+Nhật ký bảo mật cung cấp bằng chứng cho giám sát, điều tra và phản ứng. NIST SP
+800-92 nhấn mạnh rằng tổ chức cần quy trình và hạ tầng để quản lý nhật ký bảo
+mật máy tính một cách hiệu quả \citep{Kent2006SP80092}. Trong bài báo này, nhật
+ký được xem như tập sự kiện có cấu trúc, có thể được phân tích, kiểm tra hợp lệ
+và chuyển đổi thành phát hiện cũng như sự cố. Khía cạnh audit và accountability
+cũng xuất hiện như một họ kiểm soát độc lập trong NIST SP 800-53
+\citep{JTF2020SP80053}, nhưng nguyên mẫu chỉ minh họa việc phân tích log, không
+nhằm chứng minh tuân thủ một bộ kiểm soát.
+
+\subsection{Phát hiện theo luật và SQL injection}
+\label{subsec:rule-detection}
+
+SQL injection vẫn là một rủi ro phổ biến của ứng dụng web khi đầu vào người dùng
+được đưa vào truy vấn cơ sở dữ liệu mà không tham số hóa đúng cách. OWASP khuyến
+nghị sử dụng prepared statement, stored procedure, kiểm tra danh sách cho phép
+và nguyên tắc đặc quyền tối thiểu như các biện pháp phòng vệ chính
+\citep{OWASPSQLi}. Nguyên mẫu không thay thế các kiểm soát lập trình an toàn;
+nó chỉ phát hiện một số chỉ báo SQL injection trong nhật ký nhằm phục vụ giám
+sát và trình diễn.
+
+\subsection{Giám sát dựa trên rủi ro}
+\label{subsec:risk-monitoring}
+
+Giám sát dựa trên rủi ro mở rộng quyết định nhị phân cho phép/từ chối bằng cách
+xem xét ngữ cảnh như hành vi người dùng, IP nguồn, thời điểm và lịch sử sự kiện
+gần đây. NIST SP 800-207 đặt trọng tâm bảo vệ vào người dùng, tài sản và tài
+nguyên, thay vì giả định sự tin cậy dựa trên vị trí mạng \citep{Rose2020SP800207}.
+NIST SP 800-63B cũng cho phép dùng chỉ báo gian lận, chẳng hạn IP hoặc vị trí
+địa lý không mong đợi, làm tín hiệu cho kiểm soát xác thực bổ sung
+\citep{NIST2025SP80063B}. Tổng quan hệ thống của Xiao và cộng sự cho thấy
+RBAC có thể là nguồn ngữ cảnh trong thiết kế access control có xét rủi ro, dù
+các tiếp cận tinh hạt thường thiên về ABAC \citep{Xiao2022ContextRisk}.
+
+Nguyên mẫu trong bài báo không thay đổi quyết định cấp quyền tại thời gian thực.
+Thay vào đó, nó dùng RBAC như một nguồn bằng chứng để hậu kiểm nhật ký và ưu
+tiên hóa cảnh báo. Vì vậy, các tín hiệu IP mới, ngoài giờ, tài nguyên hiếm và
+từ chối lặp lại được biểu diễn bởi heuristic theo luật có thể giải thích, không
+phải một mô hình học máy hay một cơ chế access control thích nghi.
+
+\subsection{Tương quan cảnh báo và phân loại sự cố}
+\label{subsec:alert-correlation}
+
+Một cảnh báo đơn lẻ hiếm khi mô tả đầy đủ một cuộc tấn công nhiều bước. Valdes
+và Skinner nghiên cứu tương quan cảnh báo theo hướng xác suất
+\citep{Valdes2001AlertCorrelation}; Zhou và cộng sự mô hình hóa quan hệ logic
+giữa các alert để nhận diện alert cùng thuộc một intrusion
+\citep{Zhou2007AlertCorrelation}. Trái với những mô hình correlation tổng quát
+đó, RBAC Guard áp dụng quy tắc gom nhóm đơn giản theo cặp người dùng--IP và cửa
+sổ thời gian. Lựa chọn này giảm phạm vi nhưng giúp evidence, IDs sự kiện và
+điểm rủi ro của mỗi incident dễ kiểm tra trong môi trường học tập.
+
+\subsection{Liên hệ với kịch bản tấn công}
+\label{subsec:attack-scenarios}
+
+Kịch bản đoán mật khẩu tương ứng với kỹ thuật Brute Force (T1110) trong ATT\&CK
+\citep{MITRET1110}. Các chỉ báo SQL injection được dùng như dấu hiệu quan sát
+trong request log; chúng không khẳng định khai thác thành công, nhưng phù hợp
+với phạm vi giám sát một ứng dụng public-facing có thể bị khai thác
+\citep{MITRET1190}. Các mapping này chỉ phục vụ mô tả kịch bản đánh giá, không
+phải tuyên bố hệ thống bao phủ đầy đủ ATT\&CK.

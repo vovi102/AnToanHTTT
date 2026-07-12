@@ -1,0 +1,166 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+
+% T5 không được cài như một gói độc lập trong môi trường TeX này, dù font
+% Latin Modern T5 đã có. Khai báo cục bộ các ký tự tiếng Việt để pdfLaTeX không
+% làm rơi dấu mũ, móc, râu và dấu thanh khi xử lý UTF-8.
+\makeatletter
+\DeclareFontEncoding{T5}{}{}
+\DeclareFontSubstitution{T5}{lmr}{m}{n}
+\DeclareTextAccent{\`}{T5}{0}
+\DeclareTextAccent{\'}{T5}{1}
+\DeclareTextAccent{\^}{T5}{2}
+\DeclareTextAccent{\~}{T5}{3}
+\DeclareTextAccent{\u}{T5}{8}
+\DeclareTextAccent{\.}{T5}{10}
+\DeclareTextAccent{\h}{T5}{12}
+\DeclareTextCommand{\d}{T5}[1]{\hmode@bgroup\o@lign{\relax#1\crcr\hidewidth\ltx@sh@ft{-1ex}.\hidewidth}\egroup}
+% Dấu râu (\texttt{ơ}, \texttt{ư}); không được thay bằng ký tự cơ sở.
+\DeclareTextCommand{\horn}{T5}[1]{\TextSymbolUnavailable{\horn{#1}}#1}
+\DeclareTextSymbol{\ACIRCUMFLEX}{T5}{133}
+\DeclareTextSymbol{\ABREVE}{T5}{139}
+\DeclareTextSymbol{\ECIRCUMFLEX}{T5}{150}
+\DeclareTextSymbol{\OCIRCUMFLEX}{T5}{198}
+\DeclareTextSymbol{\OHORN}{T5}{204}
+\DeclareTextSymbol{\UHORN}{T5}{215}
+\DeclareTextSymbol{\acircumflex}{T5}{165}
+\DeclareTextSymbol{\abreve}{T5}{171}
+\DeclareTextSymbol{\ecircumflex}{T5}{182}
+\DeclareTextSymbol{\ocircumflex}{T5}{230}
+\DeclareTextSymbol{\ohorn}{T5}{236}
+\DeclareTextSymbol{\uhorn}{T5}{247}
+\DeclareTextSymbol{\DJ}{T5}{30}
+\DeclareTextSymbol{\dj}{T5}{31}
+\DeclareTextComposite{\horn}{T5}{O}{204}
+\DeclareTextComposite{\horn}{T5}{U}{215}
+\DeclareTextComposite{\horn}{T5}{o}{236}
+\DeclareTextComposite{\horn}{T5}{u}{247}
+\DeclareTextComposite{\`}{T5}{\ACIRCUMFLEX}{134}
+\DeclareTextComposite{\'}{T5}{\ACIRCUMFLEX}{135}
+\DeclareTextComposite{\~}{T5}{\ACIRCUMFLEX}{136}
+\DeclareTextComposite{\h}{T5}{\ACIRCUMFLEX}{137}
+\DeclareTextComposite{\d}{T5}{\ACIRCUMFLEX}{138}
+\DeclareTextComposite{\`}{T5}{\ABREVE}{140}
+\DeclareTextComposite{\'}{T5}{\ABREVE}{141}
+\DeclareTextComposite{\~}{T5}{\ABREVE}{142}
+\DeclareTextComposite{\h}{T5}{\ABREVE}{143}
+\DeclareTextComposite{\d}{T5}{\ABREVE}{144}
+\DeclareTextComposite{\`}{T5}{\ECIRCUMFLEX}{151}
+\DeclareTextComposite{\'}{T5}{\ECIRCUMFLEX}{152}
+\DeclareTextComposite{\~}{T5}{\ECIRCUMFLEX}{153}
+\DeclareTextComposite{\h}{T5}{\ECIRCUMFLEX}{154}
+\DeclareTextComposite{\d}{T5}{\ECIRCUMFLEX}{155}
+\DeclareTextComposite{\`}{T5}{\OCIRCUMFLEX}{199}
+\DeclareTextComposite{\'}{T5}{\OCIRCUMFLEX}{200}
+\DeclareTextComposite{\~}{T5}{\OCIRCUMFLEX}{201}
+\DeclareTextComposite{\h}{T5}{\OCIRCUMFLEX}{202}
+\DeclareTextComposite{\d}{T5}{\OCIRCUMFLEX}{203}
+\DeclareTextComposite{\`}{T5}{\OHORN}{205}
+\DeclareTextComposite{\'}{T5}{\OHORN}{206}
+\DeclareTextComposite{\~}{T5}{\OHORN}{207}
+\DeclareTextComposite{\h}{T5}{\OHORN}{208}
+\DeclareTextComposite{\d}{T5}{\OHORN}{209}
+\DeclareTextComposite{\`}{T5}{\UHORN}{216}
+\DeclareTextComposite{\'}{T5}{\UHORN}{217}
+\DeclareTextComposite{\~}{T5}{\UHORN}{218}
+\DeclareTextComposite{\h}{T5}{\UHORN}{219}
+\DeclareTextComposite{\d}{T5}{\UHORN}{220}
+\DeclareTextComposite{\`}{T5}{\acircumflex}{166}
+\DeclareTextComposite{\'}{T5}{\acircumflex}{167}
+\DeclareTextComposite{\~}{T5}{\acircumflex}{168}
+\DeclareTextComposite{\h}{T5}{\acircumflex}{169}
+\DeclareTextComposite{\d}{T5}{\acircumflex}{170}
+\DeclareTextComposite{\`}{T5}{\abreve}{172}
+\DeclareTextComposite{\'}{T5}{\abreve}{173}
+\DeclareTextComposite{\~}{T5}{\abreve}{174}
+\DeclareTextComposite{\h}{T5}{\abreve}{175}
+\DeclareTextComposite{\d}{T5}{\abreve}{176}
+\DeclareTextComposite{\`}{T5}{\ecircumflex}{183}
+\DeclareTextComposite{\'}{T5}{\ecircumflex}{184}
+\DeclareTextComposite{\~}{T5}{\ecircumflex}{185}
+\DeclareTextComposite{\h}{T5}{\ecircumflex}{186}
+\DeclareTextComposite{\d}{T5}{\ecircumflex}{187}
+\DeclareTextComposite{\`}{T5}{\ocircumflex}{231}
+\DeclareTextComposite{\'}{T5}{\ocircumflex}{232}
+\DeclareTextComposite{\~}{T5}{\ocircumflex}{233}
+\DeclareTextComposite{\h}{T5}{\ocircumflex}{234}
+\DeclareTextComposite{\d}{T5}{\ocircumflex}{235}
+\DeclareTextComposite{\`}{T5}{\ohorn}{237}
+\DeclareTextComposite{\'}{T5}{\ohorn}{238}
+\DeclareTextComposite{\~}{T5}{\ohorn}{239}
+\DeclareTextComposite{\h}{T5}{\ohorn}{240}
+\DeclareTextComposite{\d}{T5}{\ohorn}{241}
+\DeclareTextComposite{\`}{T5}{\uhorn}{248}
+\DeclareTextComposite{\'}{T5}{\uhorn}{249}
+\DeclareTextComposite{\~}{T5}{\uhorn}{250}
+\DeclareTextComposite{\h}{T5}{\uhorn}{251}
+\DeclareTextComposite{\d}{T5}{\uhorn}{252}
+\renewcommand{\encodingdefault}{T5}
+\fontencoding{T5}\selectfont
+\makeatother
+
+\geometry{margin=2.5cm}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!50!black,
+  citecolor=blue!50!black,
+  urlcolor=blue!50!black
+}
+
+\lstdefinestyle{cli}{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  columns=fullflexible
+}
+
+\renewcommand{\abstractname}{Tóm tắt}
+\renewcommand{\refname}{Tài liệu tham khảo}
+\renewcommand{\figurename}{Hình}
+\renewcommand{\tablename}{Bảng}
+
+\title{Giám sát truy cập dựa trên rủi ro với RBAC, phân tích nhật ký bảo mật và chấm điểm theo ngữ cảnh}
+\author{Tác giả ẩn danh}
+\date{Ngày \number\day~tháng \number\month~năm \number\year}
+
+\begin{document}
+
+\fontencoding{T5}\selectfont
+
+\maketitle
+
+\input{sections/00_abstract}
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_system_model}
+\input{sections/04_methodology}
+\input{sections/05_implementation}
+\input{sections/06_evaluation}
+\input{sections/07_discussion}
+\input{sections/08_conclusion}
+
+\section*{Tuyên bố về việc sử dụng AI}
+Bản thảo khung này được chuẩn bị với sự hỗ trợ của công cụ viết học thuật dùng
+AI. Tác giả chịu trách nhiệm kiểm chứng toàn bộ lập luận, trích dẫn, kết quả
+thực nghiệm và cách diễn đạt cuối cùng trước khi nộp.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

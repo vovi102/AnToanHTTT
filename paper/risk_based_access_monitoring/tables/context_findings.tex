@@ -1,0 +1,17 @@
+\begin{table}[t]
+  \centering
+  \caption{Các phát hiện ngữ cảnh tái sinh trên 14 sự kiện tổng hợp. Số lượng lấy từ \texttt{artifacts/cp3-context/context\_findings.json}.}
+  \label{tab:context-findings}
+  \begin{tabular}{lrrr}
+    \toprule
+    Tín hiệu ngữ cảnh & Số finding & Confidence & Context bonus \\
+    \midrule
+    Ngoài giờ (CTX-AFTER-HOURS) & 6 & 0.75 & 8 \\
+    IP mới (CTX-NEW-IP) & 1 & 0.80 & 10 \\
+    Tài nguyên hiếm (CTX-RARE-RESOURCE) & 2 & 0.70 & 8 \\
+    Từ chối lặp lại (CTX-REPEATED-DENIAL) & 1 & 0.85 & 12 \\
+    \midrule
+    Tổng & 10 & -- & -- \\
+    \bottomrule
+  \end{tabular}
+\end{table}

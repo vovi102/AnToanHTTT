@@ -1,0 +1,93 @@
+\section{Mô hình hệ thống và kiến trúc}
+\label{sec:system-model}
+
+\subsection{Mô hình đe dọa và phạm vi}
+\label{subsec:threat-model}
+
+Nguyên mẫu là một công cụ hậu kiểm nhật ký cho ứng dụng kiểu ngân hàng. Nó giả
+định một dịch vụ nguồn đã ghi sự kiện theo sơ đồ quy định và nhà vận hành cung
+cấp cơ sở dữ liệu RBAC cùng cấu hình đã được kiểm soát. Việc thu thập, chuẩn hóa
+và phân tích nhật ký là một phần quan trọng của điều tra sự cố
+\citep{Kent2006SP80092}; ở đây, các bước đó được thu gọn thành một pipeline
+nhỏ có thể tái lập, không phải kiến trúc quản lý log đầy đủ.
+
+Kẻ tấn công trong phạm vi có thể tạo ra các hành vi để lại dấu vết trong nhật
+ký: gửi yêu cầu chứa chỉ báo SQL injection, lặp lại xác thực thất bại, hoặc cố
+gắng truy cập/phân quyền không phù hợp. Các kịch bản này tương ứng với dấu hiệu
+khai thác ứng dụng công khai và brute force ở mức quan sát được
+\citep{OWASPSQLi,MITRET1190,MITRET1110}. Mục tiêu là tạo cảnh báo có evidence
+và ưu tiên chúng để hỗ trợ triage, không phải xác nhận một cuộc tấn công thành
+công.
+
+\subsection{Đầu vào, đầu ra và ranh giới tin cậy}
+\label{subsec:trust-boundary}
+
+Đầu vào không tin cậy là tệp nhật ký CSV hoặc JSON; các trường như user, IP,
+request và status được parser kiểm tra trước khi chuyển thành event. Nhãn
+\texttt{expected\_label} trong các tệp demo chỉ là nhãn đánh giá và không đi
+vào quyết định phát hiện. CSDL SQLite chứa trạng thái người dùng--vai trò--quyền
+và tệp TOML chứa ngưỡng, cửa sổ thời gian và điểm cộng; hai thành phần này thuộc
+ranh giới tin cậy của lần chạy. Ranh giới đó cũng bao gồm mã nguồn dịch vụ và thư
+mục xuất report. Do đó, kết quả chỉ đáng tin cậy khi RBAC seed, cấu hình và
+nguồn log được nhà vận hành bảo vệ khỏi sửa đổi.
+
+Đầu ra gồm alert theo luật hoặc theo ngữ cảnh, metadata của lần chạy và, khi
+bật context-risk, context finding cùng incident. Mỗi alert giữ định danh event
+và evidence; mỗi incident giữ các alert/event IDs, evidence, điểm và hai mốc
+thời gian của đoạn nhóm. Thiết kế này làm rõ đường truy vết từ report về input,
+nhưng không thay thế cơ chế toàn vẹn, ký số hoặc lưu trữ bất biến của log.
+
+\subsection{Phạm vi phát hiện và các điều không xử lý}
+\label{subsec:scope-limitations}
+
+Nguyên mẫu tập trung vào ba nhóm rủi ro trong nhật ký ứng dụng kiểu ngân hàng:
+
+\begin{enumerate}
+  \item Dấu hiệu SQL injection trong chuỗi yêu cầu.
+  \item Đoán mật khẩu, được biểu diễn bằng nhiều lần đăng nhập thất bại.
+  \item Truy cập trái phép, được biểu diễn bằng hành động bị RBAC hoặc trạng
+  thái nhật ký từ chối.
+\end{enumerate}
+
+Hệ thống không xử lý dữ liệu ngân hàng thật, không thực thi quyết định cấp quyền
+trực tuyến, không bảo vệ kênh thu thập log, không chống giả mạo/sửa đổi log và
+không triển khai tương quan đa nguồn, điều tra pháp chứng hay phản ứng tự động.
+Nó cũng không học mô hình hành vi hoặc đánh giá độ chính xác trên dữ liệu vận
+hành. Đây là minh chứng ý tưởng theo hướng giảng dạy, nhằm làm cho mỗi cảnh báo
+có thể truy vết đến sự kiện, luật và bằng chứng ngữ cảnh; một triển khai zero
+trust vận hành sẽ cần các kiểm soát rộng hơn \citep{Rose2020SP800207,JTF2020SP80053}.
+
+\subsection{Kiến trúc}
+\label{subsec:architecture}
+
+Hình~\ref{fig:architecture} tóm tắt pipeline xử lý.
+
+\begin{figure}[t]
+  \centering
+  \resizebox{\linewidth}{!}{\input{figures/architecture.tex}}
+  \caption{Kiến trúc pipeline của nguyên mẫu. Parser chuẩn hóa nhật ký; bộ máy
+  luật dùng dữ liệu RBAC khi cần; profiler ngữ cảnh chỉ được kích hoạt trong
+  chế độ context-risk. Các phát hiện được chấm điểm trước khi reporter ghi
+  alert, finding và incident thành hiện vật CSV/JSON.}
+  \label{fig:architecture}
+\end{figure}
+
+Giao diện dòng lệnh và giao diện người dùng Streamlit là các adapter phía trên
+một dịch vụ ứng dụng dùng chung. Dịch vụ này phân tích nhật ký đầu vào, khởi tạo
+các luật phát hiện, tính toán tín hiệu ngữ cảnh khi bật chế độ tương ứng, chấm
+điểm phát hiện, gom nhóm sự cố và ghi các hiện vật báo cáo.
+
+\subsection{Mô hình dữ liệu}
+\label{subsec:data-model}
+
+Mỗi sự kiện gồm định danh, dấu thời gian, loại sự kiện, người dùng, IP nguồn,
+tài nguyên, hành động, trạng thái, yêu cầu và chi tiết. Các dataset đánh giá
+trong kho mã nguồn cung cấp thêm nhãn kỳ vọng; parser hiện yêu cầu trường này,
+nhưng logic phát hiện không dùng nhãn để quyết định cảnh báo. Dữ liệu RBAC được
+lưu trong các bảng SQLite cho người
+dùng, vai trò, quyền, gán người dùng--vai trò và gán vai trò--quyền.
+
+Mô hình đầu ra gồm cảnh báo và sự cố. Cảnh báo biểu diễn từng phát hiện theo
+luật hoặc theo ngữ cảnh. Sự cố gom nhóm các cảnh báo liên quan theo người dùng,
+IP và cửa sổ thời gian, đồng thời chứa phần tóm tắt, điểm rủi ro, mức độ nghiêm
+trọng, định danh sự kiện nguồn và chuỗi bằng chứng.

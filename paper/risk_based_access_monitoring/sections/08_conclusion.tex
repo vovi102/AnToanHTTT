@@ -1,0 +1,18 @@
+\section{Kết luận}
+\label{sec:conclusion}
+
+Bài báo đã trình bày một nguyên mẫu giám sát truy cập dựa trên rủi ro, kết hợp
+RBAC, phân tích nhật ký có cấu trúc, phát hiện theo luật, chấm điểm ngữ cảnh và
+gom nhóm incident. Trên 60 sự kiện của tập baseline, nguyên mẫu sinh 20 cảnh
+báo, với precision macro 1{,}0000, recall macro 0{,}9667 và F1 macro 0{,}9825;
+thiếu sót duy nhất là một sự kiện SQL injection không khớp luật regex. Trên tập
+ngữ cảnh gồm 14 sự kiện hợp lệ, pipeline tạo 15 cảnh báo, 10 finding và 3
+incident có bằng chứng truy nguyên được. Vì hai tập đều là dữ liệu tổng hợp,
+các kết quả này chỉ chứng minh tính tái lập của các kịch bản đã thiết kế, không
+đại diện cho độ chính xác hay khả năng tổng quát hóa trong vận hành thực tế.
+
+Các bước tiếp theo là đánh giá trên nhật ký ẩn danh có nhãn độc lập, đo ảnh
+hưởng của drift, dữ liệu thiếu và proxy đến từng luật, và so sánh các ngưỡng
+trên cùng một giao thức đánh giá. Khi đó có thể cân nhắc hồ sơ hành vi bền
+vững, quản lý phiên bản luật, tích hợp luồng/SIEM và các mô hình học máy, với
+điều kiện vẫn duy trì khả năng giải thích và kiểm soát quyền riêng tư.

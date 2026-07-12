@@ -1,0 +1,411 @@
+[
+  {
+    "alert_id": "alert-86d2380fd690",
+    "timestamp": "2026-06-22T09:00:00+07:00",
+    "rule_id": "SQLI-TAUTOLOGY",
+    "risk_type": "sql_injection",
+    "user": null,
+    "ip": "203.0.113.11",
+    "resource": "accounts",
+    "action": "read",
+    "evidence": "pattern=tautology; request=' OR 1=1 --",
+    "risk_score": 64,
+    "severity": "High",
+    "event_ids": [
+      "evt-011"
+    ],
+    "base_score": 45,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-952ede3ff1b3",
+    "timestamp": "2026-06-22T09:01:00+07:00",
+    "rule_id": "SQLI-UNION",
+    "risk_type": "sql_injection",
+    "user": null,
+    "ip": "203.0.113.12",
+    "resource": "accounts",
+    "action": "read",
+    "evidence": "pattern=union-select; request=1 UNION SELECT password FROM users",
+    "risk_score": 64,
+    "severity": "High",
+    "event_ids": [
+      "evt-012"
+    ],
+    "base_score": 45,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-d4509cfdb06b",
+    "timestamp": "2026-06-22T09:02:00+07:00",
+    "rule_id": "SQLI-STACKED",
+    "risk_type": "sql_injection",
+    "user": null,
+    "ip": "203.0.113.13",
+    "resource": "accounts",
+    "action": "read",
+    "evidence": "pattern=stacked-query; request=1; DROP TABLE users",
+    "risk_score": 64,
+    "severity": "High",
+    "event_ids": [
+      "evt-013"
+    ],
+    "base_score": 45,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-617c753f107a",
+    "timestamp": "2026-06-22T09:03:00+07:00",
+    "rule_id": "SQLI-COMMENT",
+    "risk_type": "sql_injection",
+    "user": null,
+    "ip": "203.0.113.14",
+    "resource": "accounts",
+    "action": "read",
+    "evidence": "pattern=sql-comment; request=admin'--",
+    "risk_score": 64,
+    "severity": "High",
+    "event_ids": [
+      "evt-014"
+    ],
+    "base_score": 45,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-66215deb0ef4",
+    "timestamp": "2026-06-22T09:05:00+07:00",
+    "rule_id": "SQLI-UNION",
+    "risk_type": "sql_injection",
+    "user": null,
+    "ip": "203.0.113.16",
+    "resource": "accounts",
+    "action": "read",
+    "evidence": "pattern=union-select; request=0 UNION SELECT account_no FROM accounts",
+    "risk_score": 64,
+    "severity": "High",
+    "event_ids": [
+      "evt-016"
+    ],
+    "base_score": 45,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-276f0e1b7484",
+    "timestamp": "2026-06-22T09:06:00+07:00",
+    "rule_id": "SQLI-STACKED",
+    "risk_type": "sql_injection",
+    "user": null,
+    "ip": "203.0.113.17",
+    "resource": "accounts",
+    "action": "read",
+    "evidence": "pattern=stacked-query; request=2; DELETE FROM accounts",
+    "risk_score": 64,
+    "severity": "High",
+    "event_ids": [
+      "evt-017"
+    ],
+    "base_score": 45,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-497cb6acef96",
+    "timestamp": "2026-06-22T09:07:00+07:00",
+    "rule_id": "SQLI-COMMENT",
+    "risk_type": "sql_injection",
+    "user": null,
+    "ip": "203.0.113.18",
+    "resource": "accounts",
+    "action": "read",
+    "evidence": "pattern=sql-comment; request=user' #",
+    "risk_score": 64,
+    "severity": "High",
+    "event_ids": [
+      "evt-018"
+    ],
+    "base_score": 45,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-7f340dd43474",
+    "timestamp": "2026-06-22T09:08:00+07:00",
+    "rule_id": "SQLI-TAUTOLOGY",
+    "risk_type": "sql_injection",
+    "user": null,
+    "ip": "203.0.113.19",
+    "resource": "accounts",
+    "action": "read",
+    "evidence": "pattern=tautology; request=' OR 2>1 --",
+    "risk_score": 64,
+    "severity": "High",
+    "event_ids": [
+      "evt-019"
+    ],
+    "base_score": 45,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-606fb80291f1",
+    "timestamp": "2026-06-22T09:09:00+07:00",
+    "rule_id": "SQLI-UNION",
+    "risk_type": "sql_injection",
+    "user": null,
+    "ip": "203.0.113.20",
+    "resource": "accounts",
+    "action": "read",
+    "evidence": "pattern=union-select; request=5 UNION SELECT role FROM users",
+    "risk_score": 64,
+    "severity": "High",
+    "event_ids": [
+      "evt-020"
+    ],
+    "base_score": 45,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-3df64d138aa6",
+    "timestamp": "2026-06-22T10:03:00+07:00",
+    "rule_id": "AUTH-PASSWORD-GUESSING",
+    "risk_type": "password_guessing",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "count=10; first=2026-06-22T10:00:00+07:00; last=2026-06-22T10:03:00+07:00; user=teller01; ip=198.51.100.50",
+    "risk_score": 73,
+    "severity": "High",
+    "event_ids": [
+      "evt-021",
+      "evt-022",
+      "evt-023",
+      "evt-024",
+      "evt-025",
+      "evt-026",
+      "evt-027",
+      "evt-028",
+      "evt-029",
+      "evt-030"
+    ],
+    "base_score": 40,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-dc35f5fbe5b0",
+    "timestamp": "2026-06-22T14:00:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "teller01",
+    "ip": "10.0.0.1",
+    "resource": "users",
+    "action": "delete",
+    "evidence": "permission=users:delete; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "evt-051"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-4344d6cc4a6c",
+    "timestamp": "2026-06-22T14:01:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "auditor01",
+    "ip": "10.0.0.2",
+    "resource": "accounts",
+    "action": "update",
+    "evidence": "permission=accounts:update; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "evt-052"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-2890374b3e25",
+    "timestamp": "2026-06-22T14:02:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "disabled01",
+    "ip": "10.0.0.4",
+    "resource": "accounts",
+    "action": "read",
+    "evidence": "permission=accounts:read; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "evt-053"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-6a1316d5a043",
+    "timestamp": "2026-06-22T14:03:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "missing",
+    "ip": "10.0.0.5",
+    "resource": "accounts",
+    "action": "read",
+    "evidence": "permission=accounts:read; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "evt-054"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-82a0c8cd90d2",
+    "timestamp": "2026-06-22T14:04:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "teller01",
+    "ip": "10.0.0.1",
+    "resource": "audit_logs",
+    "action": "read",
+    "evidence": "permission=audit_logs:read; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "evt-055"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-a37cfb569f0e",
+    "timestamp": "2026-06-22T14:05:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "auditor01",
+    "ip": "10.0.0.2",
+    "resource": "users",
+    "action": "delete",
+    "evidence": "permission=users:delete; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "evt-056"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-1878b66460b2",
+    "timestamp": "2026-06-22T14:06:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "disabled01",
+    "ip": "10.0.0.4",
+    "resource": "accounts",
+    "action": "update",
+    "evidence": "permission=accounts:update; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "evt-057"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-b19baeaf8fe2",
+    "timestamp": "2026-06-22T14:07:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "missing",
+    "ip": "10.0.0.5",
+    "resource": "audit_logs",
+    "action": "read",
+    "evidence": "permission=audit_logs:read; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "evt-058"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-fd4d4693587b",
+    "timestamp": "2026-06-22T14:08:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "teller01",
+    "ip": "10.0.0.1",
+    "resource": "users",
+    "action": "delete",
+    "evidence": "permission=users:delete; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "evt-059"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  },
+  {
+    "alert_id": "alert-eaa334a2bc01",
+    "timestamp": "2026-06-22T14:09:00+07:00",
+    "rule_id": "RBAC-UNAUTHORIZED",
+    "risk_type": "unauthorized_access",
+    "user": "auditor01",
+    "ip": "10.0.0.2",
+    "resource": "accounts",
+    "action": "update",
+    "evidence": "permission=accounts:update; rbac_granted=false; log_status=denied",
+    "risk_score": 84,
+    "severity": "High",
+    "event_ids": [
+      "evt-060"
+    ],
+    "base_score": 50,
+    "context_bonus": 0,
+    "context_signals": [],
+    "context_evidence": []
+  }
+]

@@ -1,0 +1,63 @@
+\section{Giới thiệu}
+\label{sec:introduction}
+
+Ứng dụng ngân hàng số cung cấp các chức năng truy cập tài khoản, giao dịch, xác
+thực và quản trị thông qua các hệ thống hướng web. Những hệ thống này phải trả
+lời hai câu hỏi bổ sung cho nhau: người dùng có được phép thực hiện một hành
+động hay không, và chuỗi sự kiện quan sát được có biểu hiện hành vi đáng ngờ hay
+không. RBAC giải quyết câu hỏi thứ nhất bằng cách ánh xạ người dùng với vai trò
+và vai trò với quyền. Phân tích nhật ký bảo mật giải quyết câu hỏi thứ hai bằng
+cách lưu giữ bằng chứng sự kiện phục vụ phát hiện, điều tra và phản ứng. Các
+hướng dẫn về quản lý log cũng coi việc tổ chức thu thập và phân tích nhật ký là
+nền tảng cho điều tra sự cố \citep{Kent2006SP80092}.
+
+Động lực của nghiên cứu này xuất phát từ thực tế rằng trong các nguyên mẫu nhỏ,
+hai nguồn thông tin trên thường được xử lý tách biệt: logic kiểm soát truy cập
+chặn hoặc cho phép yêu cầu, còn phân tích nhật ký phát hiện mẫu mà không xét đến
+ngữ cảnh vai trò. Sự tách rời này làm giảm khả năng giải thích của cảnh báo. Ví
+dụ, một thao tác bị từ chối có thể là bình thường nếu người dùng không có quyền,
+nhưng nhiều lần bị từ chối từ một IP mới sau một số lần đăng nhập thất bại có
+thể cho thấy hành vi thăm dò. Ngược lại, một hành động được RBAC cho phép vẫn có
+thể rủi ro nếu diễn ra ngoài ngữ cảnh hành vi thông thường.
+
+Bài báo này trình bày RBAC Guard, một hệ thống minh chứng ý tưởng cho giám sát
+truy cập dựa trên rủi ro đối với nhật ký kiểu ngân hàng. Hệ thống kết hợp kiểm
+tra RBAC xác định, chỉ báo tấn công theo luật, tín hiệu hành vi theo ngữ cảnh và
+gom nhóm sự cố. Cách tiếp cận này phù hợp với xu hướng đánh giá truy cập theo
+ngữ cảnh thay vì chỉ dựa trên vị trí mạng hay trạng thái tĩnh
+\citep{Rose2020SP800207,Xiao2022ContextRisk}. Đóng góp cốt lõi không phải là
+một mô hình kiểm soát truy cập mới, mà là một mẫu tích hợp có thể giải thích,
+liên kết trạng thái phân quyền, bằng chứng sự kiện, chấm điểm rủi ro và thông
+tin sự cố.
+
+\subsection{Đóng góp}
+\label{subsec:contributions}
+
+Bài báo có các đóng góp sau:
+
+\begin{itemize}
+  \item Một kiến trúc RBAC và phân tích nhật ký nhỏ gọn để phát hiện SQL
+  injection, đoán mật khẩu và truy cập trái phép trong một nguyên mẫu có thể tái
+  lập.
+  \item Một lớp chấm điểm theo ngữ cảnh bổ sung tín hiệu về địa chỉ IP mới, hoạt
+  động ngoài giờ, truy cập tài nguyên hiếm gặp, các lần từ chối lặp lại và chuỗi
+  rủi ro gồm nhiều sự kiện.
+  \item Một cơ chế báo cáo sự cố gom nhóm các cảnh báo liên quan theo người
+  dùng, IP và cửa sổ thời gian.
+  \item Một bộ dữ liệu đánh giá tổng hợp và bộ kiểm thử tự động hỗ trợ trình
+  diễn, giảng dạy và tái lập kết quả.
+\end{itemize}
+
+\subsection{Câu hỏi nghiên cứu}
+\label{subsec:research-questions}
+
+Nghiên cứu được tổ chức quanh các câu hỏi sau:
+
+\begin{description}
+  \item[RQ1] Làm thế nào để kết hợp quyết định RBAC và sự kiện nhật ký bảo mật
+  thành một pipeline giám sát rủi ro truy cập có khả năng giải thích?
+  \item[RQ2] Những tín hiệu ngữ cảnh đơn giản nào giúp cải thiện phân loại cảnh
+  báo so với việc chỉ phát hiện theo luật?
+  \item[RQ3] Nguyên mẫu phát hiện các kịch bản tấn công tổng hợp đã định và tóm
+  tắt chúng thành sự cố hiệu quả đến mức nào?
+\end{description}

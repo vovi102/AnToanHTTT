@@ -1,0 +1,31 @@
+% Luồng thực thi trong src/rbac_guard/service.py.
+\begin{tikzpicture}[
+  font=\footnotesize,
+  >=Latex,
+  node distance=7mm and 9mm,
+  component/.style={draw, rounded corners=2pt, align=center, minimum height=12mm,
+    text width=25mm, fill=blue!7},
+  source/.style={component, fill=gray!12},
+  store/.style={component, fill=orange!14},
+  output/.style={component, fill=green!11},
+  flow/.style={->, line width=.55pt},
+  auxiliary/.style={->, dashed, line width=.5pt}
+]
+  \node[source] (logs) {Nhật ký CSV/JSON\\và cấu hình};
+  \node[component, right=of logs] (parser) {Parser\\sự kiện hợp lệ};
+  \node[store, above=of parser] (rbac) {CSDL SQLite\\RBAC};
+  \node[component, right=of parser] (rules) {Bộ máy luật\\SQLi, mật khẩu, RBAC};
+  \node[component, below=of rules] (context) {Profiler ngữ cảnh\\giờ, IP, tài nguyên, từ chối};
+  \node[component, right=of rules] (scorer) {Bộ chấm điểm\\và mức độ};
+  \node[output, right=of scorer] (reporter) {Reporter\\alerts, findings, incidents\\CSV/JSON};
+  \node[source, below=of parser] (adapter) {CLI / Streamlit\\adapter};
+
+  \draw[flow] (logs) -- (parser);
+  \draw[flow] (parser) -- (rules);
+  \draw[flow] (parser) -| (context);
+  \draw[auxiliary] (rbac) -- (rules);
+  \draw[flow] (rules) -- (scorer);
+  \draw[flow] (context) -| (scorer);
+  \draw[flow] (scorer) -- (reporter);
+  \draw[auxiliary] (adapter) -- (parser);
+\end{tikzpicture}

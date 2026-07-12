@@ -2,6 +2,9 @@
 
 PoC kiểm soát truy cập RBAC và phân tích log dựa trên luật để phát hiện SQL Injection, password guessing và truy cập trái quyền.
 
+Hướng dẫn tái lập đầy đủ hai thực nghiệm baseline và context-risk: xem
+[`HUONG_DAN_CHAY_DEMO.md`](HUONG_DAN_CHAY_DEMO.md).
+
 ## Thiết lập
 
 Yêu cầu Python 3.11 trở lên.

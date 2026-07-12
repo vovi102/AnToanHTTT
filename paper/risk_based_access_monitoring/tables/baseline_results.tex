@@ -1,0 +1,16 @@
+\begin{table}[t]
+  \centering
+  \caption{Hiệu năng phát hiện theo luật nền trên 60 sự kiện nhật ký tổng hợp. Các giá trị được tái sinh từ \texttt{artifacts/cp3-baseline/metrics.json}.}
+  \label{tab:baseline-results}
+  \begin{tabular}{lrrrrrrr}
+    \toprule
+    Loại rủi ro & TP & FP & FN & TN & Precision & Recall & F1 \\
+    \midrule
+    SQL injection & 9 & 0 & 1 & 50 & 1.0000 & 0.9000 & 0.9474 \\
+    Đoán mật khẩu & 10 & 0 & 0 & 50 & 1.0000 & 1.0000 & 1.0000 \\
+    Truy cập trái phép & 10 & 0 & 0 & 50 & 1.0000 & 1.0000 & 1.0000 \\
+    \midrule
+    Trung bình macro & \multicolumn{4}{c}{--} & 1.0000 & 0.9667 & 0.9825 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

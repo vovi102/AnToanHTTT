@@ -1,0 +1,9 @@
+{
+  "run_at": "2026-07-12T13:25:04.430064+07:00",
+  "source_file": "data/logs_risk_demo.csv",
+  "config_file": "config/default.toml",
+  "total_rows": 14,
+  "valid_rows": 14,
+  "invalid_rows": 0,
+  "alert_count": 15
+}

@@ -1,0 +1,154 @@
+[
+  {
+    "signal_id": "CTX-RARE-RESOURCE",
+    "risk_type": "context_anomaly",
+    "event_ids": [
+      "risk-011"
+    ],
+    "timestamp": "2026-06-22T11:00:00+07:00",
+    "user": "auditor01",
+    "ip": "10.0.0.2",
+    "resource": "accounts",
+    "action": "read",
+    "evidence": "rare_resource_for_user=true; user=auditor01; resource=accounts",
+    "confidence": 0.7,
+    "bonus": 8
+  },
+  {
+    "signal_id": "CTX-REPEATED-DENIAL",
+    "risk_type": "context_anomaly",
+    "event_ids": [
+      "risk-012",
+      "risk-013",
+      "risk-014"
+    ],
+    "timestamp": "2026-06-22T11:12:00+07:00",
+    "user": "auditor01",
+    "ip": "10.0.0.2",
+    "resource": "accounts",
+    "action": "update",
+    "evidence": "denials_in_window=3; window_seconds=300",
+    "confidence": 0.85,
+    "bonus": 12
+  },
+  {
+    "signal_id": "CTX-AFTER-HOURS",
+    "risk_type": "context_anomaly",
+    "event_ids": [
+      "risk-005"
+    ],
+    "timestamp": "2026-06-22T22:00:00+07:00",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "after_hours=true; hour=22; business_hours=08:00-18:00",
+    "confidence": 0.75,
+    "bonus": 8
+  },
+  {
+    "signal_id": "CTX-NEW-IP",
+    "risk_type": "context_anomaly",
+    "event_ids": [
+      "risk-005"
+    ],
+    "timestamp": "2026-06-22T22:00:00+07:00",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "new_ip_for_user=true; user=teller01; ip=198.51.100.50",
+    "confidence": 0.8,
+    "bonus": 10
+  },
+  {
+    "signal_id": "CTX-AFTER-HOURS",
+    "risk_type": "context_anomaly",
+    "event_ids": [
+      "risk-006"
+    ],
+    "timestamp": "2026-06-22T22:01:00+07:00",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "after_hours=true; hour=22; business_hours=08:00-18:00",
+    "confidence": 0.75,
+    "bonus": 8
+  },
+  {
+    "signal_id": "CTX-AFTER-HOURS",
+    "risk_type": "context_anomaly",
+    "event_ids": [
+      "risk-007"
+    ],
+    "timestamp": "2026-06-22T22:02:00+07:00",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "after_hours=true; hour=22; business_hours=08:00-18:00",
+    "confidence": 0.75,
+    "bonus": 8
+  },
+  {
+    "signal_id": "CTX-AFTER-HOURS",
+    "risk_type": "context_anomaly",
+    "event_ids": [
+      "risk-008"
+    ],
+    "timestamp": "2026-06-22T22:03:00+07:00",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "after_hours=true; hour=22; business_hours=08:00-18:00",
+    "confidence": 0.75,
+    "bonus": 8
+  },
+  {
+    "signal_id": "CTX-AFTER-HOURS",
+    "risk_type": "context_anomaly",
+    "event_ids": [
+      "risk-009"
+    ],
+    "timestamp": "2026-06-22T22:04:00+07:00",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "session",
+    "action": "login",
+    "evidence": "after_hours=true; hour=22; business_hours=08:00-18:00",
+    "confidence": 0.75,
+    "bonus": 8
+  },
+  {
+    "signal_id": "CTX-AFTER-HOURS",
+    "risk_type": "context_anomaly",
+    "event_ids": [
+      "risk-010"
+    ],
+    "timestamp": "2026-06-22T22:05:00+07:00",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "users",
+    "action": "delete",
+    "evidence": "after_hours=true; hour=22; business_hours=08:00-18:00",
+    "confidence": 0.75,
+    "bonus": 8
+  },
+  {
+    "signal_id": "CTX-RARE-RESOURCE",
+    "risk_type": "context_anomaly",
+    "event_ids": [
+      "risk-010"
+    ],
+    "timestamp": "2026-06-22T22:05:00+07:00",
+    "user": "teller01",
+    "ip": "198.51.100.50",
+    "resource": "users",
+    "action": "delete",
+    "evidence": "rare_resource_for_user=true; user=teller01; resource=users",
+    "confidence": 0.7,
+    "bonus": 8
+  }
+]
