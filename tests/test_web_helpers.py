@@ -1,4 +1,10 @@
-from rbac_guard.web import count_alerts, filter_alert_rows, filter_incident_rows
+from rbac_guard.web import (
+    count_alerts,
+    filter_alert_rows,
+    filter_incident_rows,
+    permission_label,
+    rbac_graph,
+)
 
 
 ALERTS = [
@@ -45,3 +51,25 @@ def test_filter_incident_rows_applies_user_severity_risk_and_signal() -> None:
         severities={"Critical"},
         context_signals={"CTX-NEW-IP"},
     ) == [rows[0]]
+
+
+def test_rbac_graph_shows_user_role_and_permission_path() -> None:
+    graph = rbac_graph(
+        [
+            {
+                "username": "teller01",
+                "status": "active",
+                "role": "teller",
+                "resource": "accounts",
+                "action": "read",
+            }
+        ]
+    )
+
+    assert '"user:teller01" -> "role:teller"' in graph
+    assert '"role:teller" -> "permission:accounts:read"' in graph
+
+
+def test_permission_label_uses_banking_application_language() -> None:
+    assert permission_label("accounts", "read") == "Xem tài khoản khách hàng"
+    assert permission_label("users", "delete") == "Xóa tài khoản người dùng"

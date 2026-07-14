@@ -2,6 +2,9 @@
 .uv-cache/
 .uv-python/
 .pip-cache/
+web/node_modules/
+web/.next/
+web/.npm-cache/
 __pycache__/
 *.py[cod]
 *.egg-info/

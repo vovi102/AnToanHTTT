@@ -94,3 +94,24 @@ def test_project_seed_grants_expected_roles(tmp_path: Path) -> None:
     assert repository.has_permission("teller01", "accounts", "read") is True
     assert repository.has_permission("auditor01", "audit_logs", "read") is True
     assert repository.has_permission("teller01", "users", "delete") is False
+
+
+def test_list_access_rows_exposes_user_role_permission_links(seed_db: Path) -> None:
+    rows = RBACRepository(seed_db).list_access_rows()
+
+    assert rows == [
+        {
+            "username": "disabled01",
+            "status": "disabled",
+            "role": "teller",
+            "resource": "accounts",
+            "action": "read",
+        },
+        {
+            "username": "teller01",
+            "status": "active",
+            "role": "teller",
+            "resource": "accounts",
+            "action": "read",
+        },
+    ]
