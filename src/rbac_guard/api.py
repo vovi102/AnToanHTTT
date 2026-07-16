@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,6 +41,18 @@ class CreateUserRequest(BaseModel):
 class AccountUpdateRequest(BaseModel):
     phone: str = Field(min_length=6, max_length=30)
     address: str = Field(min_length=4, max_length=160)
+
+
+class SecurityModeRequest(BaseModel):
+    mode: Literal["baseline", "rbac"]
+
+
+class CreateTransactionRequest(BaseModel):
+    source_account: str = Field(pattern=r"^[0-9]{10,20}$")
+    destination_account: str = Field(pattern=r"^[0-9]{10,20}$")
+    beneficiary_name: str = Field(min_length=2, max_length=80)
+    amount_vnd: int = Field(gt=0, le=10_000_000_000)
+    description: str = Field(min_length=3, max_length=160)
 
 
 @app.on_event("startup")
@@ -144,6 +156,157 @@ def update_account(account_id: int, payload: AccountUpdateRequest, user: authori
 @app.get("/audit-logs")
 def audit_logs(user: authorized("audit_logs", "read")) -> list[dict[str, object]]:
     return repository.list_audit_logs()
+
+
+@app.get("/demo/security-mode")
+def get_security_mode(user: CurrentUser) -> dict[str, str]:
+    return {"mode": repository.security_mode()}
+
+
+@app.patch("/demo/security-mode")
+def set_security_mode(
+    payload: SecurityModeRequest, user: authorized("demo", "configure")
+) -> dict[str, str]:
+    repository.set_security_mode(payload.mode, user["username"])
+    return {"mode": payload.mode}
+
+
+def transaction_read_scope(user: dict[str, str]) -> bool:
+    username = user["username"]
+    if repository.has_permission(username, "transactions", "read_all"):
+        return True
+    if repository.has_permission(username, "transactions", "read_own"):
+        return False
+    repository.audit(
+        username,
+        "transactions",
+        "read",
+        "denied",
+        "RBAC denied transaction read",
+    )
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail={
+            "message": "RBAC từ chối thao tác",
+            "permission": "transactions:read_own",
+        },
+    )
+
+
+@app.post("/transactions", status_code=status.HTTP_201_CREATED)
+def create_transaction(
+    payload: CreateTransactionRequest,
+    user: authorized("transactions", "create"),
+) -> dict[str, object]:
+    return repository.create_transaction(
+        creator=user["username"],
+        source_account=payload.source_account,
+        destination_account=payload.destination_account,
+        beneficiary_name=payload.beneficiary_name,
+        amount_vnd=payload.amount_vnd,
+        description=payload.description,
+    )
+
+
+@app.get("/transactions")
+def transactions(user: CurrentUser) -> list[dict[str, object]]:
+    read_all = transaction_read_scope(user)
+    repository.audit(
+        user["username"],
+        "transactions",
+        "read",
+        "allowed",
+        "RBAC allowed transaction list",
+    )
+    return repository.list_transactions(user["username"], read_all=read_all)
+
+
+def readable_transaction(reference: str, user: dict[str, str]) -> dict[str, object]:
+    read_all = transaction_read_scope(user)
+    transaction = repository.get_transaction(
+        reference, user["username"], read_all=read_all
+    )
+    if transaction is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Không tìm thấy giao dịch",
+        )
+    return transaction
+
+
+@app.get("/transactions/{reference}")
+def transaction_detail(reference: str, user: CurrentUser) -> dict[str, object]:
+    return readable_transaction(reference, user)
+
+
+@app.get("/transactions/{reference}/timeline")
+def transaction_timeline(
+    reference: str, user: CurrentUser
+) -> list[dict[str, object]]:
+    readable_transaction(reference, user)
+    return repository.transaction_timeline(reference)
+
+
+@app.post("/transactions/{reference}/approve")
+def approve_transaction(reference: str, user: CurrentUser) -> dict[str, object]:
+    username = user["username"]
+    if repository.has_permission(username, "transactions", "approve"):
+        repository.audit(
+            username,
+            "transactions",
+            "approve",
+            "allowed",
+            "RBAC allowed transaction approval",
+            transaction_reference=reference,
+        )
+    elif (
+        repository.security_mode() == "baseline"
+        and "teller" in repository.user_roles(username)
+    ):
+        repository.audit(
+            username,
+            "transactions",
+            "approve",
+            "baseline_bypass",
+            "Baseline mode bypassed the approval permission",
+            transaction_reference=reference,
+        )
+    else:
+        repository.audit(
+            username,
+            "transactions",
+            "approve",
+            "denied",
+            "RBAC denied transaction approval",
+            transaction_reference=reference,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "message": "RBAC từ chối tự phê duyệt giao dịch",
+                "permission": "transactions:approve",
+            },
+        )
+    try:
+        return repository.approve_transaction(reference, username)
+    except LookupError as error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Không tìm thấy giao dịch",
+        ) from error
+    except ValueError as error:
+        repository.audit(
+            username,
+            "transactions",
+            "approve",
+            "conflict",
+            str(error),
+            transaction_reference=reference,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Giao dịch đã được xử lý trước đó",
+        ) from error
 
 
 @app.post("/demo/reset")

@@ -17,11 +17,11 @@ npm install
 npm run dev
 ```
 
-Truy cập <http://localhost:3000>. Đăng nhập `admin01 / Admin@123`, tạo user mới
-và gán role. Đăng xuất, đăng nhập user mới để thao tác với dữ liệu khách hàng;
-thử mở Quản lý người dùng để thấy FastAPI trả `403` nếu role không có
-`users:manage`. Nhật ký kiểm toán lấy từ SQLite hiển thị các request được cho
-phép và bị chặn.
+Truy cập <http://localhost:3000>. Dùng ba tab độc lập để chạy kịch bản Nova
+Bank: Admin tạo `lan.demo` role Teller; Teller tự duyệt giao dịch 50 triệu ở
+Baseline; Admin bật RBAC; Teller gửi thử request duyệt và nhận `403`; Controller
+`controller01 / Controller@123` phê duyệt giao dịch đang chờ. Xem
+`docs/USER_JOURNEY_DEMO_RBAC.md` để có lời thoại từng bước.
 
 Tài liệu này hướng dẫn tái lập hai thực nghiệm trong bài báo:
 
@@ -68,7 +68,7 @@ Chạy bộ kiểm thử hồi quy:
 uv run pytest -q
 ```
 
-Kết quả mong đợi của code hiện tại là **71 passed**. Để kiểm tra cả
+Kết quả mong đợi của code hiện tại là **78 passed**. Để kiểm tra cả
 coverage của phần lõi:
 
 ```bash

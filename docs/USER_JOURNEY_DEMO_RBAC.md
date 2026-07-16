@@ -1,75 +1,92 @@
-# User journey demo RBAC — BankSafe
+# User journey demo RBAC — Nova Bank
 
-Tài liệu này là kịch bản để trình bày trực tiếp ý nghĩa của Role-Based Access
-Control (RBAC) qua ứng dụng ngân hàng mẫu BankSafe.
+Kịch bản này trình bày một case chuyển khoản 50.000.000 VND trong vài phút cho
+giảng viên. Mục tiêu là quan sát được cả nghiệp vụ, thay đổi dữ liệu thật và
+quyết định phân quyền từ backend.
 
-## 1. Khởi động backend và giao diện
+## Tài khoản và ba tab
 
-Tại thư mục gốc dự án, chạy:
+Mở ba tab trực tiếp tới <http://localhost:3000>; mỗi tab dùng `sessionStorage`
+riêng nên giữ một token backend độc lập.
 
-```bash
-uv sync --extra api
-uv run uvicorn rbac_guard.api:app --reload --port 8000
-```
+| Tab | Tài khoản | Vai trò |
+| --- | --- | --- |
+| Admin | `admin01 / Admin@123` | Quản trị viên |
+| Teller | `lan.demo / Lan@1234` | Được tạo trực tiếp khi demo |
+| Controller | `controller01 / Controller@123` | Kiểm soát viên seed sẵn |
 
-Mở terminal thứ hai:
+## Case duy nhất cần trình bày
 
-```bash
-cd web
-npm install
-npm run dev
-```
+### 1. Admin tạo giao dịch viên
 
-Mở trình duyệt tại <http://localhost:3000>. Backend chạy ở
-<http://localhost:8000>; dữ liệu được lưu vào SQLite.
+1. Đăng nhập tab Admin.
+2. Mở **Nhân viên**.
+3. Giữ dữ liệu mẫu `Lan Nguyễn / lan.demo / Lan@1234 / Giao dịch viên`.
+4. Bấm **Tạo tài khoản và gán vai trò**.
 
-## 2. Đăng nhập quản trị viên và tạo nhân viên
+Lời nói ngắn:
 
-1. Đăng nhập `admin01` với mật khẩu `Admin@123`.
-2. Mở **Quản lý người dùng**.
-3. Tạo `lan.demo`, đặt mật khẩu `Lan@1234`, chọn role **Giao dịch viên**.
+> Tài khoản này vừa được gửi tới FastAPI, mật khẩu được băm và role Teller được
+> lưu vào SQLite. Đây không phải user viết cứng trong giao diện.
 
-**Điểm cần nói:** Tài khoản và role vừa được gửi đến FastAPI, băm mật khẩu và
-lưu vào SQLite. Đây không phải danh sách người dùng cố định trong giao diện.
+### 2. Trước RBAC — Teller tự phê duyệt
 
-## 3. Đăng nhập bằng tài khoản vừa tạo
+1. Tab Admin mở **Điều khiển demo** và xác nhận trạng thái **Baseline**.
+2. Tab Teller đăng nhập `lan.demo / Lan@1234`.
+3. Giữ form mẫu chuyển 50.000.000 VND cho Lê Bình và bấm **Tạo yêu cầu**.
+4. Bấm **Tự phê duyệt giao dịch** rồi xác nhận.
+5. Quan sát giao dịch thứ nhất chuyển từ Pending sang Approved, người tạo và
+   người duyệt đều là `lan.demo`.
 
-1. Đăng xuất admin.
-2. Đăng nhập `lan.demo / Lan@1234`.
-3. Mở **Khách hàng**, thay đổi số điện thoại hoặc địa chỉ, rồi bấm lưu.
+Lời nói ngắn:
 
-Giao diện hiện `PATCH /accounts/{id} → HTTP 200`; thay đổi được lưu thật trong
-SQLite.
+> Khi chưa áp dụng RBAC, hệ thống biết Lan là ai nhưng không tách quyền tạo và
+> duyệt. Một người hoàn tất cả hai bước, tạo ra rủi ro gian lận.
 
-**Điểm cần nói:** Backend nhận ra Lan thuộc role Giao dịch viên và kiểm tra
-quyền `accounts:update` trước khi ghi dữ liệu.
+### 3. Admin bật RBAC
 
-## 4. Chứng minh backend chặn vượt quyền
+1. Quay lại tab Admin, mở **Điều khiển demo**.
+2. Bấm **Bật bảo vệ RBAC** và xác nhận.
+3. Quan sát banner chuyển sang `SECURE MODE`.
 
-1. Khi vẫn đăng nhập bằng Lan, bấm **Quản lý người dùng**.
-2. Giao diện gọi `GET /users`, nhưng hiện `HTTP 403 · cần users:manage`.
+Lời nói ngắn:
 
-**Điểm cần nói:** Nút vẫn gửi request đến backend. Chỉ server quyết định quyền,
-vì vậy không thể vượt quyền bằng cách mở URL hay gọi API trực tiếp.
+> Chính sách được lưu tại backend. Việc đổi chế độ cũng được ghi audit, không
+> phải một hiệu ứng giao diện.
 
-## 5. Kiểm toán bằng chứng
+### 4. Sau RBAC — backend chặn Teller
 
-1. Đăng nhập lại `admin01 / Admin@123`.
-2. Mở **Nhật ký kiểm toán**.
-3. Quan sát các dòng `success`, `allowed` và `denied`: đăng nhập Lan, cập nhật
-khách hàng và lần bị chặn `users:manage`.
+1. Quay lại tab Teller; khi tab nhận focus, mode và dữ liệu được tải lại.
+2. Tạo giao dịch 50.000.000 VND thứ hai bằng cùng form mẫu.
+3. Nút phê duyệt bình thường không còn xuất hiện.
+4. Mở **Kiểm tra bảo vệ backend** trên giao dịch Pending.
+5. Bấm **Gửi thử request vượt quyền**.
+6. Quan sát `POST /transactions/{reference}/approve → HTTP 403` và permission
+   `transactions:approve`; trạng thái vẫn Pending.
 
-**Điểm cần nói:** Audit log lấy trực tiếp từ SQLite, chứng minh kết quả không
-chỉ là thông báo trên trình duyệt.
+Lời nói ngắn:
 
-## 6. Kịch bản Kiểm toán viên và đặt lại
+> Giao diện ẩn tác vụ để đúng trải nghiệm Teller, nhưng tôi vẫn cố ý gọi API.
+> Backend mới là lớp bảo vệ thật: trả 403 và không thay đổi giao dịch.
 
-Tạo một user role **Kiểm toán viên** rồi đăng nhập user này để xem audit log;
-role này không thể quản lý người dùng hoặc cập nhật khách hàng. Cuối buổi, admin
-chọn **Đặt lại dữ liệu demo** để trở về tài khoản bootstrap và xóa dữ liệu thử.
+### 5. Controller phê duyệt và đối chiếu audit
 
-## Thông điệp kết thúc
+1. Đăng nhập tab Controller bằng `controller01 / Controller@123`.
+2. Mở **Phê duyệt**, chọn giao dịch Pending và xác nhận.
+3. Quan sát trạng thái thành Approved, `approved_by = controller01`.
+4. Quay lại Admin, mở **Nhật ký kiểm toán**.
+5. Lọc hoặc tìm mã giao dịch để chỉ ra `baseline_bypass`, `denied`, `allowed`
+   và `success`.
 
-> RBAC đảm bảo đúng người, đúng vai trò, đúng quyền. Đăng nhập xác định người
-> dùng là ai; vai trò quyết định người dùng được làm gì; hệ thống kiểm tra quyền
-> trước mỗi thao tác quan trọng.
+Lời kết:
+
+> Authentication trả lời người dùng là ai. RBAC quyết định vai trò đó được làm
+> gì. Quyền được kiểm tra tại backend trước khi thay đổi trạng thái nghiệp vụ,
+> còn audit log chứng minh quyết định đã thực sự xảy ra.
+
+## Kết quả cuối buổi
+
+- Giao dịch thứ nhất: Approved bởi chính Teller trong Baseline.
+- Giao dịch thứ hai: từng bị Teller từ chối với 403, sau đó Approved bởi
+  Controller.
+- Audit log có đầy đủ actor, role, transaction reference, outcome và thời gian.

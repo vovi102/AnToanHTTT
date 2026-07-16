@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
+import { AuthProvider } from "../components/AuthProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "BankSafe | Hành trình RBAC",
-  description: "Minh hoạ trực quan kiểm soát truy cập theo vai trò.",
+  title: "Nova Bank | Cổng vận hành",
+  description: "Demo nghiệp vụ ngân hàng trước và sau khi áp dụng RBAC.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="vi">
-      <body>{children}</body>
+      <body><AuthProvider>{children}</AuthProvider></body>
     </html>
   );
 }

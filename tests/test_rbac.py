@@ -115,3 +115,95 @@ def test_list_access_rows_exposes_user_role_permission_links(seed_db: Path) -> N
             "action": "read",
         },
     ]
+
+
+@pytest.fixture
+def demo_repository(tmp_path: Path) -> RBACRepository:
+    repository = RBACRepository(tmp_path / "demo.db")
+    repository.initialize()
+    repository.reset_demo()
+    repository.create_user("lan.demo", "Lan Nguyễn", "Lan@1234", "teller")
+    return repository
+
+
+def test_demo_reset_seeds_baseline_controller_and_transaction_permissions(
+    demo_repository: RBACRepository,
+) -> None:
+    assert demo_repository.security_mode() == "baseline"
+    assert demo_repository.authenticate("controller01", "Controller@123") is not None
+    assert demo_repository.has_permission("lan.demo", "transactions", "create") is True
+    assert demo_repository.has_permission("lan.demo", "transactions", "approve") is False
+    assert demo_repository.has_permission("controller01", "transactions", "approve") is True
+
+
+def test_transaction_lifecycle_filters_rows_and_rejects_second_approval(
+    demo_repository: RBACRepository,
+) -> None:
+    transaction = demo_repository.create_transaction(
+        creator="lan.demo",
+        source_account="001100001234",
+        destination_account="002200005678",
+        beneficiary_name="Lê Bình",
+        amount_vnd=50_000_000,
+        description="Thanh toán hợp đồng",
+    )
+
+    assert transaction["reference"].startswith("TRX-")
+    assert transaction["status"] == "pending"
+    assert demo_repository.list_transactions("lan.demo", read_all=False) == [transaction]
+    assert demo_repository.list_transactions("admin01", read_all=False) == []
+    assert demo_repository.get_transaction(
+        transaction["reference"], "admin01", read_all=False
+    ) is None
+
+    approved = demo_repository.approve_transaction(
+        transaction["reference"], "controller01"
+    )
+
+    assert approved["status"] == "approved"
+    assert approved["approved_by"] == "controller01"
+    assert demo_repository.list_transactions("admin01", read_all=True) == [approved]
+    with pytest.raises(ValueError, match="already processed"):
+        demo_repository.approve_transaction(transaction["reference"], "controller01")
+
+
+def test_security_mode_and_transaction_timeline_are_persisted(
+    demo_repository: RBACRepository,
+) -> None:
+    demo_repository.set_security_mode("rbac", "admin01")
+    transaction = demo_repository.create_transaction(
+        creator="lan.demo",
+        source_account="001100001234",
+        destination_account="002200005678",
+        beneficiary_name="Lê Bình",
+        amount_vnd=50_000_000,
+        description="Thanh toán hợp đồng",
+    )
+    demo_repository.audit(
+        "lan.demo",
+        "transactions",
+        "approve",
+        "denied",
+        "RBAC denied request",
+        transaction_reference=str(transaction["reference"]),
+    )
+
+    assert demo_repository.security_mode() == "rbac"
+    assert [event["outcome"] for event in demo_repository.transaction_timeline(str(transaction["reference"]))] == [
+        "success",
+        "denied",
+    ]
+
+
+def test_expired_session_is_rejected_and_deleted(demo_repository: RBACRepository) -> None:
+    admin = demo_repository.authenticate("admin01", "Admin@123")
+    assert admin is not None
+    token = demo_repository.create_session(int(admin["id"]))
+    with sqlite3.connect(demo_repository.db_path) as connection:
+        connection.execute(
+            "UPDATE sessions SET expires_at = '2000-01-01T00:00:00+00:00'"
+        )
+
+    assert demo_repository.session_user(token) is None
+    with sqlite3.connect(demo_repository.db_path) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM sessions").fetchone()[0] == 0

@@ -58,10 +58,10 @@ uv run pytest -q --cov=rbac_guard --cov-report=term-missing --cov-fail-under=85
 Coverage gate đo các module lõi; `cli.py` được kiểm tra qua subprocess test và
 `web.py` qua helper test cùng smoke test Streamlit.
 
-## Demo trực quan RBAC (Next.js)
+## Demo nghiệp vụ RBAC Nova Bank (Next.js)
 
-Demo BankSafe gồm Next.js và FastAPI/SQLite thật: **admin tạo tài khoản → gán
-role → nhân viên đăng nhập → backend kiểm tra quyền ở từng request**.
+Demo gồm Next.js và FastAPI/SQLite thật: **Admin tạo Teller → Teller tạo giao
+dịch 50 triệu → so sánh trước/sau RBAC → Controller phê duyệt**.
 
 Terminal 1, tại thư mục gốc:
 
@@ -78,11 +78,18 @@ npm install
 npm run dev
 ```
 
-Mở <http://localhost:3000>, đăng nhập `admin01 / Admin@123`, rồi tạo một nhân
-viên với role **Giao dịch viên**. Đăng xuất và đăng nhập lại tài khoản vừa tạo:
-nhân viên cập nhật được khách hàng nhưng khi mở Quản lý người dùng backend trả
-`403`. Mọi kết quả được ghi tại Nhật ký kiểm toán. Nút đặt lại dữ liệu demo chỉ
-dành cho Administrator và làm các phiên cũ hết hiệu lực.
+Mở <http://localhost:3000>. Chuẩn bị ba tab độc lập cho Admin, Teller và
+Controller. Admin dùng `admin01 / Admin@123`; Controller dùng
+`controller01 / Controller@123`; tài khoản Teller `lan.demo / Lan@1234` được
+tạo trực tiếp khi trình bày.
+
+Ở Baseline, Teller tạo rồi tự phê duyệt giao dịch đầu tiên. Sau khi Admin bật
+RBAC, Teller tạo giao dịch thứ hai và dùng panel **Kiểm tra bảo vệ backend** để
+nhận `HTTP 403 · transactions:approve`; giao dịch vẫn Pending. Controller đăng
+nhập và phê duyệt thành công. Audit log ghi đầy đủ bypass, denied và approved.
+
+Kịch bản nói chi tiết: [`docs/USER_JOURNEY_DEMO_RBAC.md`](docs/USER_JOURNEY_DEMO_RBAC.md).
+Checklist trước buổi demo: [`docs/CHUAN_BI_DEMO_RBAC.md`](docs/CHUAN_BI_DEMO_RBAC.md).
 
 Giao diện Streamlit cũ vẫn dùng được cho phần phân tích log kỹ thuật:
 
