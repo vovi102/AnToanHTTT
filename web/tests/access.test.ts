@@ -20,10 +20,11 @@ describe("role-aware portal navigation", () => {
   it("shows administration and audit work to administrators", () => {
     expect(navigationFor(["administrator"]).map((item) => item.href)).toEqual([
       "/admin/users",
-      "/admin/demo-control",
+      "/admin/policies",
       "/audit",
     ]);
-    expect(roleHome(["administrator"])).toBe("/admin/demo-control");
+    expect(navigationFor(["administrator"])[1].label).toBe("Chính sách phê duyệt");
+    expect(roleHome(["administrator"])).toBe("/admin/policies");
   });
 
   it("shows only transaction review and audit to auditors", () => {
