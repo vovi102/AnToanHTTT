@@ -355,12 +355,13 @@ Run:
 git diff --check
 git status --short
 git ls-files --deleted
-test -f Khung_dan_y_v3.md
+test -f /home/khoavd/WORKSPACE/AnToanHTTT/Khung_dan_y_v3.md
+git -C /home/khoavd/WORKSPACE/AnToanHTTT status --short --untracked-files=all | rg '^\?\? Khung_dan_y_v3\.md$'
 ```
 
-Expected: không có thay đổi chưa commit từ Task 1–2; không còn file tracked bị
-xóa nhưng chưa staged; `Khung_dan_y_v3.md` vẫn tồn tại và vẫn là file untracked
-của người dùng.
+Expected: worktree không có thay đổi chưa commit từ Task 1–2; không còn file
+tracked bị xóa nhưng chưa staged; `Khung_dan_y_v3.md` vẫn tồn tại trong checkout
+gốc và vẫn là file untracked của người dùng.
 
 - [ ] **Step 6: Ghi nhận kết quả xác minh**
 
