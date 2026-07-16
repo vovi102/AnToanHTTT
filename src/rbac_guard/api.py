@@ -234,6 +234,52 @@ def readable_transaction(reference: str, user: dict[str, str]) -> dict[str, obje
     return transaction
 
 
+def approval_policy_outcome(user: dict[str, str]) -> str:
+    username = user["username"]
+    if repository.has_permission(username, "transactions", "approve"):
+        return "allowed"
+    if (
+        repository.security_mode() == "baseline"
+        and "teller" in repository.user_roles(username)
+    ):
+        return "baseline_bypass"
+    return "denied"
+
+
+def enforce_approval_policy(
+    reference: str, user: dict[str, str], action: str
+) -> str:
+    outcome = approval_policy_outcome(user)
+    details = {
+        "allowed": "Approval policy allowed the operation",
+        "baseline_bypass": "Basic control policy bypassed separation of duties",
+        "denied": "Separation of duties denied the operation",
+    }
+    repository.audit(
+        user["username"],
+        "transactions",
+        action,
+        outcome,
+        details[outcome],
+        transaction_reference=reference,
+    )
+    if outcome == "denied":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "message": "Bạn không có quyền phê duyệt giao dịch này",
+                "permission": "transactions:approve",
+            },
+        )
+    return outcome
+
+
+@app.get("/approvals/{reference}")
+def approval_detail(reference: str, user: CurrentUser) -> dict[str, object]:
+    enforce_approval_policy(reference, user, "review")
+    return readable_transaction(reference, user)
+
+
 @app.get("/transactions/{reference}")
 def transaction_detail(reference: str, user: CurrentUser) -> dict[str, object]:
     return readable_transaction(reference, user)
@@ -250,43 +296,7 @@ def transaction_timeline(
 @app.post("/transactions/{reference}/approve")
 def approve_transaction(reference: str, user: CurrentUser) -> dict[str, object]:
     username = user["username"]
-    if repository.has_permission(username, "transactions", "approve"):
-        repository.audit(
-            username,
-            "transactions",
-            "approve",
-            "allowed",
-            "RBAC allowed transaction approval",
-            transaction_reference=reference,
-        )
-    elif (
-        repository.security_mode() == "baseline"
-        and "teller" in repository.user_roles(username)
-    ):
-        repository.audit(
-            username,
-            "transactions",
-            "approve",
-            "baseline_bypass",
-            "Baseline mode bypassed the approval permission",
-            transaction_reference=reference,
-        )
-    else:
-        repository.audit(
-            username,
-            "transactions",
-            "approve",
-            "denied",
-            "RBAC denied transaction approval",
-            transaction_reference=reference,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={
-                "message": "RBAC từ chối tự phê duyệt giao dịch",
-                "permission": "transactions:approve",
-            },
-        )
+    enforce_approval_policy(reference, user, "approve")
     try:
         return repository.approve_transaction(reference, username)
     except LookupError as error:

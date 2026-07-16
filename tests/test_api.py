@@ -131,6 +131,68 @@ def test_baseline_then_rbac_requires_controller_approval(client: TestClient) -> 
     assert repeated.status_code == 409
 
 
+def test_approval_resource_is_protected_and_audited(client: TestClient) -> None:
+    admin_token = login(client, "admin01", "Admin@123")
+    created = client.post(
+        "/users",
+        headers=auth(admin_token),
+        json={
+            "username": "lan.demo",
+            "display_name": "Lan Nguyễn",
+            "password": "Lan@1234",
+            "role": "teller",
+        },
+    )
+    assert created.status_code == 201
+    teller_token = login(client, "lan.demo", "Lan@1234")
+    reference = create_transfer(client, teller_token)
+
+    baseline_view = client.get(
+        f"/approvals/{reference}", headers=auth(teller_token)
+    )
+    assert baseline_view.status_code == 200
+    assert baseline_view.json()["reference"] == reference
+
+    changed = client.patch(
+        "/demo/security-mode",
+        headers=auth(admin_token),
+        json={"mode": "rbac"},
+    )
+    assert changed.status_code == 200
+
+    denied = client.get(f"/approvals/{reference}", headers=auth(teller_token))
+    assert denied.status_code == 403
+    unchanged = client.get(
+        f"/transactions/{reference}", headers=auth(teller_token)
+    )
+    assert unchanged.json()["status"] == "pending"
+
+    controller_token = login(client, "controller01", "Controller@123")
+    allowed = client.get(
+        f"/approvals/{reference}", headers=auth(controller_token)
+    )
+    assert allowed.status_code == 200
+    assert allowed.json()["reference"] == reference
+    assert client.get(
+        "/approvals/TXN-DOES-NOT-EXIST", headers=auth(controller_token)
+    ).status_code == 404
+    assert client.get(
+        "/approvals/TXN-DOES-NOT-EXIST", headers=auth(teller_token)
+    ).status_code == 403
+
+    logs = client.get("/audit-logs", headers=auth(admin_token)).json()
+    review_outcomes = [
+        event["outcome"]
+        for event in logs
+        if event["transaction_reference"] == reference
+        and event["resource"] == "transactions"
+        and event["action"] == "review"
+    ]
+    assert "baseline_bypass" in review_outcomes
+    assert "denied" in review_outcomes
+    assert "allowed" in review_outcomes
+
+
 def test_transaction_lists_are_role_aware_and_timeline_is_ordered(
     client: TestClient,
 ) -> None:
