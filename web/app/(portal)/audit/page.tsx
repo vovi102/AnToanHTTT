@@ -16,7 +16,7 @@ export default function AuditPage() {
   const [feedback, setFeedback] = useState<FeedbackState | null>(null);
   const refresh = useCallback(async () => {
     try { setEvents(await request<AuditEvent[]>("/audit-logs")); }
-    catch (failure) { const error = failure instanceof ApiError ? failure : new ApiError(0, "Không thể tải audit log"); setFeedback({ kind: "error", title: "Không thể tải nhật ký", message: error.message, status: error.status }); }
+    catch (failure) { const error = failure instanceof ApiError ? failure : new ApiError(0, "Không thể tải audit log"); setFeedback({ kind: "error", title: "Không thể tải nhật ký", message: error.message }); }
   }, [request]);
   useEffect(() => { refresh(); }, [refresh]);
   const filtered = useMemo(() => events.filter((event) => {
