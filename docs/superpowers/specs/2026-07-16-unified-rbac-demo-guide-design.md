@@ -13,9 +13,9 @@ diện, là nơi thực thi quyền.
 - Gộp nội dung cần thiết từ hướng dẫn chạy, checklist chuẩn bị và user journey
   hiện tại.
 - Giữ một case xuyên suốt: chuyển khoản 50.000.000 VND.
-- Cập nhật `README.md`, `HUONG_DAN_CHAY_DEMO.md`,
-  `docs/CHUAN_BI_DEMO_RBAC.md` và `docs/USER_JOURNEY_DEMO_RBAC.md` để trỏ rõ tới
-  tài liệu chính, tránh duy trì nhiều phiên bản kịch bản.
+- Cập nhật `README.md` và `HUONG_DAN_CHAY_DEMO.md` để trỏ rõ tới tài liệu chính.
+- Xóa `docs/CHUAN_BI_DEMO_RBAC.md` và `docs/USER_JOURNEY_DEMO_RBAC.md` sau khi
+  nội dung cần thiết đã được gộp, tránh duy trì nhiều phiên bản kịch bản.
 - Không thay đổi backend, frontend, dữ liệu seed hay chính sách RBAC.
 
 ## Độc giả và tiêu chí thành công
@@ -80,6 +80,8 @@ thuật:
   Nova Bank chính; hướng dẫn chuyên sâu hiện có vẫn giữ cho mục đích nghiên cứu.
 - Không ghi cứng số lượng test vào checklist nhanh để tránh tài liệu lỗi thời;
   chỉ yêu cầu lệnh kiểm thử kết thúc thành công.
+- Gọi Streamlit là giao diện phân tích log tùy chọn, không gọi là giao diện cũ;
+  đây là chức năng riêng chưa được Next.js thay thế.
 
 ## Xử lý tài liệu cũ
 
@@ -89,8 +91,22 @@ Các file cũ không lặp lại toàn bộ kịch bản:
 - `README.md` giới thiệu ngắn và liên kết tới tài liệu chính.
 - `HUONG_DAN_CHAY_DEMO.md` tiếp tục chứa hướng dẫn thực nghiệm nghiên cứu, nhưng
   phần Nova Bank chỉ dẫn tới tài liệu chính.
-- Hai file trong `docs/` được thay bằng thông báo ngắn rằng nội dung đã hợp nhất
-  và liên kết tương đối đúng tới tài liệu chính.
+- `docs/CHUAN_BI_DEMO_RBAC.md` và `docs/USER_JOURNEY_DEMO_RBAC.md` bị xóa sau
+  khi mọi liên kết tới chúng được cập nhật.
+
+## Phạm vi xóa an toàn
+
+Chỉ xóa hai tài liệu demo đã được thay thế nêu trên. Những thành phần sau phải
+được giữ nguyên:
+
+- `src/rbac_guard/web.py`, `tests/test_web_helpers.py` và optional dependency
+  Streamlit vì chúng phục vụ giao diện phân tích log riêng.
+- CLI, cấu hình, dataset và artifact thực nghiệm có thể tái lập.
+- Toàn bộ `paper/`, `report/`, các file Word và đề cương ở thư mục gốc.
+- Các spec và plan lịch sử trong `docs/superpowers/`.
+- File chưa được theo dõi `Khung_dan_y_v3.md` của người dùng.
+- Cache và môi trường local đã được `.gitignore` loại khỏi Git; không xóa khỏi
+  máy như một phần của thay đổi tài liệu.
 
 ## Kiểm tra tài liệu
 
@@ -102,6 +118,8 @@ Các file cũ không lặp lại toàn bộ kịch bản:
   hướng dẫn không mô tả một luồng đã hỏng.
 - Tìm lại các đoạn hướng dẫn Nova Bank cũ để bảo đảm không còn kịch bản trùng
   hoặc mâu thuẫn.
+- Xác nhận `rg` không còn liên kết đang hoạt động tới hai file đã xóa, ngoại trừ
+  các spec/plan lịch sử ghi lại quá trình phát triển.
 
 ## Ngoài phạm vi
 
