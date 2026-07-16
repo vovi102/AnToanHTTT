@@ -59,12 +59,12 @@ export default function ApprovalDetailPage() {
       const error = failure instanceof ApiError
         ? failure
         : new ApiError(0, "Không thể phê duyệt giao dịch");
+      if (error.status === 409) await load();
       setFeedback({
         kind: "error",
         title: error.status === 409 ? "Giao dịch đã được xử lý" : "Không thể phê duyệt",
         message: error.message,
       });
-      if (error.status === 409) await load();
     } finally {
       setBusy(false);
     }

@@ -1,11 +1,35 @@
 import "@testing-library/jest-dom/vitest";
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createElement } from "react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+const approvalMocks = vi.hoisted(() => ({
+  push: vi.fn(),
+  request: vi.fn(),
+}));
+
+vi.mock("next/navigation", () => ({
+  useParams: () => ({ reference: "TXN-2026-0001" }),
+  useRouter: () => ({ push: approvalMocks.push }),
+}));
+
+vi.mock("../components/AuthProvider", () => ({
+  useAuth: () => ({
+    user: {
+      id: "controller-1",
+      username: "controller01",
+      display_name: "Kiem Soat Vien",
+      roles: ["controller"],
+    },
+    request: approvalMocks.request,
+  }),
+}));
+
+import ApprovalDetailPage from "../app/(portal)/approvals/[reference]/page";
 import { Feedback } from "../components/Feedback";
 import { TransactionList } from "../components/TransactionList";
+import { ApiError } from "../lib/api";
 import type { FeedbackState, Transaction } from "../lib/types";
 
 const transaction: Transaction = {
@@ -23,7 +47,15 @@ const transaction: Transaction = {
   approved_at: null,
 };
 
-afterEach(cleanup);
+beforeEach(() => {
+  approvalMocks.push.mockReset();
+  approvalMocks.request.mockReset();
+});
+
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 describe("approval product UI", () => {
   it("keeps feedback focused on the business title and message", () => {
@@ -94,5 +126,77 @@ describe("approval product UI", () => {
 
     expect(screen.getByText("Chưa phát sinh giao dịch")).toBeInTheDocument();
     expect(screen.queryByText(/kịch bản/i)).not.toBeInTheDocument();
+  });
+});
+
+describe("approval detail route", () => {
+  it("maps a forbidden approval resource to the denied state", async () => {
+    approvalMocks.request.mockRejectedValueOnce(new ApiError(403, "Forbidden"));
+
+    render(createElement(ApprovalDetailPage));
+
+    expect(await screen.findByRole("heading", { name: "Không có quyền truy cập" }))
+      .toBeInTheDocument();
+  });
+
+  it("maps a missing approval resource to the not-found state", async () => {
+    approvalMocks.request.mockRejectedValueOnce(new ApiError(404, "Not found"));
+
+    render(createElement(ApprovalDetailPage));
+
+    expect(await screen.findByRole("heading", { name: "Không tìm thấy giao dịch" }))
+      .toBeInTheDocument();
+  });
+
+  it("maps other load failures to the retryable error state", async () => {
+    approvalMocks.request.mockRejectedValueOnce(new ApiError(500, "Server error"));
+
+    render(createElement(ApprovalDetailPage));
+
+    expect(await screen.findByRole("heading", { name: "Không thể tải giao dịch" }))
+      .toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Thử lại" })).toBeInTheDocument();
+  });
+
+  it("approves a ready transaction and displays success", async () => {
+    const approved = {
+      ...transaction,
+      status: "approved" as const,
+      approved_by: "controller01",
+      approved_at: "2026-07-16T08:05:00Z",
+    };
+    approvalMocks.request
+      .mockResolvedValueOnce(transaction)
+      .mockResolvedValueOnce(approved);
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(createElement(ApprovalDetailPage));
+
+    fireEvent.click(await screen.findByRole("button", { name: "Phê duyệt giao dịch" }));
+
+    expect(await screen.findByText("Phê duyệt thành công")).toBeInTheDocument();
+    expect(screen.getByText("Đã phê duyệt")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Phê duyệt giao dịch" }))
+      .not.toBeInTheDocument();
+  });
+
+  it("preserves conflict feedback after refreshing a transaction processed elsewhere", async () => {
+    const approved = {
+      ...transaction,
+      status: "approved" as const,
+      approved_by: "controller02",
+      approved_at: "2026-07-16T08:06:00Z",
+    };
+    approvalMocks.request
+      .mockResolvedValueOnce(transaction)
+      .mockRejectedValueOnce(new ApiError(409, "Giao dịch đã được phê duyệt"))
+      .mockResolvedValueOnce(approved);
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(createElement(ApprovalDetailPage));
+
+    fireEvent.click(await screen.findByRole("button", { name: "Phê duyệt giao dịch" }));
+
+    await waitFor(() => expect(approvalMocks.request).toHaveBeenCalledTimes(3));
+    expect(await screen.findByText("Đã phê duyệt")).toBeInTheDocument();
+    expect(screen.getByText("Giao dịch đã được xử lý")).toBeInTheDocument();
   });
 });
