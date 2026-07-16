@@ -40,8 +40,8 @@ Controller phê duyệt → Admin kiểm tra lịch sử hoạt động
 | Trường | Giá trị |
 | --- | --- |
 | Tài khoản nguồn | `001100001234` |
-| Tài khoản đích | `002200005678` |
-| Người nhận | `Lê Bình` |
+| Tài khoản nhận | `002200005678` |
+| Người thụ hưởng | `Lê Bình` |
 | Số tiền | `50000000` |
 | Nội dung | `Thanh toán hợp đồng` |
 
@@ -143,7 +143,7 @@ xuất liên tục.
    - Họ và tên: `Lan Nguyễn`
    - Tên đăng nhập: `lan.demo`
    - Mật khẩu tạm: `Lan@1234`
-   - Vai trò: **Giao dịch viên (Teller)**
+   - Vai trò: **Giao dịch viên**
 3. Bấm **Tạo tài khoản và gán vai trò**.
 
 **Kết quả cần thấy**
@@ -227,7 +227,8 @@ xuất liên tục.
 2. Chọn **Phê duyệt**.
 3. Tìm giao dịch thứ hai đang **Chờ phê duyệt**, bấm **Xem và phê duyệt**, sau
    đó bấm **Phê duyệt giao dịch**.
-4. Quay lại tab Admin, chọn **Lịch sử hoạt động**.
+4. Quay lại tab Admin, chọn **Nhật ký kiểm toán**, sau đó xác nhận trang
+   **Lịch sử hoạt động** đã mở.
 5. Nhập mã giao dịch vào ô tìm kiếm và đối chiếu các kết quả audit.
 
 **Kết quả cần thấy**
@@ -285,4 +286,5 @@ hoặc chưa áp dụng Phân tách nhiệm vụ.
 - [ ] Đăng nhập thử được `controller01 / Controller@123`.
 - [ ] Chưa tạo `lan.demo`.
 - [ ] Dữ liệu giao dịch mẫu ở mục 2 đã sẵn sàng để nhập.
-- [ ] Đã biết vị trí **Lịch sử hoạt động** và ô tìm theo mã giao dịch.
+- [ ] Đã biết vị trí menu **Nhật ký kiểm toán**, trang **Lịch sử hoạt động** và
+      ô tìm theo mã giao dịch.
