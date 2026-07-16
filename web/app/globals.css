@@ -173,7 +173,7 @@ code { font-family: inherit; font-size: inherit; }
 .approval-actions { display: flex; justify-content: flex-end; gap: 12px; padding-top: 6px; }
 
 @media (max-width: 900px) {
-  .login-screen { grid-template-columns: 1fr; }.login-story { min-height: auto; padding: 95px 30px 45px; }.login-story h1 { font-size: 45px; }.login-card { margin: 0; border-radius: 22px 22px 0 0; padding: 36px 28px; }.server-line { margin-bottom: 30px; }
+  .login-screen { grid-template-columns: 1fr; }.login-story { min-height: auto; padding: 95px 30px 45px; }.login-card { margin: 0; border-radius: 22px 22px 0 0; padding: 36px 28px; }.server-line { margin-bottom: 30px; }
   .portal-shell { display: block; }.portal-sidebar { position: relative; height: auto; padding: 14px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; }.portal-brand { margin: 0; }.actor-card { display: none; }.portal-sidebar nav { min-width: 0; display: flex; overflow-x: auto; }.portal-sidebar nav a { white-space: nowrap; font-size: 14px; }.logout-button { margin: 0; padding: 8px; border: 0; }.portal-workspace { padding: 16px 14px 48px; }.two-panel { grid-template-columns: 1fr; }.demo-journey ol { grid-template-columns: 1fr 1fr; }.audit-table { overflow-x: auto; }.audit-row { min-width: 920px; }
 }
 

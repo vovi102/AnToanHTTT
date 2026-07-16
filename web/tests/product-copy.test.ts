@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const renderedFiles = [
+  "app/layout.tsx",
   "app/login/page.tsx",
   "components/AppShell.tsx",
   "components/Feedback.tsx",
@@ -26,6 +27,7 @@ const forbidden = [
   "Điều khiển demo",
   "Đăng nhập qua backend",
   "PHIÊN ĐĂNG NHẬP THẬT",
+  "Demo nghiệp vụ ngân hàng",
   "endpoint được bảo vệ",
   "HTTP 403",
   "SQLite",
