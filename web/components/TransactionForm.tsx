@@ -35,7 +35,7 @@ export function TransactionForm({ onCreated }: { onCreated: (value: Transaction)
 
   return (
     <form className="transfer-form" onSubmit={submit}>
-      <div className="form-section-title"><span>01</span><div><b>Thông tin chuyển khoản</b><small>Dữ liệu sẽ được lưu vào SQLite</small></div></div>
+      <div className="form-section-title"><span>01</span><div><b>Thông tin chuyển khoản</b><small>Kiểm tra thông tin người thụ hưởng và số tiền trước khi tạo yêu cầu.</small></div></div>
       <div className="form-grid two-columns">
         <label>Tài khoản nguồn<input required pattern="[0-9]{10,20}" value={form.source_account} onChange={(event) => setForm({ ...form, source_account: event.target.value })} /></label>
         <label>Tài khoản nhận<input required pattern="[0-9]{10,20}" value={form.destination_account} onChange={(event) => setForm({ ...form, destination_account: event.target.value })} /></label>

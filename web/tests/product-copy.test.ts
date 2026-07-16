@@ -6,6 +6,7 @@ const renderedFiles = [
   "app/login/page.tsx",
   "components/AppShell.tsx",
   "components/Feedback.tsx",
+  "components/TransactionForm.tsx",
   "components/TransactionList.tsx",
   "app/(portal)/transactions/page.tsx",
   "app/(portal)/approvals/page.tsx",
@@ -27,13 +28,15 @@ const forbidden = [
   "PHIÊN ĐĂNG NHẬP THẬT",
   "endpoint được bảo vệ",
   "HTTP 403",
+  "SQLite",
 ];
 
 describe("product-facing copy", () => {
   it("does not expose technical demo instructions", () => {
     const source = renderedFiles
       .map((file) => readFileSync(resolve(process.cwd(), file), "utf8"))
-      .join("\n");
-    for (const phrase of forbidden) expect(source).not.toContain(phrase);
+      .join("\n")
+      .toLowerCase();
+    for (const phrase of forbidden) expect(source).not.toContain(phrase.toLowerCase());
   });
 });
