@@ -25,7 +25,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       .catch(() => undefined);
     refresh();
     window.addEventListener("focus", refresh);
-    return () => window.removeEventListener("focus", refresh);
+    window.addEventListener("security-mode-change", refresh);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("security-mode-change", refresh);
+    };
   }, [request, user]);
 
   if (!ready || !user) return <main className="loading-screen">Đang kiểm tra phiên đăng nhập…</main>;
