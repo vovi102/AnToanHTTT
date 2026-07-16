@@ -1,66 +1,86 @@
-# Chuẩn bị trước khi demo RBAC
+# Chuẩn bị trước khi demo RBAC Nova Bank
 
-Demo này cần **hai dịch vụ cùng chạy**: backend FastAPI ở cổng `8000` và giao
-diện Next.js ở cổng `3000`. Nếu thiếu backend, nút Đăng nhập sẽ báo
-`Failed to fetch`.
+Demo cần FastAPI ở cổng `8000` và Next.js ở cổng `3000`. Thực hiện checklist
+này trước khi trình bày.
 
-## 1. Cài phụ thuộc (chỉ cần làm lần đầu)
+## 1. Cài phụ thuộc lần đầu
 
-Tại thư mục gốc dự án:
+Tại thư mục gốc:
 
 ```bash
 uv sync --extra api
 ```
 
-Tại thư mục giao diện:
+Tại thư mục frontend:
 
 ```bash
 cd web
 npm install
 ```
 
-## 2. Chạy backend — Terminal 1
+## 2. Kiểm tra code trước buổi demo
 
-Mở một terminal tại thư mục gốc dự án và giữ lệnh này chạy trong suốt buổi demo:
+```bash
+UV_CACHE_DIR=.uv-cache uv run pytest -q
+cd web
+npm test
+npm run build
+```
+
+Kỳ vọng: 78 Python tests pass, 7 frontend tests pass và Next.js build thành
+công.
+
+## 3. Chạy backend — Terminal 1
 
 ```bash
 UV_CACHE_DIR=.uv-cache uv run uvicorn rbac_guard.api:app --reload --host 127.0.0.1 --port 8000
 ```
 
-Chỉ tiếp tục khi terminal hiện:
+Chỉ tiếp tục khi <http://127.0.0.1:8000/health> trả JSON có
+`"status":"ok"`.
 
-```text
-Uvicorn running on http://127.0.0.1:8000
-```
-
-Kiểm tra nhanh bằng trình duyệt: <http://127.0.0.1:8000/health>. Trang phải
-trả về JSON, ví dụ `{"status":"ok"}`.
-
-## 3. Chạy giao diện — Terminal 2
-
-Mở terminal thứ hai:
+## 4. Chạy frontend — Terminal 2
 
 ```bash
 cd web
 npm run dev
 ```
 
-Mở <http://localhost:3000> khi terminal hiện địa chỉ Local.
+Mở <http://localhost:3000>. Không đóng hai terminal trong lúc demo.
 
-## 4. Tài khoản để bắt đầu demo
+## 5. Đặt lại và chuẩn bị ba tab
+
+1. Đăng nhập Admin `admin01 / Admin@123`.
+2. Vào **Điều khiển demo**, chọn **Đặt lại toàn bộ dữ liệu demo** nếu đã từng
+   chạy thử. Sau reset, đăng nhập Admin lại.
+3. Xác nhận mode là **Baseline**.
+4. Mở ba tab trực tiếp tới <http://localhost:3000> và đặt tên để dễ chuyển:
+   Admin, Teller, Controller.
+5. Controller seed sẵn: `controller01 / Controller@123`.
+6. Không tạo `lan.demo` trước; tài khoản này cần được tạo trực tiếp khi trình
+   bày để chứng minh backend hoạt động.
+
+## 6. Dữ liệu form chuẩn
 
 ```text
-Username: admin01
-Mật khẩu: Admin@123
+Teller: lan.demo / Lan@1234
+Nguồn: 001100001234
+Đích: 002200005678
+Người nhận: Lê Bình
+Số tiền: 50000000
+Nội dung: Thanh toán hợp đồng
 ```
-
-Đăng nhập bằng tài khoản này để tạo một nhân viên mới, gán role, sau đó đăng
-xuất và đăng nhập lại bằng tài khoản nhân viên vừa tạo.
 
 ## Xử lý lỗi thường gặp
 
 | Hiện tượng | Cách xử lý |
 | --- | --- |
-| `Failed to fetch` khi đăng nhập | Backend chưa chạy. Thực hiện lại bước 2 và kiểm tra `/health`. |
-| `__webpack_modules__[moduleId] is not a function` | Dừng Next.js, chạy `rm -rf web/.next`, sau đó `cd web && npm run dev`; hard refresh trình duyệt (`Ctrl + Shift + R`). |
-| Cổng 8000 đã được dùng | Dừng tiến trình FastAPI cũ, rồi chạy lại lệnh ở bước 2. |
+| Không thể kết nối máy chủ khi login | Kiểm tra Terminal 1 và mở `/health`. |
+| `Failed to fetch` trong DevTools | Backend chưa chạy hoặc sai `NEXT_PUBLIC_API_BASE_URL`. |
+| `__webpack_modules__[moduleId] is not a function` | Dừng Next.js, xóa `web/.next`, chạy lại `npm run dev`, rồi hard refresh. |
+| Cổng 8000 hoặc 3000 đã được dùng | Dừng tiến trình cũ hoặc đổi cổng tương ứng. |
+| Teller vẫn thấy Baseline sau khi Admin bật RBAC | Chuyển sang tab Teller để sự kiện focus tải mode mới; nếu cần bấm Tải lại. |
+| Tạo `lan.demo` báo đã tồn tại | Admin dùng **Đặt lại toàn bộ dữ liệu demo**, đăng nhập lại và chạy từ đầu. |
+| Controller không thấy giao dịch | Xác nhận giao dịch thứ hai đang Pending và bấm Tải lại ở hàng đợi. |
+
+Kịch bản lời thoại đầy đủ nằm tại `docs/USER_JOURNEY_DEMO_RBAC.md`.
