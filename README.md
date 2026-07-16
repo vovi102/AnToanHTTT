@@ -63,35 +63,17 @@ Coverage gate đo các module lõi; `cli.py` được kiểm tra qua subprocess 
 Demo gồm Next.js và FastAPI/SQLite thật: **Admin tạo Teller → Teller tạo giao
 dịch 50 triệu → so sánh trước/sau RBAC → Controller phê duyệt**.
 
-Terminal 1, tại thư mục gốc:
-
-```bash
-uv sync --extra api
-uv run uvicorn rbac_guard.api:app --reload --port 8000
-```
-
-Terminal 2:
-
-```bash
-cd web
-npm install
-npm run dev
-```
-
-Mở <http://localhost:3000>. Chuẩn bị ba tab độc lập cho Admin, Teller và
-Controller. Admin dùng `admin01 / Admin@123`; Controller dùng
-`controller01 / Controller@123`; tài khoản Teller `lan.demo / Lan@1234` được
-tạo trực tiếp khi trình bày.
-
 Ở Baseline, Teller tạo rồi tự phê duyệt giao dịch đầu tiên. Sau khi Admin bật
 RBAC, Teller tạo giao dịch thứ hai và dùng panel **Kiểm tra bảo vệ backend** để
 nhận `HTTP 403 · transactions:approve`; giao dịch vẫn Pending. Controller đăng
 nhập và phê duyệt thành công. Audit log ghi đầy đủ bypass, denied và approved.
 
-Kịch bản nói chi tiết: [`docs/USER_JOURNEY_DEMO_RBAC.md`](docs/USER_JOURNEY_DEMO_RBAC.md).
-Checklist trước buổi demo: [`docs/CHUAN_BI_DEMO_RBAC.md`](docs/CHUAN_BI_DEMO_RBAC.md).
+Hướng dẫn khởi động, dữ liệu mẫu, kịch bản 5–7 phút và xử lý sự cố nằm tại
+[`DEMO_RBAC_NOVA_BANK.md`](DEMO_RBAC_NOVA_BANK.md).
 
-Giao diện Streamlit cũ vẫn dùng được cho phần phân tích log kỹ thuật:
+## Giao diện phân tích log tùy chọn
+
+Streamlit cung cấp giao diện riêng cho phần phân tích log kỹ thuật:
 
 ```bash
 uv sync --no-dev --extra web
