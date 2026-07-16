@@ -1,27 +1,12 @@
 # Hướng dẫn chạy lại demo thực nghiệm RBAC Guard
 
-## Demo giao diện RBAC có backend (Next.js + FastAPI)
+## Demo giao diện RBAC Nova Bank
 
-Mở terminal thứ nhất tại thư mục gốc dự án:
+Hướng dẫn cài đặt, khởi động, chuẩn bị ba vai trò, kịch bản 5–7 phút và xử lý sự
+cố đã được hợp nhất tại [`DEMO_RBAC_NOVA_BANK.md`](DEMO_RBAC_NOVA_BANK.md).
 
-```bash
-uv sync --extra api
-uv run uvicorn rbac_guard.api:app --reload --port 8000
-```
-
-Mở terminal thứ hai:
-
-```bash
-cd web
-npm install
-npm run dev
-```
-
-Truy cập <http://localhost:3000>. Dùng ba tab độc lập để chạy kịch bản Nova
-Bank: Admin tạo `lan.demo` role Teller; Teller tự duyệt giao dịch 50 triệu ở
-Baseline; Admin bật RBAC; Teller gửi thử request duyệt và nhận `403`; Controller
-`controller01 / Controller@123` phê duyệt giao dịch đang chờ. Xem
-`docs/USER_JOURNEY_DEMO_RBAC.md` để có lời thoại từng bước.
+Phần còn lại của tài liệu này chỉ dành cho việc tái lập thực nghiệm phân tích
+log và context-aware risk.
 
 Tài liệu này hướng dẫn tái lập hai thực nghiệm trong bài báo:
 
@@ -68,8 +53,8 @@ Chạy bộ kiểm thử hồi quy:
 uv run pytest -q
 ```
 
-Kết quả mong đợi của code hiện tại là **78 passed**. Để kiểm tra cả
-coverage của phần lõi:
+Kết quả mong đợi: toàn bộ kiểm thử kết thúc thành công. Để kiểm tra cả coverage
+của phần lõi:
 
 ```bash
 uv run pytest -q --cov=rbac_guard --cov-report=term-missing --cov-fail-under=85

@@ -260,7 +260,7 @@ Run:
 ```bash
 test ! -e docs/CHUAN_BI_DEMO_RBAC.md
 test ! -e docs/USER_JOURNEY_DEMO_RBAC.md
-! rg -n 'CHUAN_BI_DEMO_RBAC|USER_JOURNEY_DEMO_RBAC|Giao diện Streamlit cũ|78 passed|7 frontend tests' README.md HUONG_DAN_CHAY_DEMO.md docs --glob '!superpowers/**'
+! rg -n 'CHUAN_BI_DEMO_RBAC|USER_JOURNEY_DEMO_RBAC|Giao diện Streamlit cũ|78 passed|7 frontend tests' README.md HUONG_DAN_CHAY_DEMO.md docs --glob '!docs/superpowers/**'
 rg -n 'DEMO_RBAC_NOVA_BANK\.md' README.md HUONG_DAN_CHAY_DEMO.md
 git diff --check
 ```
