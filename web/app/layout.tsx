@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Nova Bank | Cổng vận hành",
-  description: "Demo nghiệp vụ ngân hàng trước và sau khi áp dụng RBAC.",
+  description: "Cổng nghiệp vụ nội bộ Nova Bank.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

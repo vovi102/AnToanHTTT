@@ -1,11 +1,15 @@
 import type { SecurityMode } from "./types";
 
-export type ApprovalPresentation = "self_approve" | "backend_proof" | "approve" | "none";
+export type ApprovalPresentation =
+  | "self_approve"
+  | "approval_link"
+  | "waiting"
+  | "none";
 
 export function approvalPresentation(mode: SecurityMode, roles: string[]): ApprovalPresentation {
-  if (roles.includes("controller")) return "approve";
+  if (roles.includes("controller")) return "approval_link";
   if (!roles.includes("teller")) return "none";
-  return mode === "baseline" ? "self_approve" : "backend_proof";
+  return mode === "baseline" ? "self_approve" : "waiting";
 }
 
 export function formatVnd(value: number): string {

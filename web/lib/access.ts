@@ -15,7 +15,7 @@ const roleNavigation: Record<Role, NavigationItem[]> = {
   ],
   administrator: [
     { href: "/admin/users", label: "Nhân viên", shortLabel: "NV" },
-    { href: "/admin/demo-control", label: "Điều khiển demo", shortLabel: "DM" },
+    { href: "/admin/policies", label: "Chính sách phê duyệt", shortLabel: "CS" },
     { href: "/audit", label: "Nhật ký kiểm toán", shortLabel: "KT" },
   ],
   auditor: [
@@ -34,7 +34,7 @@ export function navigationFor(roles: string[]): NavigationItem[] {
 }
 
 export function roleHome(roles: string[]): string {
-  if (roles.includes("administrator")) return "/admin/demo-control";
+  if (roles.includes("administrator")) return "/admin/policies";
   return navigationFor(roles)[0]?.href ?? "/login";
 }
 

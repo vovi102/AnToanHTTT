@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { navigationFor, roleHome, roleLabels } from "../lib/access";
+import { modePresentation } from "../lib/presentation";
 import type { SecurityMode } from "../lib/types";
 import { useAuth } from "./AuthProvider";
 
@@ -35,6 +36,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (!ready || !user) return <main className="loading-screen">Đang kiểm tra phiên đăng nhập…</main>;
   const navigation = navigationFor(user.roles);
   const role = user.roles[0] ?? "";
+  const policy = modePresentation(mode);
 
   return (
     <main className="portal-shell">
@@ -50,9 +52,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
       <section className="portal-workspace">
         <div className={`mode-banner mode-${mode}`}>
-          <div><strong>{mode === "rbac" ? "RBAC đang bảo vệ hệ thống" : "Baseline — chưa áp dụng RBAC"}</strong>
-          <span>{mode === "rbac" ? "Backend kiểm tra quyền trên từng thao tác nhạy cảm" : "Chế độ so sánh chỉ dùng trong buổi demo"}</span></div>
-          <b>{mode === "rbac" ? "SECURE MODE" : "BASELINE"}</b>
+          <div><strong>{policy.title}</strong><span>{policy.description}</span></div>
+          <b>{mode === "rbac" ? "ĐANG ÁP DỤNG" : "CHÍNH SÁCH HIỆN TẠI"}</b>
         </div>
         {children}
       </section>

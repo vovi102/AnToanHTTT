@@ -5,11 +5,11 @@ import { approvalPresentation, formatVnd } from "../lib/transactions";
 describe("transaction presentation", () => {
   it("shows self approval only to tellers in baseline mode", () => {
     expect(approvalPresentation("baseline", ["teller"])).toBe("self_approve");
-    expect(approvalPresentation("rbac", ["teller"])).toBe("backend_proof");
+    expect(approvalPresentation("rbac", ["teller"])).toBe("waiting");
   });
 
   it("shows normal approval only to controllers", () => {
-    expect(approvalPresentation("rbac", ["controller"])).toBe("approve");
+    expect(approvalPresentation("rbac", ["controller"])).toBe("approval_link");
     expect(approvalPresentation("rbac", ["auditor"])).toBe("none");
     expect(approvalPresentation("rbac", ["administrator"])).toBe("none");
   });

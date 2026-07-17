@@ -63,10 +63,9 @@ Coverage gate đo các module lõi; `cli.py` được kiểm tra qua subprocess 
 Demo gồm Next.js và FastAPI/SQLite thật: **Admin tạo Teller → Teller tạo giao
 dịch 50 triệu → so sánh trước/sau RBAC → Controller phê duyệt**.
 
-Ở Baseline, Teller tạo rồi tự phê duyệt giao dịch đầu tiên. Sau khi Admin bật
-RBAC, Teller tạo giao dịch thứ hai và dùng panel **Kiểm tra bảo vệ backend** để
-nhận `HTTP 403 · transactions:approve`; giao dịch vẫn Pending. Controller đăng
-nhập và phê duyệt thành công. Audit log ghi đầy đủ bypass, denied và approved.
+Với Kiểm soát cơ bản, Teller tạo rồi hoàn tất giao dịch đầu tiên. Sau khi Admin
+áp dụng Phân tách nhiệm vụ, Teller truy cập trực tiếp trang phê duyệt và bị từ
+chối; Controller phê duyệt thành công.
 
 Hướng dẫn khởi động, dữ liệu mẫu, kịch bản 5–7 phút và xử lý sự cố nằm tại
 [`DEMO_RBAC_NOVA_BANK.md`](DEMO_RBAC_NOVA_BANK.md).

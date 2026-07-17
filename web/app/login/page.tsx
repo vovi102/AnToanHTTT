@@ -4,14 +4,14 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "../../components/AuthProvider";
-import { ApiError, API_BASE } from "../../lib/api";
+import { ApiError } from "../../lib/api";
 import { roleHome } from "../../lib/access";
 
 export default function LoginPage() {
   const router = useRouter();
   const { login, user, ready } = useAuth();
-  const [username, setUsername] = useState("admin01");
-  const [password, setPassword] = useState("Admin@123");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [expired, setExpired] = useState(false);
@@ -38,35 +38,24 @@ export default function LoginPage() {
     }
   };
 
-  const useDemoAccount = (account: "admin" | "controller") => {
-    if (account === "admin") {
-      setUsername("admin01"); setPassword("Admin@123");
-    } else {
-      setUsername("controller01"); setPassword("Controller@123");
-    }
-  };
-
   return (
     <main className="login-screen">
       <section className="login-story">
         <div className="login-brand"><span>N</span>NOVA BANK</div>
-        <p className="kicker light">CỔNG VẬN HÀNH NỘI BỘ</p>
-        <h1>Một giao dịch.<br />Hai chế độ.<br /><em>Quyền quyết định kết quả.</em></h1>
-        <p className="login-lead">Demo nghiệp vụ chuyển khoản 50 triệu trước và sau khi backend áp dụng RBAC.</p>
-        <div className="story-steps"><span><b>01</b>Admin tạo giao dịch viên</span><span><b>02</b>Teller tạo yêu cầu</span><span><b>03</b>Controller phê duyệt</span></div>
+        <p className="kicker light">CỔNG NGHIỆP VỤ NỘI BỘ</p>
+        <h1>Vận hành giao dịch<br /><em>an toàn và nhất quán.</em></h1>
+        <p className="login-lead">Không gian làm việc dành cho nhân viên Nova Bank.</p>
       </section>
       <section className="login-card">
-        <div className="server-line"><i></i>FastAPI · {API_BASE}</div>
-        <p className="kicker">PHIÊN ĐĂNG NHẬP THẬT</p><h2>Đăng nhập hệ thống</h2>
-        <p>Mật khẩu được xác thực tại backend; mỗi tab giữ một phiên độc lập để chạy demo theo vai trò.</p>
+        <p className="kicker">ĐĂNG NHẬP HỆ THỐNG</p><h2>Đăng nhập hệ thống</h2>
+        <p>Sử dụng tài khoản nội bộ đã được cấp.</p>
         {expired && <div className="inline-alert warning">Phiên đã hết hạn. Vui lòng đăng nhập lại.</div>}
         <form className="form-grid" onSubmit={submit}>
           <label>Tên đăng nhập<input required value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" /></label>
           <label>Mật khẩu<input required type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" /></label>
-          {error && <div className="inline-alert error">{error}{error.includes("kết nối") && <small>Hãy kiểm tra backend tại http://127.0.0.1:8000/health</small>}</div>}
-          <button className="button primary wide" disabled={submitting}>{submitting ? "Đang xác thực…" : "Đăng nhập qua backend"}<span>→</span></button>
+          {error && <div className="inline-alert error">{error}</div>}
+          <button className="button primary wide" disabled={submitting}>{submitting ? "Đang đăng nhập…" : "Đăng nhập"}<span>→</span></button>
         </form>
-        <div className="demo-accounts"><span>Tài khoản chuẩn bị sẵn</span><button onClick={() => useDemoAccount("admin")}>Admin</button><button onClick={() => useDemoAccount("controller")}>Controller</button></div>
       </section>
     </main>
   );

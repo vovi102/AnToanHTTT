@@ -44,10 +44,7 @@ export type ManagedUser = {
 };
 
 export type FeedbackState = {
-  kind: "success" | "error" | "proof";
+  kind: "success" | "error";
   title: string;
   message: string;
-  endpoint?: string;
-  status?: number;
-  permission?: string;
 };

@@ -416,19 +416,20 @@ class RBACRepository:
             ).fetchone()
             if approver_row is None:
                 raise ValueError("unknown approver")
-            exists = connection.execute(
-                "SELECT status FROM transactions WHERE reference = ?", (reference,)
-            ).fetchone()
-            if exists is None:
-                raise LookupError("transaction not found")
-            if exists[0] != "pending":
-                raise ValueError("transaction already processed")
-            connection.execute(
+            updated = connection.execute(
                 """UPDATE transactions
                    SET status = 'approved', approved_by = ?, approved_at = ?
                    WHERE reference = ? AND status = 'pending'""",
                 (approver_row[0], now, reference),
             )
+            if updated.rowcount != 1:
+                exists = connection.execute(
+                    "SELECT status FROM transactions WHERE reference = ?",
+                    (reference,),
+                ).fetchone()
+                if exists is None:
+                    raise LookupError("transaction not found")
+                raise ValueError("transaction already processed")
         self.audit(
             approver,
             "transactions",

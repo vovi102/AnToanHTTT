@@ -1,4 +1,7 @@
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+import sqlite3
+import threading
 
 from fastapi.testclient import TestClient
 import pytest
@@ -38,6 +41,31 @@ def create_transfer(client: TestClient, token: str) -> str:
     )
     assert response.status_code == 201
     return response.json()["reference"]
+
+
+class ApprovalRaceConnection(sqlite3.Connection):
+    approval_barrier: threading.Barrier | None = None
+
+    def execute(
+        self, sql: str, parameters: tuple[object, ...] = ()
+    ) -> sqlite3.Cursor:
+        normalized = " ".join(sql.split()).lower()
+        if (
+            self.approval_barrier is not None
+            and normalized.startswith("update transactions")
+            and "status = 'pending'" in normalized
+        ):
+            self.approval_barrier.wait(timeout=5)
+        return super().execute(sql, parameters)
+
+
+class ApprovalRaceRepository(RBACRepository):
+    def _connect(self) -> sqlite3.Connection:
+        connection = sqlite3.connect(
+            self.db_path, timeout=5, factory=ApprovalRaceConnection
+        )
+        connection.execute("PRAGMA foreign_keys = ON")
+        return connection
 
 
 def test_admin_creates_teller_then_backend_enforces_permissions(client: TestClient) -> None:
@@ -129,6 +157,128 @@ def test_baseline_then_rbac_requires_controller_approval(client: TestClient) -> 
         f"/transactions/{rbac_reference}/approve", headers=auth(controller_token)
     )
     assert repeated.status_code == 409
+
+
+def test_concurrent_approval_has_one_winner_and_one_conflict(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository = ApprovalRaceRepository(tmp_path / "approval-race.db")
+    monkeypatch.setattr(api, "repository", repository)
+
+    with TestClient(api.app) as test_client:
+        admin_token = login(test_client, "admin01", "Admin@123")
+        created = test_client.post(
+            "/users",
+            headers=auth(admin_token),
+            json={
+                "username": "lan.demo",
+                "display_name": "Lan Nguyễn",
+                "password": "Lan@1234",
+                "role": "teller",
+            },
+        )
+        assert created.status_code == 201
+        teller_token = login(test_client, "lan.demo", "Lan@1234")
+        reference = create_transfer(test_client, teller_token)
+        changed_mode = test_client.patch(
+            "/demo/security-mode",
+            headers=auth(admin_token),
+            json={"mode": "rbac"},
+        )
+        assert changed_mode.status_code == 200
+        controller_token = login(test_client, "controller01", "Controller@123")
+
+        ApprovalRaceConnection.approval_barrier = threading.Barrier(2)
+        try:
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                responses = list(
+                    executor.map(
+                        lambda _: test_client.post(
+                            f"/transactions/{reference}/approve",
+                            headers=auth(controller_token),
+                        ),
+                        range(2),
+                    )
+                )
+        finally:
+            ApprovalRaceConnection.approval_barrier = None
+
+        assert sorted(response.status_code for response in responses) == [200, 409]
+        transaction = repository.get_transaction(
+            reference, "controller01", read_all=True
+        )
+        assert transaction is not None
+        assert transaction["status"] == "approved"
+        assert transaction["approved_by"] == "controller01"
+
+        approval_successes = [
+            event
+            for event in repository.transaction_timeline(reference)
+            if event["action"] == "approve" and event["outcome"] == "success"
+        ]
+        assert len(approval_successes) == 1
+
+
+def test_approval_resource_is_protected_and_audited(client: TestClient) -> None:
+    admin_token = login(client, "admin01", "Admin@123")
+    created = client.post(
+        "/users",
+        headers=auth(admin_token),
+        json={
+            "username": "lan.demo",
+            "display_name": "Lan Nguyễn",
+            "password": "Lan@1234",
+            "role": "teller",
+        },
+    )
+    assert created.status_code == 201
+    teller_token = login(client, "lan.demo", "Lan@1234")
+    reference = create_transfer(client, teller_token)
+
+    baseline_view = client.get(
+        f"/approvals/{reference}", headers=auth(teller_token)
+    )
+    assert baseline_view.status_code == 200
+    assert baseline_view.json()["reference"] == reference
+
+    changed = client.patch(
+        "/demo/security-mode",
+        headers=auth(admin_token),
+        json={"mode": "rbac"},
+    )
+    assert changed.status_code == 200
+
+    denied = client.get(f"/approvals/{reference}", headers=auth(teller_token))
+    assert denied.status_code == 403
+    unchanged = client.get(
+        f"/transactions/{reference}", headers=auth(teller_token)
+    )
+    assert unchanged.json()["status"] == "pending"
+
+    controller_token = login(client, "controller01", "Controller@123")
+    allowed = client.get(
+        f"/approvals/{reference}", headers=auth(controller_token)
+    )
+    assert allowed.status_code == 200
+    assert allowed.json()["reference"] == reference
+    assert client.get(
+        "/approvals/TXN-DOES-NOT-EXIST", headers=auth(controller_token)
+    ).status_code == 404
+    assert client.get(
+        "/approvals/TXN-DOES-NOT-EXIST", headers=auth(teller_token)
+    ).status_code == 403
+
+    logs = client.get("/audit-logs", headers=auth(admin_token)).json()
+    review_outcomes = [
+        event["outcome"]
+        for event in logs
+        if event["transaction_reference"] == reference
+        and event["resource"] == "transactions"
+        and event["action"] == "review"
+    ]
+    assert "baseline_bypass" in review_outcomes
+    assert "denied" in review_outcomes
+    assert "allowed" in review_outcomes
 
 
 def test_transaction_lists_are_role_aware_and_timeline_is_ordered(

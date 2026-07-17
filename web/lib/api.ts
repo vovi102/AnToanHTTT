@@ -28,7 +28,7 @@ export async function apiRequest<T>(
       },
     });
   } catch {
-    throw new ApiError(0, "Không thể kết nối máy chủ FastAPI");
+    throw new ApiError(0, "Không thể kết nối hệ thống. Vui lòng thử lại hoặc liên hệ quản trị viên.");
   }
 
   if (!response.ok) {
