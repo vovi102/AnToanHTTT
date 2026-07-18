@@ -98,8 +98,9 @@ Injection trong RBAC Guard không được xem là lớp phòng vệ ứng dụn
 lớp giám sát hậu kiểm để phát hiện request có chỉ báo đáng ngờ trong log.
 
 Rule dùng một tập regex xác định trước và lưu pattern đã khớp làm evidence.
-Ưu điểm của cách này là người đọc biết ngay vì sao Event bị gắn cờ, dễ viết test
-và tái lập cùng một kết quả. Đổi lại, nó có thể bỏ sót encoding, payload phân
+Ưu điểm của cách này là người đọc biết ngay vì sao Event bị gắn cờ, dễ đối
+chiếu bằng chứng và tái lập cùng một kết quả. Đổi lại, nó có thể bỏ sót
+encoding, payload phân
 mảnh hoặc biến thể chưa nằm trong pattern; mở rộng pattern lại có thể bắt nhầm
 văn bản hợp lệ. Kết quả SQL Injection của dataset tổng hợp vì thế được trình
 bày như kiểm chứng implementation theo scenario, không phải tỷ lệ phát hiện
@@ -157,5 +158,5 @@ correlation chỉ ra nhu cầu liên hệ alert để giảm gánh nặng phân 
 quy tắc gom nhóm đơn giản theo cùng user--IP và khoảng cách thời gian. Incident
 kết quả giữ toàn bộ alert ID, Event ID, loại rủi ro, context signal và evidence;
 điều này giúp người đọc truy ngược nguyên nhân. Quy tắc không mô hình hóa quan
-hệ nhân quả như các hệ thống correlation chuyên sâu, đổi lại nó dễ kiểm thử và
-phù hợp với quy mô đồ án.
+hệ nhân quả như các hệ thống correlation chuyên sâu, đổi lại hành vi của nó dễ
+xác minh và phù hợp với quy mô đồ án.
