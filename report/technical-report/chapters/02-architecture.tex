@@ -21,6 +21,28 @@ end-to-end từ quyết định nghiệp vụ tới detector.
 
 \section{Các thành phần chính}
 
+Các thành phần của hệ thống được tổ chức thành bốn lớp trách nhiệm. Lớp trình
+bày gồm giao diện Next.js, tiếp nhận thao tác của người dùng nhưng không tự đưa
+ra quyết định phân quyền. Lớp nghiệp vụ và kiểm soát truy cập nằm tại FastAPI,
+nơi xác thực phiên, kiểm tra permission, áp dụng chính sách nghiệp vụ và tạo
+bản ghi audit cho mỗi hành động cần theo dõi. Lớp lưu trữ sử dụng SQLite cùng
+\texttt{RBACRepository} để duy trì nhất quán giữa user, role, permission, phiên
+đăng nhập và trạng thái giao dịch.
+
+Ranh giới trách nhiệm này bảo đảm dữ liệu do trình duyệt gửi lên chỉ được xem
+là yêu cầu, không phải bằng chứng về quyền hạn. FastAPI tra cứu quyền từ
+repository trước khi thực thi thao tác; frontend chỉ hiển thị kết quả do API
+trả về. Vì vậy, việc ẩn một nút trên giao diện không thay thế cho kiểm soát ở
+backend, và một yêu cầu gọi trực tiếp endpoint vẫn phải đi qua cùng cơ chế xác
+thực và phân quyền.
+
+Ở nhánh giám sát, audit adapter chuyển các sự kiện xác thực và phân quyền trong
+Nova Bank sang hợp đồng Event chung. Parser chuẩn hóa dữ liệu, tập luật phát
+hiện chỉ báo, bộ chấm điểm gán mức rủi ro và reporter ghi các artifact phục vụ
+điều tra. Chuỗi xử lý này tách schema nghiệp vụ khỏi logic phát hiện, đồng thời
+cho phép truy vết từ một quyết định tại API tới cảnh báo hoặc incident tương
+ứng. Bảng~\ref{tab:components} tổng hợp trách nhiệm cụ thể của từng thành phần.
+
 \begin{table}[htbp]
 \centering
 \small
