@@ -36,11 +36,19 @@ python3.11 --version
 uv sync
 ```
 
+**Bạn làm gì:** tạo môi trường phụ thuộc tái lập được cho CLI trước khi chạy
+demo. **Ý nghĩa:** `uv` đọc lockfile để dùng các phiên bản đã được chốt, tránh
+việc máy khác dùng dependency không tương thích.
+
 Xác nhận CLI đã sẵn sàng:
 
 ```bash
 uv run rbac-guard --help
 ```
+
+**Kết quả cần thấy:** danh sách lệnh con như `init-db`, `check-access`,
+`analyze` và `evaluate`. Đây là kiểm tra entry point đã được cài đúng, không
+phải thao tác phân tích dữ liệu.
 
 Nếu lệnh không tìm thấy `python3.11`, dùng trình thông dịch Python 3.11+ đang
 có trên máy, ví dụ `python3`.
@@ -60,6 +68,9 @@ của phần lõi:
 uv run pytest -q --cov=rbac_guard --cov-report=term-missing --cov-fail-under=85
 ```
 
+**Ý nghĩa:** test không tạo artifact cho buổi trình bày; nó chỉ xác nhận mã và
+quy tắc phát hiện vẫn hoạt động trước khi dùng kết quả demo.
+
 ## 4. Khởi tạo RBAC và kiểm tra quyền
 
 Tạo thư mục làm việc tạm cho một lần demo. Biến `DEMO_DIR` giúp các lần chạy
@@ -70,6 +81,11 @@ export DEMO_DIR="$(mktemp -d)"
 echo "$DEMO_DIR"
 uv run rbac-guard init-db --db "$DEMO_DIR/rbac.db" --seed data/rbac_seed.json
 ```
+
+**Bạn làm gì:** tạo một CSDL SQLite mới và nạp người dùng, role, permission mẫu.
+`DEMO_DIR` do `mktemp -d` tạo giúp tách hoàn toàn artifact của lần chạy này khỏi
+lần chạy khác. **Ý nghĩa:** mọi kiểm tra truy cập trong `analyze` đều tra CSDL
+seed này, thay vì dựa trên dữ liệu quyền ghi cứng trong file log.
 
 Kết quả mong đợi có dạng:
 
@@ -87,9 +103,17 @@ uv run rbac-guard check-access \
 
 Kết quả mong đợi: `ALLOWED`.
 
+**Ý nghĩa:** đây là kiểm tra nhanh đường đi RBAC: user, resource và action được
+tra trong CSDL vừa seed. Nếu không nhận `ALLOWED`, dừng tại đây vì các bước phân
+tích sau sẽ dùng cùng nguồn quyền.
+
 ## 5. Thực nghiệm 1 — Baseline detection
 
 ### 5.1 Chạy phân tích
+
+**Bạn làm gì:** đưa log baseline qua parser và các luật phát hiện, đồng thời đối
+chiếu quyền truy cập bằng `rbac.db`. `--output` là nơi chương trình ghi báo cáo;
+không chỉnh sửa các tệp này bằng tay.
 
 ```bash
 uv run rbac-guard analyze \
@@ -105,7 +129,13 @@ Kết quả mong đợi:
 Analyzed 60 valid events; 0 invalid rows; 20 alerts
 ```
 
+**Ý nghĩa:** 60 là số event parser chấp nhận, 20 là số alert sinh bởi luật;
+đây là checkpoint pipeline xử lý trước khi đánh giá metric.
+
 ### 5.2 Tính metric
+
+**Bạn làm gì:** so sánh định danh event trong `alerts.json` với nhãn
+`expected_label` của `logs_demo.csv`, rồi ghi metric vào một tệp riêng.
 
 ```bash
 uv run rbac-guard evaluate \
@@ -133,11 +163,18 @@ metrics.json
 run_metadata.json
 ```
 
+**Ý nghĩa:** `alerts.csv`/`alerts.json` là cảnh báo để xem hoặc tái sử dụng,
+`run_metadata.json` ghi thông tin lần chạy, còn `metrics.json` là bằng chứng
+định lượng sau khi `evaluate` hoàn tất.
+
 Đọc metric mà không cần cài thêm công cụ:
 
 ```bash
 uv run python -m json.tool "$DEMO_DIR/baseline/metrics.json"
 ```
+
+**Kết quả cần thấy:** JSON được format dễ đọc, với macro precision, recall và
+F1 khớp checkpoint ở trên.
 
 Diễn giải ngắn: 60 sự kiện gồm dữ liệu lành tính và ba nhãn rủi ro; hệ thống
 sinh 20 cảnh báo. Một mẫu SQL injection không khớp luật regex, nên recall macro
@@ -147,6 +184,10 @@ vận hành thực tế.
 ## 6. Thực nghiệm 2 — Context-aware risk và incident grouping
 
 Dùng cùng CSDL RBAC đã seed ở bước 4:
+
+**Bạn làm gì:** chạy lại pipeline trên dataset nhỏ hơn nhưng bật
+`--context-risk`. Cờ này vẫn giữ các alert rule-based và thêm finding theo ngữ
+cảnh, sau đó gom finding/alert liên quan thành incident.
 
 ```bash
 uv run rbac-guard analyze \
@@ -184,6 +225,10 @@ Xem finding và incident ở định dạng dễ đọc:
 uv run python -m json.tool "$DEMO_DIR/context/context_findings.json"
 uv run python -m json.tool "$DEMO_DIR/context/incidents.json"
 ```
+
+**Ý nghĩa:** `context_findings.json` cho biết từng tín hiệu hành vi; `incidents`
+cho biết các tín hiệu nào được nhóm thành cùng một sự cố. Hai tệp là bằng chứng
+cho phần context-aware, không thay thế `alerts.json`.
 
 Kết quả checkpoint mong đợi là 10 finding, gồm 6 `CTX-AFTER-HOURS`, 1
 `CTX-NEW-IP`, 2 `CTX-RARE-RESOURCE` và 1 `CTX-REPEATED-DENIAL`; các cảnh báo
@@ -240,6 +285,10 @@ uv sync --no-dev --extra web
 uv run --no-dev --extra web streamlit run src/rbac_guard/web.py
 ```
 
+**Ý nghĩa:** Streamlit là adapter giao diện cho cùng luồng phân tích, không phải
+một pipeline khác. `--extra web` chỉ bổ sung dependency UI; không cần khi chạy
+CLI ở các mục trước.
+
 Trước khi nhấn **Analyze** trên giao diện, khởi tạo CSDL `demo.db` tại thư mục
 gốc:
 
@@ -248,8 +297,13 @@ uv run rbac-guard init-db --db demo.db --seed data/rbac_seed.json
 ```
 
 Sau đó tải `data/logs_demo.csv` cho baseline hoặc `data/logs_risk_demo.csv` và
-bật **Context-aware risk analysis** cho thực nghiệm ngữ cảnh. Giao diện chỉ
-đọc kết quả và không thay đổi dữ liệu RBAC hay luật phát hiện.
+bật **Context-aware risk analysis** cho thực nghiệm ngữ cảnh. Giao diện gọi
+cùng dịch vụ phân tích với CLI, dùng CSDL RBAC ở `demo.db` để kiểm tra quyền;
+nó không thay đổi dữ liệu RBAC hay luật phát hiện.
+
+**Kết quả cần thấy:** trước khi bấm **Analyze**, `demo.db` phải đã được khởi tạo
+riêng tại thư mục gốc; nếu không giao diện không có nguồn permission để đánh giá
+truy cập.
 
 ## 9. Biên dịch lại bài báo (tùy chọn)
 
@@ -284,3 +338,7 @@ unset DEMO_DIR
 
 Không dùng lệnh này nếu bạn đã thay `DEMO_DIR` bằng một thư mục chứa dữ liệu cần
 giữ.
+
+**Ý nghĩa:** lệnh xóa an toàn trong hướng dẫn này chỉ vì `DEMO_DIR` được tạo bởi
+`mktemp -d` ở bước 4. Nếu đã gán biến đó sang đường dẫn khác, hãy kiểm tra lại
+giá trị bằng `echo "$DEMO_DIR"` trước khi xóa.

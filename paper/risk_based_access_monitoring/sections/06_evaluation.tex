@@ -1,84 +1,50 @@
-\section{Đánh giá}
+\section{Kiểm chứng nguyên mẫu}
 \label{sec:evaluation}
 
-\subsection{Bộ dữ liệu}
+Phần này kiểm chứng rằng nguyên mẫu hiện thực hóa các thành phần thiết kế và
+tạo hiện vật có thể đối chiếu. Đây không phải đánh giá hiệu năng của một hệ
+thống vận hành. Hai dataset CSV trong kho mã nguồn đều là dữ liệu tổng hợp;
+trường \texttt{expected\_label} chỉ phục vụ so sánh sau khi phát hiện và không
+đi vào parser, luật hoặc chấm điểm.
+
+\subsection{Kịch bản kiểm chứng}
 \label{subsec:datasets}
 
-Bộ dữ liệu nền chứa các sự kiện lành tính tổng hợp và ba loại rủi ro có nhãn:
-SQL injection, đoán mật khẩu và truy cập trái phép. Bộ dữ liệu rủi ro theo ngữ
-cảnh chứa thêm các kịch bản liên quan đến địa chỉ IP mới, hoạt động ngoài giờ,
-truy cập tài nguyên hiếm gặp, hành động bị từ chối lặp lại và chuỗi tấn công
-nhiều sự kiện. Bảng~\ref{tab:dataset-description} tách rõ hai tệp CSV và vai
-trò của chúng. Trường \texttt{expected\_label} là nhãn phục vụ đánh giá trong
-nguyên mẫu; nó không phải dữ liệu mà một triển khai vận hành sẽ có sẵn.
+Dataset baseline gồm 60 event: 30 benign, 10 SQL injection, 10 password
+guessing và 10 unauthorized access. Nó kiểm chứng hai luật phát hiện chính và
+luật RBAC hỗ trợ trên các trường hợp đã xây dựng. Dataset context gồm 14 event
+để xác nhận tùy chọn context-risk có thể sinh finding và incident; dataset này
+không được dùng để suy ra một metric phân loại độc lập.
 
 \input{tables/dataset_description}
 
-\subsection{Thước đo}
-\label{subsec:metrics}
-
-Với bộ dữ liệu phát hiện theo luật nền, đánh giá báo cáo dương tính đúng (TP),
-dương tính giả (FP), âm tính giả (FN), âm tính đúng (TN), độ chính xác
-(precision), độ bao phủ (recall) và F1 theo từng loại rủi ro. Với lớp ngữ cảnh,
-đánh giá được thực hiện theo kịch bản: số event hợp lệ, alert, finding theo
-từng tín hiệu và incident được lấy trực tiếp từ artifact, thay vì gán một metric
-phân loại độc lập cho từng finding. Cả hai lần chạy dùng cùng seed RBAC
-\texttt{data/rbac\_seed.json} và \texttt{config/default.toml}: cửa sổ 300 giây,
-giờ làm việc 08:00--18:00, và bonus ngữ cảnh 10 (IP mới), 8 (ngoài giờ/tài
-nguyên hiếm), 12 (từ chối lặp lại) và 15 (chuỗi incident). Các lệnh tái sinh và
-artifact đầu ra được lưu trong \texttt{PROGRESS.md} và thư mục \texttt{artifacts/}.
-
-\subsection{Kết quả}
+\subsection{Kết quả kiểm chứng luật}
 \label{subsec:results}
 
-Bảng~\ref{tab:baseline-results} tóm tắt kết quả nền hiện tại.
+Lần chạy baseline xử lý 60 event hợp lệ, không có dòng lỗi và tạo 20 alert.
+Bảng~\ref{tab:baseline-results} so alert với nhãn tổng hợp theo từng loại rủi
+ro. SQL injection có một âm tính giả, do một request không khớp bốn regex cài
+đặt; password guessing và kiểm tra truy cập không được phép khớp toàn bộ trường
+hợp đã xây dựng. Vì dataset được thiết kế cùng phạm vi luật, các precision,
+recall và F1 chỉ chứng minh hành vi của nguyên mẫu trên kịch bản có nhãn, không
+đại diện cho hiệu năng trên log thực tế.
 
 \input{tables/baseline_results}
 
-Lần chạy tái lập xử lý 60 sự kiện hợp lệ, không có dòng lỗi và tạo 20 cảnh
-báo. Ba nhãn có precision tuyệt đối trong tập tổng hợp này; riêng SQL injection
-có một âm tính giả, nên recall là 0.9000 và F1 là 0.9474. Do đó, các số liệu chỉ
-cho thấy hành vi của nguyên mẫu trên kịch bản có nhãn, không phải hiệu năng trên
-nhật ký vận hành thực tế.
+\subsection{Kiểm chứng mở rộng theo ngữ cảnh}
 
-Trên kịch bản rủi ro theo ngữ cảnh, lần chạy xử lý 14 sự kiện hợp lệ, không có
-dòng lỗi, tạo 15 cảnh báo và 10 phát hiện ngữ cảnh. Bảng~\ref{tab:context-findings}
-cho thấy sáu phát hiện ngoài giờ, hai phát hiện tài nguyên hiếm, một IP mới và
-một cụm từ chối lặp lại. Số lượng finding không phải số sự kiện duy nhất: một
-sự kiện có thể mang nhiều tín hiệu; vì vậy kết quả được trình bày như tín hiệu
-triage giải thích được thay vì một độ đo phân loại độc lập.
+Khi bật \texttt{--context-risk}, lần chạy thứ hai xử lý 14 event hợp lệ, sinh
+15 alert, 10 context finding và 3 incident. Các số đếm được lấy trực tiếp từ
+\texttt{run\_metadata.json}, \texttt{context\_findings.json} và
+\texttt{incidents.json}. Chúng xác nhận đường xử lý mở rộng hoạt động và giữ
+event IDs/evidence, nhưng không phải thước đo độ chính xác. Các bảng chi tiết
+về finding và incident được giữ trong artifact của kho nguồn để phục vụ truy
+vết, thay vì là bằng chứng chính của đóng góp.
 
-\input{tables/context_findings}
-
-Cuối cùng, cơ chế grouping tạo ba incident (Bảng~\ref{tab:incident-summary}).
-Mỗi incident được tạo bằng cách nhóm cảnh báo theo cùng cặp người dùng--IP;
-trong từng nhóm, một đoạn mới bắt đầu khi chênh lệch với cảnh báo trước lớn hơn
-300 giây. Mức điểm incident là điểm cảnh báo lớn nhất trong đoạn cộng bonus chuỗi
-khi đoạn có nhiều cảnh báo, sau đó bị chặn ở 100. Vì artifact chỉ lưu hai mốc
-đầu-cuối, bảng không diễn giải nó như một timeline pháp chứng đầy đủ.
-
-\input{tables/incident_summary}
-
-\paragraph{Kiểm tra tính nhất quán.}
-Bốn bảng trong bài gồm mô tả dataset, metric baseline, finding ngữ cảnh và
-incident; mỗi bảng đều ghi rõ tệp nguồn hoặc artifact CP3 trong caption. Cụ thể,
-\texttt{run\_metadata.json} của lần chạy context ghi 14 dòng hợp lệ, 0 dòng lỗi
-và 15 alert; các con số 10 finding và 3 incident được đếm từ hai JSON tương
-ứng. Vì vậy, so sánh định lượng duy nhất là metric baseline có nhãn; các bảng
-ngữ cảnh chỉ mô tả đầu ra của kịch bản tổng hợp và không được dùng để suy ra
-precision, recall hay khả năng tổng quát hóa.
-
-\subsection{Case study: chuỗi truy cập rủi ro ngoài giờ}
-\label{subsec:case-study}
-
-Incident \texttt{incident-38dfcb846bfe} là ví dụ có nhiều tín hiệu nhất trong
-artifact. Bản ghi xác định người dùng \texttt{teller01} và IP
-\texttt{198.51.100.50}, với hai mốc 22:00--22:05 ngày 22-06-2026, sáu event và
-10 alert. Evidence nguyên gốc gồm truy cập ngoài giờ, IP mới đối với người dùng,
-năm lần đăng nhập thất bại trong năm phút, một thao tác
-\texttt{users:delete} bị RBAC từ chối và tài nguyên hiếm. Incident nhận điểm
-99 và mức Critical, vì chương trình lấy điểm alert lớn nhất trong đoạn và cộng
-bonus chuỗi 15 trước khi giới hạn trên 100. Case này minh họa cách các rule nền
-và tín hiệu ngữ cảnh tạo một đơn vị triage có thể giải thích, nhưng toàn bộ event
-và nhãn là dữ liệu tổng hợp; nó không xác nhận hiệu quả phát hiện trên môi trường
-vận hành hoặc hành vi người dùng thật.
+\paragraph{Khả năng tái lập.}
+Mỗi lần chạy dùng cùng \texttt{data/rbac\_seed.json} và
+\texttt{config/default.toml}; CSDL SQLite được seed trước khi phân tích. Vì
+\texttt{alerts.json} ghi rule ID, event IDs, evidence, điểm và severity, kết
+quả trong Bảng~\ref{tab:baseline-results} có thể lần từ metric về alert, rồi
+về event nguồn. Đây là bằng chứng kiểm chứng cho mục tiêu truy vết của thiết
+kế, không phải xác nhận ý đồ hoặc thành công của một cuộc tấn công.

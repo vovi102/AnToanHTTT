@@ -60,12 +60,18 @@ uv sync --extra api
 
 UV sẽ tự tạo và quản lý môi trường Python trong `.venv`.
 
+**Ý nghĩa:** `--extra api` cài nhóm phụ thuộc dành cho FastAPI; vì vậy lệnh
+Uvicorn ở phần khởi động sau có thể nạp backend thật thay vì chỉ chạy giao diện.
+
 ### Frontend
 
 ```bash
 cd /home/khoavd/WORKSPACE/AnToanHTTT/web
 npm install
 ```
+
+**Ý nghĩa:** lệnh này cài đúng dependency graph của Next.js trong thư mục
+`web`. Chỉ cần chạy lại khi `package.json` hoặc lockfile thay đổi.
 
 ### Kiểm tra trước buổi demo
 
@@ -87,6 +93,10 @@ lúc đang đứng trước lớp nếu bạn đã kiểm tra trước đó.
 
 Cần giữ đồng thời hai terminal hoạt động.
 
+**Bạn làm gì:** Terminal 1 chạy API và SQLite; Terminal 2 chạy ứng dụng trình
+duyệt. Frontend chỉ hiển thị/thực hiện request, còn backend mới xác thực, kiểm
+tra RBAC và thay đổi dữ liệu.
+
 ### Terminal 1 — FastAPI backend
 
 ```bash
@@ -103,6 +113,9 @@ Mở <http://127.0.0.1:8000/health>. Chỉ tiếp tục khi nhận được JSON
 Nếu health check không hoạt động thì giao diện có thể mở nhưng đăng nhập sẽ báo
 `Failed to fetch`.
 
+**Ý nghĩa:** `/health` xác nhận FastAPI đã lắng nghe đúng cổng 8000. Đây là
+checkpoint bắt buộc trước khi mở giao diện, vì mọi thao tác demo đều gọi API này.
+
 ### Terminal 2 — Next.js frontend
 
 ```bash
@@ -111,6 +124,9 @@ npm run dev
 ```
 
 Mở <http://localhost:3000>. Không đóng hai terminal trong lúc demo.
+
+**Kết quả cần thấy:** mở được trang đăng nhập. Nếu trình duyệt hỏi đổi cổng do
+3000 đang bận, dừng tiến trình cũ thay vì tiếp tục với một URL khác.
 
 ## 5. Chuẩn bị trạng thái sạch
 
@@ -128,6 +144,12 @@ Thực hiện phần này trước khi trình bày, không thực hiện giữa 
 7. Không tạo `lan.demo` trước. Tài khoản này phải được tạo trực tiếp khi trình
    bày để chứng minh backend thật sự thay đổi dữ liệu.
 
+**Ý nghĩa:** **Khôi phục dữ liệu** dựng lại trạng thái mẫu xác định và làm token
+hiện tại hết hiệu lực, nên phải đăng nhập Admin lại. Ba tab mở trực tiếp có
+session độc lập vì `sessionStorage` bị giới hạn theo tab; nhờ đó có thể giữ đồng
+thời vai trò Admin, Teller và Controller. Việc để `lan.demo` chưa tồn tại giúp
+người xem thấy rõ tài khoản và role được lưu ở backend khi tạo.
+
 Ứng dụng lưu phiên trong `sessionStorage`, vì vậy mỗi tab có thể giữ một token
 đăng nhập độc lập. Hãy mở từng tab trực tiếp, không dùng chung một tab rồi đăng
 xuất liên tục.
@@ -135,6 +157,10 @@ xuất liên tục.
 ## 6. Kịch bản demo 5–7 phút
 
 ### Bước 1 — Admin tạo tài khoản Teller
+
+**Ý nghĩa:** thiết lập danh tính và role được dùng cho toàn bộ các bước sau;
+điểm cần chứng minh là quyền không do frontend tự gán mà do backend lưu trong
+SQLite.
 
 **Thao tác**
 
@@ -158,6 +184,9 @@ xuất liên tục.
 
 ### Bước 2 — Kiểm soát cơ bản cho phép Teller hoàn tất giao dịch
 
+**Ý nghĩa:** tạo một đối chứng trước khi bật RBAC chặt chẽ. Giao dịch thứ nhất
+cho thấy thiếu phân tách nhiệm vụ cho phép cùng người tạo và duyệt.
+
 **Thao tác**
 
 1. Ở tab Teller, đăng nhập `lan.demo / Lan@1234`.
@@ -180,6 +209,9 @@ xuất liên tục.
 
 ### Bước 3 — Admin áp dụng Phân tách nhiệm vụ
 
+**Ý nghĩa:** thay đổi policy có hiệu lực tại backend cho các request sau đó;
+không chỉ ẩn một nút trên giao diện.
+
 **Thao tác**
 
 1. Quay lại tab Admin và mở **Chính sách phê duyệt**.
@@ -197,6 +229,9 @@ xuất liên tục.
 > frontend.
 
 ### Bước 4 — Teller bị từ chối tại trang phê duyệt
+
+**Ý nghĩa:** truy cập trực tiếp URL loại trừ khả năng frontend chỉ che chức
+năng. Kết quả đúng là backend từ chối và không làm thay đổi trạng thái giao dịch.
 
 **Thao tác**
 
@@ -220,6 +255,9 @@ xuất liên tục.
 > phê duyệt. Backend từ chối quyền truy cập và dữ liệu giao dịch không thay đổi.
 
 ### Bước 5 — Controller duyệt và Admin kiểm tra lịch sử hoạt động
+
+**Ý nghĩa:** xác nhận đúng role có thể hoàn tất nghiệp vụ và audit trail lưu
+bằng chứng cho cả lần bị từ chối lẫn các request được cho phép.
 
 **Thao tác**
 

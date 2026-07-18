@@ -1,6 +1,8 @@
-# Bài báo về giám sát truy cập dựa trên rủi ro
+# Bài báo về mô hình RBAC và phân tích log theo luật
 
-Thư mục này chứa khung LaTeX cho bài báo học thuật dựa trên dự án RBAC Guard.
+Thư mục này chứa bản thảo LaTeX về thiết kế mô hình RBAC và hệ thống phân tích
+log theo luật trong dự án RBAC Guard. SQL injection và dò đoán mật khẩu là hai
+kịch bản phát hiện chính; dữ liệu tổng hợp chỉ kiểm chứng nguyên mẫu.
 
 ## Tệp tin
 

@@ -1,4 +1,4 @@
-% Quy tắc build_incidents trong src/rbac_guard/context.py.
+% Phần mở rộng context-risk: quy tắc build_incidents trong src/rbac_guard/context.py.
 \begin{tikzpicture}[
   font=\footnotesize,
   >=Latex,
@@ -17,7 +17,7 @@
   \node[grouping, below=of partition] (segment) {Tạo đoạn mới khi\\khoảng cách $> W$;\\$W=300$ giây trong cấu hình};
   \node[result, right=16mm of segment] (incident) {Incident\\IDs alert/event, evidence,\\start/end, điểm, mức độ};
 
-  \draw[flow] (events) -- node[above, align=center] {luật và\\ngữ cảnh} (alerts);
+  \draw[flow] (events) -- node[above, align=center] {luật; ngữ cảnh\\khi được bật} (alerts);
   \draw[flow] (alerts) -- (partition);
   \draw[flow] (partition) -- (segment);
   \draw[flow] (segment) -- node[above, align=center, font=\scriptsize] {max alert +\\bonus chuỗi} (incident);

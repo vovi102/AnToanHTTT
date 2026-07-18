@@ -14,18 +14,18 @@
   \node[source] (logs) {Nhật ký CSV/JSON\\và cấu hình};
   \node[component, right=of logs] (parser) {Parser\\sự kiện hợp lệ};
   \node[store, above=of parser] (rbac) {CSDL SQLite\\RBAC};
-  \node[component, right=of parser] (rules) {Bộ máy luật\\SQLi, mật khẩu, RBAC};
-  \node[component, below=of rules] (context) {Profiler ngữ cảnh\\giờ, IP, tài nguyên, từ chối};
+  \node[component, right=of parser] (rules) {Bộ máy luật chính\\SQLi, dò mật khẩu\\và đối chiếu RBAC};
+  \node[component, below=of rules] (context) {Tùy chọn context-risk\\giờ, IP, tài nguyên, từ chối};
   \node[component, right=of rules] (scorer) {Bộ chấm điểm\\và mức độ};
-  \node[output, right=of scorer] (reporter) {Reporter\\alerts, findings, incidents\\CSV/JSON};
+  \node[output, right=of scorer] (reporter) {Reporter\\alerts, metadata\\và hiện vật tùy chọn\\CSV/JSON};
   \node[source, below=of parser] (adapter) {CLI / Streamlit\\adapter};
 
   \draw[flow] (logs) -- (parser);
   \draw[flow] (parser) -- (rules);
-  \draw[flow] (parser) -| (context);
+  \draw[auxiliary] (parser) -| (context);
   \draw[auxiliary] (rbac) -- (rules);
   \draw[flow] (rules) -- (scorer);
-  \draw[flow] (context) -| (scorer);
+  \draw[auxiliary] (context) -| (scorer);
   \draw[flow] (scorer) -- (reporter);
   \draw[auxiliary] (adapter) -- (parser);
 \end{tikzpicture}

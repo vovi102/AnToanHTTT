@@ -41,31 +41,35 @@ không phải điểm quyết định cấp quyền trực tuyến.
 \subsection{Phát hiện theo luật}
 \label{subsec:detection-rules}
 
-\textbf{SQL injection.} Với mỗi request, nguyên mẫu kiểm tra tuần tự một danh
-sách biểu thức chính quy cho tautology, \texttt{union select}, truy vấn xếp
-chồng và SQL comment. Mỗi event sinh nhiều nhất một finding, tại mẫu đầu tiên
-khớp; evidence chứa tên mẫu và phần request đã cắt ngắn. Các chỉ báo này là
-heuristic có thể giải thích, không phải bộ phòng vệ SQL injection hoàn chỉnh
-\citep{OWASPSQLi}.
+\textbf{SQL injection.} Đây là luật phát hiện chính thứ nhất. Với mỗi request,
+nguyên mẫu kiểm tra tuần tự biểu thức chính quy cho bốn chỉ báo: tautology,
+\texttt{union select}, truy vấn xếp chồng và SQL comment. Mỗi event sinh nhiều
+nhất một finding, tại mẫu đầu tiên khớp; evidence chứa tên mẫu và phần request
+đã cắt ngắn. Các chỉ báo này là heuristic có thể giải thích, không phải bộ phòng
+vệ SQL injection hoàn chỉnh \citep{OWASPSQLi}.
 
-\textbf{Đoán mật khẩu.} Các event \texttt{authentication} được sắp xếp theo
-thời gian và phân nhóm theo $(u,ip)$. Trong từng nhóm, một đoạn thất bại kết
-thúc khi có đăng nhập thành công hoặc khi khoảng cách giữa hai event liên tiếp
-lớn hơn cửa sổ $W_p$. Một finding \texttt{AUTH-PASSWORD-GUESSING} được tạo nếu
-trong đoạn có một cửa sổ trượt đạt ít nhất $N_p$ event thất bại. Với cấu hình
-thực nghiệm, $N_p=5$ và $W_p=300$ giây. Finding giữ toàn bộ event IDs của đoạn
-để evidence có thể được rà soát.
+\textbf{Dò đoán mật khẩu.} Đây là luật phát hiện chính thứ hai. Các event
+\texttt{authentication} được sắp xếp theo thời gian và phân nhóm theo $(u,ip)$.
+Trong từng nhóm, một đoạn thất bại kết thúc khi có đăng nhập thành công hoặc khi
+khoảng cách giữa hai event liên tiếp lớn hơn cửa sổ $W_p$. Một finding
+\texttt{AUTH-PASSWORD-GUESSING} được tạo nếu trong đoạn có một cửa sổ trượt đạt
+ít nhất $N_p$ event thất bại. Cấu hình mặc định dùng $N_p=5$ và $W_p=300$ giây.
+Finding giữ toàn bộ event IDs của đoạn để evidence có thể được rà soát.
 
-\textbf{Truy cập trái phép.} Luật trong \eqref{eq:unauthorized-rule} chạy độc
-lập với hai luật trên. Các finding sau đó được sắp xếp xác định theo thời gian,
-loại rủi ro và rule ID trước khi đưa vào bước chấm điểm.
+\textbf{Truy cập trái phép.} Luật trong \eqref{eq:unauthorized-rule} là kiểm
+tra hỗ trợ: nó làm rõ event \texttt{access}/\texttt{authorization} nào không
+được RBAC cấp quyền hoặc đã bị log ghi nhận là từ chối. Các finding từ ba luật
+được sắp xếp xác định theo thời gian, loại rủi ro và rule ID trước khi đưa vào
+bước chấm điểm.
 
 \subsection{Tín hiệu rủi ro theo ngữ cảnh}
 \label{subsec:context-signals}
 
 Khi tùy chọn context-risk được bật, profiler duyệt event theo thời gian và chỉ
-học baseline từ các event đã quan sát trước đó. Bốn tín hiệu có thể giải thích
-là: (i) \texttt{CTX-AFTER-HOURS} nếu giờ event nằm ngoài $[h_s,h_e)$; (ii)
+học baseline từ các event đã quan sát trước đó. Đây là phần mở rộng để ưu tiên
+triage, không làm thay đổi predicate quyền trong \eqref{eq:rbac-permission}.
+Bốn tín hiệu có thể giải thích là: (i) \texttt{CTX-AFTER-HOURS} nếu giờ event
+nằm ngoài $[h_s,h_e)$; (ii)
 \texttt{CTX-NEW-IP} nếu IP chưa từng thấy cho người dùng nhưng baseline IP đã
 có; (iii) \texttt{CTX-RARE-RESOURCE} nếu event là access/authorization và tài
 nguyên chưa từng được người dùng truy cập thành công; và (iv)
@@ -114,9 +118,9 @@ pháp chứng chi tiết.
 \begin{figure}[t]
   \centering
   \resizebox{0.98\linewidth}{!}{\input{figures/event_alert_incident.tex}}
-  \caption{Luồng từ event sang alert và incident. Alert được phân vùng theo cặp
-  người dùng--IP rồi sắp xếp theo thời gian. Trong mỗi phân vùng, một khoảng
-  cách lớn hơn cửa sổ $W$ tạo incident mới; các trường thời gian chỉ là
-  start/end của đoạn, không phải timeline pháp chứng chi tiết.}
+  \caption{Phần mở rộng context-risk: luồng từ event sang alert và incident.
+  Alert được phân vùng theo cặp người dùng--IP rồi sắp xếp theo thời gian. Trong
+  mỗi phân vùng, một khoảng cách lớn hơn cửa sổ $W$ tạo incident mới; các trường
+  thời gian chỉ là start/end của đoạn, không phải timeline pháp chứng chi tiết.}
   \label{fig:event-alert-incident}
 \end{figure}

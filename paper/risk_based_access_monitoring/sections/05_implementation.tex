@@ -1,62 +1,23 @@
-\section{Cài đặt}
+\section{Hiện thực hóa nguyên mẫu}
 \label{sec:implementation}
 
-Nguyên mẫu được cài đặt bằng Python~3.11 dưới dạng gói \texttt{rbac-guard}.
-Lớp \texttt{parser} chuẩn hóa và kiểm tra event CSV/JSON; \texttt{rbac} lưu
-người dùng, role, permission trong SQLite; \texttt{rules} thực hiện ba luật
-cơ sở; và \texttt{context} duy trì baseline, sinh finding và gom incident.
-\texttt{scoring} tính điểm/mức độ, còn \texttt{reporting} ghi kết quả theo
-kiểu thay thế tệp tạm--đổi tên để tránh một report bị ghi dở. Hàm dịch vụ
-\texttt{analyze} ghép các mô-đun này thành một pipeline; CLI và giao diện web
-chỉ là hai adapter gọi cùng hàm dịch vụ, nên không có hai cách diễn giải luật
-khác nhau.
+Thiết kế được hiện thực bằng Python~3.11 dưới dạng gói
+\texttt{rbac-guard}. Mô-đun \texttt{rbac} lưu người dùng, role và permission
+trong SQLite; \texttt{parser} chuẩn hóa event CSV/JSON; \texttt{rules} cài đặt
+hai luật chính cùng luật đối chiếu quyền RBAC; \texttt{scoring} gán điểm và mức
+độ; còn \texttt{reporting} ghi hiện vật. Hàm dịch vụ \texttt{analyze} ghép các
+thành phần này thành một pipeline xác định. CLI và giao diện Streamlit chỉ là
+hai adapter gọi cùng dịch vụ, do đó dùng chung luật và CSDL RBAC.
 
-\subsection{Cấu hình và giao diện chạy}
+CLI cung cấp \texttt{init-db} để khởi tạo CSDL từ seed,
+\texttt{check-access} để kiểm tra một permission, \texttt{analyze} để sinh
+\texttt{alerts.csv}, \texttt{alerts.json} và \texttt{run\_metadata.json}, và
+\texttt{evaluate} để so alert với nhãn \texttt{expected\_label} của dataset
+tổng hợp. Tùy chọn \texttt{--context-risk} sinh thêm finding và incident.
+Quy trình cài đặt và chạy đầy đủ được ghi trong tài liệu hướng dẫn chạy demo ở
+thư mục gốc của kho nguồn.
 
-CLI cài cùng gói cung cấp bốn lệnh: \texttt{init-db} khởi tạo SQLite từ seed,
-\texttt{check-access} kiểm tra một permission, \texttt{analyze} chạy pipeline
-và \texttt{evaluate} so alert với \texttt{expected\_label} của dataset. Tệp
-\texttt{config/default.toml} là đầu vào cấu hình duy nhất cho severity, ngưỡng
-password guessing, cửa sổ thời gian và trọng số ngữ cảnh; các giá trị dùng
-trong thực nghiệm là $N_p=5$, $W_p=W_c=300$ giây và các ngưỡng severity
-30/60/85 như Mục~\ref{sec:methodology}. Chế độ ngữ cảnh không bật mặc định;
-tùy chọn \texttt{--context-risk} mới yêu cầu profiler, finding và incident.
-
-Báo cáo cơ sở luôn gồm \texttt{alerts.csv}, \texttt{alerts.json} và
-\texttt{run\_metadata.json}. Ở chế độ ngữ cảnh, chương trình còn tạo
-\texttt{context\_findings.json}, \texttt{incidents.csv} và
-\texttt{incidents.json}. Tệp metadata lưu số event hợp lệ và lỗi parser, nhờ
-đó có thể đối chiếu report với lần chạy. Giao diện Streamlit là tùy chọn, chỉ
-đọc: nó gọi cùng service, lọc alert/incident và cho tải kết quả; nó không thay
-đổi RBAC hay luật phát hiện.
-
-\subsection{Khả năng tái lập}
-\label{subsec:reproducibility}
-
-Sau khi tạo môi trường Python~3.11 và cài \texttt{pip install -e '.[dev]'},
-Listing~\ref{lst:reproduce} tái sinh hai checkpoint dùng trong bài. Thư mục
-tạm bảo đảm CSDL RBAC mới được seed cho mỗi lần chạy. Các đường dẫn output có
-thể thay bằng một thư mục trống khác; không có JSON hay metric nào được sửa
-thủ công sau khi chạy.
-
-\begin{lstlisting}[style=cli,caption={Tái sinh kết quả baseline và context-risk.},label={lst:reproduce}]
-tmpdir=$(mktemp -d)
-.venv/bin/rbac-guard init-db --db "$tmpdir/rbac.db" --seed data/rbac_seed.json
-.venv/bin/rbac-guard analyze --db "$tmpdir/rbac.db" --log data/logs_demo.csv \
-  --config config/default.toml --output paper/risk_based_access_monitoring/artifacts/cp3-baseline
-.venv/bin/rbac-guard evaluate \
-  --alerts paper/risk_based_access_monitoring/artifacts/cp3-baseline/alerts.json \
-  --events data/logs_demo.csv \
-  --output paper/risk_based_access_monitoring/artifacts/cp3-baseline/metrics.json
-.venv/bin/rbac-guard analyze --db "$tmpdir/rbac.db" --log data/logs_risk_demo.csv \
-  --config config/default.toml \
-  --output paper/risk_based_access_monitoring/artifacts/cp3-context --context-risk
-\end{lstlisting}
-
-Kho nguồn có kiểm thử cho parser, RBAC, luật, scoring, context, reporting,
-CLI và helper web. Cổng chất lượng tái lập là
-\texttt{.venv/bin/pytest -q --cov=rbac\_guard --cov-report=term-missing
---cov-fail-under=85}; coverage loại trừ hai adapter \texttt{cli.py} và
-\texttt{web.py}, vốn được kiểm tra qua subprocess, helper và smoke test. Kết
-quả test của checkpoint được ghi tại Mục~\ref{sec:evaluation}, còn artifact
-CP3 là nguồn cho mọi số liệu trong các bảng.
+Các tham số thực nghiệm nằm trong \texttt{config/default.toml}: luật dò đoán
+mật khẩu dùng ngưỡng năm lần thất bại trong 300 giây; severity bắt đầu tại
+30/60/85. Các hiện vật báo cáo ghi metadata của lần chạy, event IDs, rule IDs và
+evidence, nhờ đó hỗ trợ kiểm tra đường truy vết của thiết kế.

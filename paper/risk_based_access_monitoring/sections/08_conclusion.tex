@@ -1,18 +1,22 @@
 \section{Kết luận}
 \label{sec:conclusion}
 
-Bài báo đã trình bày một nguyên mẫu giám sát truy cập dựa trên rủi ro, kết hợp
-RBAC, phân tích nhật ký có cấu trúc, phát hiện theo luật, chấm điểm ngữ cảnh và
-gom nhóm incident. Trên 60 sự kiện của tập baseline, nguyên mẫu sinh 20 cảnh
-báo, với precision macro 1{,}0000, recall macro 0{,}9667 và F1 macro 0{,}9825;
-thiếu sót duy nhất là một sự kiện SQL injection không khớp luật regex. Trên tập
-ngữ cảnh gồm 14 sự kiện hợp lệ, pipeline tạo 15 cảnh báo, 10 finding và 3
-incident có bằng chứng truy nguyên được. Vì hai tập đều là dữ liệu tổng hợp,
-các kết quả này chỉ chứng minh tính tái lập của các kịch bản đã thiết kế, không
-đại diện cho độ chính xác hay khả năng tổng quát hóa trong vận hành thực tế.
+Bài báo đã trình bày thiết kế giải pháp gồm mô hình RBAC và pipeline phân tích
+log theo luật cho ứng dụng kiểu ngân hàng. Mô hình dùng quan hệ người dùng--vai
+trò--quyền trong SQLite để đối chiếu event truy cập/ủy quyền; hai luật trung tâm
+phát hiện chỉ báo SQL injection và chuỗi dò đoán mật khẩu, đồng thời giữ event,
+luật và evidence trong alert để hỗ trợ truy vết. Kiểm tra truy cập không được
+cấp quyền, chấm điểm ngữ cảnh và incident là các cơ chế hỗ trợ hoặc mở rộng, không
+thay thế điểm quyết định cấp quyền thời gian thực.
+
+Việc kiểm chứng trên 60 event baseline tổng hợp tạo 20 alert, với precision
+macro 1{,}0000, recall macro 0{,}9667 và F1 macro 0{,}9825; một event SQL
+injection không khớp regex. Các kết quả này chứng minh nguyên mẫu hiện thực hóa
+được các kịch bản đã thiết kế và có thể tái lập, nhưng không đại diện cho độ
+chính xác hoặc khả năng tổng quát hóa trong vận hành thực tế.
 
 Các bước tiếp theo là đánh giá trên nhật ký ẩn danh có nhãn độc lập, đo ảnh
-hưởng của drift, dữ liệu thiếu và proxy đến từng luật, và so sánh các ngưỡng
-trên cùng một giao thức đánh giá. Khi đó có thể cân nhắc hồ sơ hành vi bền
-vững, quản lý phiên bản luật, tích hợp luồng/SIEM và các mô hình học máy, với
-điều kiện vẫn duy trì khả năng giải thích và kiểm soát quyền riêng tư.
+hưởng của drift, dữ liệu thiếu, proxy và các biến thể né luật đối với từng cơ
+chế phát hiện. Khi có dữ liệu đủ chất lượng, hệ thống có thể mở rộng quản lý
+phiên bản luật, tích hợp nguồn log hoặc hồ sơ hành vi, với điều kiện duy trì khả
+năng giải thích và kiểm soát quyền riêng tư.

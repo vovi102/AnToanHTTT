@@ -1,21 +1,20 @@
 \begin{abstract}
-Hệ thống ngân hàng số cần đồng thời có cơ chế kiểm soát truy cập mang tính
-phòng ngừa và cơ chế giám sát sự kiện bảo mật mang tính phát hiện. Bài báo này
-trình bày một hệ thống minh chứng ý tưởng kết hợp kiểm soát truy cập dựa trên
-vai trò (RBAC), phân tích nhật ký theo luật và chấm điểm rủi ro theo ngữ cảnh
-để phát hiện và ưu tiên hóa các rủi ro bảo mật liên quan đến truy cập. Hệ thống
-phân tích nhật ký bảo mật ở định dạng CSV/JSON, đối chiếu hành động của người
-dùng với mô hình RBAC lưu trong SQLite, phát hiện dấu hiệu SQL injection, đoán
-mật khẩu và truy cập trái phép, đồng thời bổ sung ngữ cảnh hành vi như IP nguồn
-mới, hoạt động ngoài giờ, truy cập tài nguyên hiếm gặp và các lần từ chối lặp
-lại. Trên tập baseline gồm 60 sự kiện tổng hợp, nguyên mẫu sinh 20 cảnh báo và
-đạt precision macro 1{,}0000, recall macro 0{,}9667, F1 macro 0{,}9825; một
-sự kiện SQL injection không được luật regex nhận diện. Trên tập ngữ cảnh gồm
-14 sự kiện hợp lệ, hệ thống sinh 15 cảnh báo, 10 finding và gom thành 3
-incident có định danh, khoảng thời gian và bằng chứng. Các số liệu này minh
-chứng khả năng tái lập và truy nguyên của pipeline trong môi trường học tập,
-không phải hiệu năng trên nhật ký vận hành hay một hệ thống ngân hàng sản xuất.
+Bài báo đề xuất thiết kế giải pháp kết hợp kiểm soát truy cập dựa trên vai trò
+(RBAC) với phân tích nhật ký bảo mật theo luật cho ứng dụng kiểu ngân hàng.
+Mô hình RBAC lưu trong SQLite xác định quan hệ người dùng--vai trò--quyền; từ
+đó pipeline hậu kiểm log CSV/JSON đối chiếu hành động đã ghi nhận với trạng
+thái phân quyền và tạo cảnh báo có thể truy vết về event, luật và evidence.
+Hai kịch bản phát hiện chính là chỉ báo SQL injection trong request và chuỗi
+đăng nhập thất bại biểu diễn dò đoán mật khẩu. Kiểm tra truy cập không được
+RBAC cấp quyền là bằng chứng hỗ trợ. Nguyên mẫu còn có tùy chọn chấm điểm theo
+ngữ cảnh và gom nhóm incident để ưu tiên triage, nhưng các heuristic này không
+thay đổi quyết định cấp quyền thời gian thực. Trên tập baseline gồm 60 sự kiện
+tổng hợp, nguyên mẫu tạo 20 cảnh báo; precision macro, recall macro và F1 macro
+lần lượt là 1{,}0000, 0{,}9667 và 0{,}9825, với một mẫu SQL injection không
+khớp regex. Kết quả chỉ kiểm chứng khả năng hiện thực hóa, tái lập và truy vết
+của thiết kế trên dữ liệu được xây dựng, không phải hiệu năng trên nhật ký vận
+hành hoặc hệ thống ngân hàng sản xuất.
 \end{abstract}
 
 \noindent\textbf{Từ khóa:} RBAC; kiểm soát truy cập; nhật ký bảo mật; chấm
-điểm rủi ro; SQL injection; đoán mật khẩu; phân loại sự cố.
+phân tích log theo luật; SQL injection; dò đoán mật khẩu.

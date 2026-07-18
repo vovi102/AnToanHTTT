@@ -7,8 +7,8 @@
     \toprule
     Tập dữ liệu & Quy mô và nhãn & Vai trò & Kết quả tái sinh \\
     \midrule
-    Baseline (\texttt{demo}) & 60 event: 30 benign, 10 SQL injection, 10 password guessing, 10 unauthorized access & Đánh giá detection nền theo nhãn & 20 alert \\
-    Context (\texttt{risk-demo}) & 14 event: 4 benign, 2 context anomaly, 4 password guessing, 4 unauthorized access & Đánh giá theo kịch bản tín hiệu context và grouping & 15 alert, 10 finding, 3 incident \\
+    Baseline (\texttt{demo}) & 60 event: 30 benign, 10 SQL injection, 10 password guessing, 10 unauthorized access & Kiểm chứng luật chính và đối chiếu RBAC theo nhãn & 20 alert \\
+    Context (\texttt{risk-demo}) & 14 event: 4 benign, 2 context anomaly, 4 password guessing, 4 unauthorized access & Kiểm chứng mở rộng context-risk và grouping & 15 alert, 10 finding, 3 incident \\
     \bottomrule
   \end{tabular}
 \end{table}

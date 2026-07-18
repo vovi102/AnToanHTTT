@@ -3,22 +3,21 @@
 
 \subsection{Giá trị và trade-off của thiết kế}
 
-Đóng góp thực tế của nguyên mẫu không phải là thay thế một nền tảng SIEM, mà là
-liên kết một quyết định RBAC, luật phát hiện và bằng chứng trong cùng đầu ra.
-Mỗi alert giữ định danh event, luật, evidence, điểm và severity; incident chỉ
-gom các alert có cùng cặp người dùng--IP trong cửa sổ đã công bố. Vì vậy một
-người phân tích có thể lần từ incident về event gốc mà không phải suy luận từ
-một điểm số không giải thích được. Cách trình bày này phù hợp với mục đích quản
-lý log và điều tra sau sự kiện, trong đó ngữ cảnh và khả năng truy vết cần được
-duy trì \cite{Kent2006SP80092}.
+Giá trị của giải pháp nằm ở ranh giới rõ giữa phân quyền và phát hiện. RBAC
+biểu diễn trạng thái người dùng--vai trò--quyền, còn các luật đọc event đã được
+ghi và tạo bằng chứng; kết quả hậu kiểm không được dùng để thay đổi quyết định
+cho phép/từ chối của dịch vụ nguồn. Mỗi alert giữ định danh event, luật,
+evidence, điểm và severity. Vì vậy người phân tích có thể lần từ alert về event
+gốc và trạng thái RBAC liên quan mà không phải suy luận từ một điểm số không giải
+thích được. Cách trình bày này phù hợp với mục đích quản lý log và điều tra sau
+sự kiện \cite{Kent2006SP80092}.
 
 Trade-off là tính linh hoạt thấp hơn. RBAC SQLite và các luật xác định giúp
 kết quả ổn định, dễ test và tái lập, nhưng giả định role/permission trong seed
-phản ánh đúng trạng thái ủy quyền tại thời điểm event. Tương tự, ngưỡng password
-guessing, giờ làm việc, bonus và cửa sổ 300 giây là các quyết định cấu hình,
-không phải tham số đã được hiệu chỉnh thống kê. Điều đó phù hợp với một pipeline
-nhỏ gọn, song không loại bỏ nhu cầu quản trị policy liên tục trong một kiến trúc
-zero-trust hay vận hành thực \cite{Rose2020SP800207}.
+phản ánh đúng trạng thái ủy quyền tại thời điểm event. Tương tự, bốn regex SQL
+injection, ngưỡng năm lần thất bại và cửa sổ 300 giây là các quyết định cấu hình,
+không phải tham số đã được hiệu chỉnh thống kê. Context-risk chỉ bổ sung triage
+khi được bật, nên không làm giảm giới hạn này.
 
 \subsection{Threats to validity}
 
@@ -31,14 +30,14 @@ metric theo nhãn. Sai khác giữa timestamp, địa chỉ IP hoặc trạng th
 log và CSDL seed cũng có thể làm thay đổi kết quả mà không phản ánh một thay đổi
 trong hành vi tấn công.
 
-\paragraph{Tính xây dựng.} SQL injection được biểu diễn bằng một tập regex và
-chỉ báo finding cho mẫu khớp đầu tiên; biến thể mã hóa, phân mảnh hoặc không có
+\paragraph{Tính xây dựng.} SQL injection được biểu diễn bằng bốn regex và chỉ
+báo finding cho mẫu khớp đầu tiên; biến thể mã hóa, phân mảnh hoặc không có
 trong mẫu có thể bị bỏ sót. Password guessing dựa trên số lần thất bại của đúng
 cặp người dùng--IP; kẻ tấn công phân tán IP, tài khoản hay thời gian có thể
 không đạt ngưỡng. Các tín hiệu IP mới, ngoài giờ, tài nguyên hiếm và từ chối
-lặp lại là heuristic triage có thể tạo nhiễu cho công việc hợp lệ bất thường,
-không phải kết luận về ý đồ hay thành công của tấn công. Chúng cần được xem như
-đầu vào ưu tiên hóa để con người kiểm tra, thay vì một quyết định chặn truy cập.
+lặp lại chỉ là heuristic triage có thể tạo nhiễu cho công việc hợp lệ bất thường,
+không phải kết luận về ý đồ hay thành công của tấn công. Chúng không phải quyết
+định chặn truy cập.
 
 \paragraph{Tính ngoại suy và vận hành.} Hai tập log đều tổng hợp, nhỏ và có
 phong cách schema đồng nhất; chúng không phản ánh drift hành vi, NAT/proxy,
@@ -58,5 +57,5 @@ Có thể bổ sung kiểm tra schema, provenance và correlation đa nguồn tr
 đưa vào luồng sự kiện. Việc học baseline dài hạn hoặc mô hình học máy chỉ nên
 được so sánh với heuristic hiện tại khi có dữ liệu đủ chất lượng, cách hiệu
 chỉnh ngưỡng và cơ chế giải thích/kiểm toán rõ ràng. Những thay đổi này mở rộng
-nguyên mẫu theo từng giả thuyết có thể đo được, thay vì suy diễn từ kết quả
-trên dữ liệu tổng hợp hiện tại.
+giải pháp theo từng giả thuyết có thể đo được, thay vì suy diễn từ kết quả trên
+dữ liệu tổng hợp hiện tại.
