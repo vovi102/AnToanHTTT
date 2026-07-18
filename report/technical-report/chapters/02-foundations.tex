@@ -1,0 +1,151 @@
+\chapter{Cơ sở lý thuyết và nguyên tắc bảo mật}
+\label{chap:foundations}
+
+Chương này trình bày các khái niệm được dùng để thiết kế và đánh giá nguyên
+mẫu. Mục đích không phải thay thế một chuyên khảo an toàn thông tin, mà là làm
+rõ vì sao từng thành phần của RBAC Guard tồn tại, dữ liệu nào nó xử lý và giới
+hạn nào cần giữ khi diễn giải kết quả. Các nguyên tắc dưới đây được dùng trực
+tiếp trong mô hình quyền, API Nova Bank, cấu trúc log và pipeline phát hiện.
+
+\section{Kiểm soát truy cập theo vai trò}
+
+Kiểm soát truy cập trả lời câu hỏi chủ thể nào được làm hành động nào trên tài
+nguyên nào. Trong mô hình cấp quyền trực tiếp, quyền được gán vào từng tài khoản;
+cách này đơn giản ở quy mô nhỏ nhưng nhanh chóng khó quản trị khi nhiều người có
+cùng chức năng nghiệp vụ. RBAC giải quyết vấn đề bằng cách đưa vai trò vào giữa
+user và permission: tổ chức gán quyền cho role, rồi gán role cho user. Mô hình
+này được hình thức hóa bởi Ferraiolo và Kuhn, sau đó được Sandhu và cộng sự mở
+rộng thành họ mô hình RBAC96 \citep{Ferraiolo1992RBAC,Sandhu1996RBAC}.
+
+Trong RBAC lõi, tập user $U$, role $R$, permission $P$ và session $S$ được nối
+bằng hai quan hệ gán: $UA \subseteq U \times R$ và $PA \subseteq P \times R$.
+Permission trong nguyên mẫu được biểu diễn bằng cặp $(resource, action)$, ví
+dụ \texttt{transactions:approve}. Một request chỉ được thực thi khi user active
+có ít nhất một role dẫn đến permission yêu cầu. Cách biểu diễn này giúp kiểm
+tra quyền nhất quán ở CLI, FastAPI và pipeline phân tích log.
+
+Nguyên tắc \emph{đặc quyền tối thiểu} yêu cầu chỉ cấp những quyền cần cho nhiệm
+vụ hiện tại. Vì vậy Teller được tạo giao dịch và xem các giao dịch thuộc phạm
+vi của mình, còn Controller mới có quyền phê duyệt. Tách quyền như vậy giảm
+xác suất một tài khoản đơn lẻ vừa khởi tạo vừa tự xác nhận giao dịch. RBAC Guard
+chưa có role hierarchy, delegated administration hoặc review quyền định kỳ;
+đây là các mở rộng hợp lý khi hệ thống chuyển từ demo sang vận hành thật.
+
+\section{Xác thực, phân quyền và trách nhiệm giải trình}
+
+Xác thực (authentication) xác định người đang gửi request; phân quyền
+(authorization) xác định request đó có được phép không. Hai bước cần tách biệt:
+một password hợp lệ chỉ tạo danh tính, không tự động cho phép mọi thao tác. API
+Nova Bank thực hiện xác thực tại \texttt{/auth/login}, tạo token phiên, rồi
+kiểm tra token và permission ở từng endpoint có bảo vệ. Mô hình này tránh sai
+lầm phổ biến là để frontend tự quyết định một nút có được bấm hay không.
+
+Sau khi request kết thúc, hệ thống cần accountability: khả năng trả lời ai đã
+thực hiện gì, vào lúc nào, với kết quả nào. NIST SP 800-53 xem audit và
+accountability là nhóm kiểm soát độc lập, nhấn mạnh việc tạo, bảo vệ và xem xét
+bản ghi \citep{JTF2020SP80053}. Trong dự án, audit log lưu username, role tại
+thời điểm thao tác, resource, action, outcome, thời điểm và transaction
+reference. Nó không phải bằng chứng không thể sửa đổi như hệ thống pháp chứng,
+nhưng đủ để minh họa quyết định allowed, denied, baseline bypass và conflict.
+
+Nguyên tắc phân tách nhiệm vụ (separation of duties) bổ sung cho đặc quyền tối
+thiểu. Nó không chỉ hỏi ``Teller có quyền hay không'' mà còn xác định các bước
+nhạy cảm không nên do cùng một vai trò hoàn tất. Kịch bản Nova Bank giữ chế độ
+baseline như một đối chứng có chủ đích: Teller có thể tạo và duyệt giao dịch.
+Sau khi áp dụng RBAC, endpoint phê duyệt kiểm tra quyền tại backend và từ chối
+Teller ngay cả khi người dùng biết URL của hồ sơ. Điều này thể hiện enforcement
+và audit trail phải nằm tại điểm thực thi nghiệp vụ.
+
+\section{Nhật ký bảo mật và vòng đời sự kiện}
+
+Log bảo mật là dấu vết có cấu trúc của hoạt động xác thực, truy cập, thay đổi
+quyền và lỗi hệ thống. Theo hướng dẫn quản lý log của NIST, log có giá trị cho
+giám sát, điều tra sự cố và đáp ứng, nhưng chỉ hữu ích khi tổ chức có thể thu
+thập, bảo quản và phân tích chúng nhất quán \citep{Kent2006SP80092}. Vấn đề
+thực tế là các nguồn log thường không đồng nhất về cột, định dạng thời gian,
+tên user và mức độ chi tiết.
+
+RBAC Guard dùng Event chuẩn hóa làm biên giữa dữ liệu đầu vào và detection
+engine. Event giữ \texttt{event\_id}, timestamp, loại sự kiện, user, IP,
+resource, action, status, request và details. Parser chấp nhận CSV/JSON, xác
+nhận header và kiểu dữ liệu, sau đó cô lập RowError thay vì hủy toàn bộ lần
+chạy vì một dòng lỗi. Thiết kế này phản ánh một nguyên tắc vận hành: dữ liệu
+không hợp lệ phải có thể truy vết, trong khi dữ liệu hợp lệ vẫn có thể được
+phân tích.
+
+Vòng đời dữ liệu của nguyên mẫu gồm bốn bước. Thứ nhất, parser tạo Event có
+thứ tự thời gian. Thứ hai, rule engine tạo finding với rule ID và evidence.
+Thứ ba, scorer biến finding thành Alert có score và severity. Cuối cùng,
+reporter ghi artifact để con người hoặc lệnh evaluate kiểm tra. Sự tách lớp này
+giúp phân biệt lỗi dữ liệu, lỗi logic detection và lỗi báo cáo, đồng thời cho
+phép tái chạy cùng input/configuration để kiểm chứng kết quả.
+
+\section{SQL Injection và phát hiện chỉ báo trong log}
+
+SQL Injection xảy ra khi dữ liệu không tin cậy được ghép vào câu lệnh truy vấn
+theo cách làm thay đổi ý nghĩa truy vấn. Phòng vệ ưu tiên là prepared statement,
+stored procedure phù hợp, kiểm tra allow-list và tài khoản database có quyền
+tối thiểu, thay vì chỉ dựa vào filter chuỗi \citep{OWASPSQLi}. Vì vậy rule SQL
+Injection trong RBAC Guard không được xem là lớp phòng vệ ứng dụng chính; nó là
+lớp giám sát hậu kiểm để phát hiện request có chỉ báo đáng ngờ trong log.
+
+Rule dùng một tập regex xác định trước và lưu pattern đã khớp làm evidence.
+Ưu điểm của cách này là người đọc biết ngay vì sao Event bị gắn cờ, dễ viết test
+và tái lập cùng một kết quả. Đổi lại, nó có thể bỏ sót encoding, payload phân
+mảnh hoặc biến thể chưa nằm trong pattern; mở rộng pattern lại có thể bắt nhầm
+văn bản hợp lệ. Kết quả SQL Injection của dataset tổng hợp vì thế được trình
+bày như kiểm chứng implementation theo scenario, không phải tỷ lệ phát hiện
+trên lưu lượng web thực.
+
+Trong ngôn ngữ ATT\&CK, việc khai thác một ứng dụng public-facing có thể là
+đường vào ban đầu của đối thủ \citep{MITRET1190}. Tuy nhiên một chuỗi xuất hiện
+trong request log chỉ là dấu hiệu quan sát: nó không chứng minh truy vấn đã chạy
+hoặc kẻ tấn công đã truy cập dữ liệu. Việc giữ phân biệt này giúp tránh diễn giải
+một alert thành một incident đã được xác nhận.
+
+\section{Password guessing và kiểm soát xác thực}
+
+Password guessing hoặc brute force là chuỗi thử thông tin xác thực lặp lại để
+tìm mật khẩu đúng. ATT\&CK mô tả brute force là kỹ thuật T1110, có thể nhắm vào
+một tài khoản hoặc phân tán qua nhiều tài khoản, IP và khoảng thời gian
+\citep{MITRET1110}. Trong dataset baseline, nguyên mẫu chọn trường hợp đơn
+giản có thể giải thích: nhóm login failure theo cặp $(user, IP)$ và báo động
+khi số lần thất bại đạt ngưỡng trong một cửa sổ thời gian.
+
+Ngưỡng không phải kết luận về ác ý. Một người dùng quên mật khẩu cũng có thể
+tạo chuỗi failure, trong khi đối thủ có thể né ngưỡng bằng cách đổi IP, đổi user
+hoặc kéo dài thời gian. NIST SP 800-63B cho phép dùng tín hiệu gian lận và rủi
+ro như IP hoặc vị trí không mong đợi để quyết định kiểm soát xác thực bổ sung
+\citep{NIST2025SP80063B}. Vì vậy context-risk của dự án thêm IP mới, hoạt động
+ngoài giờ và denial lặp lại như bằng chứng triage, nhưng không tự khóa tài khoản
+hay thay đổi quyền truy cập.
+
+Một triển khai sản xuất có thể bổ sung rate limit, progressive delay, MFA,
+credential-stuffing detection và cảnh báo phân tán. Những cơ chế này nằm ngoài
+phạm vi PoC, nhưng giới hạn hiện tại cần được ghi rõ để người vận hành không
+hiểu threshold năm lần/300 giây là chính sách áp dụng được cho mọi tổ chức.
+
+\section{Chấm điểm rủi ro, ngữ cảnh và tương quan cảnh báo}
+
+Kiểm tra quyền cho kết quả nhị phân, còn triage cần biết alert nào nên được xem
+trước. Risk scoring kết hợp loại finding, confidence, số lần lặp và kết quả
+RBAC để đưa về một thang 0--100. Score không phải xác suất tấn công được hiệu
+chỉnh thống kê; nó là quy tắc ưu tiên minh bạch. Nhờ vậy người xem có thể lần
+từ severity về điểm thành phần và evidence, thay vì phải tin vào một mô hình
+hộp đen.
+
+Tư duy zero trust nhấn mạnh việc đánh giá user, tài sản và tài nguyên thay vì
+tin cậy chỉ vì vị trí mạng \citep{Rose2020SP800207}. Các tín hiệu ngoài giờ, IP
+mới và tài nguyên hiếm trong dự án áp dụng ý tưởng này ở mức tối thiểu. Chúng
+được học từ Event xuất hiện trước đó trong cùng lần chạy, nên phù hợp để minh
+họa cách ngữ cảnh bổ sung cho rule nền, không phải hồ sơ hành vi dài hạn của
+một khách hàng thực.
+
+Một alert thường chỉ là mảnh nhỏ của chuỗi hành vi. Các nghiên cứu alert
+correlation chỉ ra nhu cầu liên hệ alert để giảm gánh nặng phân tích
+\citep{Valdes2001AlertCorrelation,Zhou2007AlertCorrelation}. RBAC Guard chọn
+quy tắc gom nhóm đơn giản theo cùng user--IP và khoảng cách thời gian. Incident
+kết quả giữ toàn bộ alert ID, Event ID, loại rủi ro, context signal và evidence;
+điều này giúp người đọc truy ngược nguyên nhân. Quy tắc không mô hình hóa quan
+hệ nhân quả như các hệ thống correlation chuyên sâu, đổi lại nó dễ kiểm thử và
+phù hợp với quy mô đồ án.

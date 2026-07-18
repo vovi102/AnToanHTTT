@@ -1,0 +1,81 @@
+\begin{thebibliography}{11}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Ferraiolo and Kuhn(1992)]{Ferraiolo1992RBAC}
+David~F. Ferraiolo and D.~Richard Kuhn.
+\newblock Role-based access controls.
+\newblock In \emph{Proceedings of the 15th National Computer Security
+  Conference}, pages 554--563, 1992.
+\newblock URL \url{https://csrc.nist.gov/projects/role-based-access-control}.
+
+\bibitem[{Joint Task Force}(2020)]{JTF2020SP80053}
+{Joint Task Force}.
+\newblock Security and privacy controls for information systems and
+  organizations.
+\newblock Special Publication 800-53 Revision 5, National Institute of
+  Standards and Technology, 2020.
+
+\bibitem[Kent and Souppaya(2006)]{Kent2006SP80092}
+Karen Kent and Murugiah Souppaya.
+\newblock Guide to computer security log management.
+\newblock Special Publication 800-92, National Institute of Standards and
+  Technology, 2006.
+
+\bibitem[{MITRE}(2026{\natexlab{a}})]{MITRET1110}
+{MITRE}.
+\newblock Brute force, technique {T1110}.
+\newblock \url{https://attack.mitre.org/techniques/T1110/}, 2026{\natexlab{a}}.
+
+\bibitem[{MITRE}(2026{\natexlab{b}})]{MITRET1190}
+{MITRE}.
+\newblock Exploit public-facing application, technique {T1190}.
+\newblock \url{https://attack.mitre.org/techniques/T1190/}, 2026{\natexlab{b}}.
+
+\bibitem[{National Institute of Standards and
+  Technology}(2025)]{NIST2025SP80063B}
+{National Institute of Standards and Technology}.
+\newblock Authentication and authenticator management.
+\newblock Special Publication 800-63B-4, National Institute of Standards and
+  Technology, 2025.
+\newblock URL \url{https://pages.nist.gov/800-63-4/sp800-63b.html}.
+
+\bibitem[{OWASP Foundation}(2026)]{OWASPSQLi}
+{OWASP Foundation}.
+\newblock Sql injection prevention cheat sheet.
+\newblock
+  \url{https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html},
+  2026.
+
+\bibitem[Rose et~al.(2020)Rose, Borchert, Mitchell, and
+  Connelly]{Rose2020SP800207}
+Scott Rose, Oliver Borchert, Stu Mitchell, and Sean Connelly.
+\newblock Zero trust architecture.
+\newblock Special Publication 800-207, National Institute of Standards and
+  Technology, 2020.
+
+\bibitem[Sandhu et~al.(1996)Sandhu, Coyne, Feinstein, and
+  Youman]{Sandhu1996RBAC}
+Ravi~S. Sandhu, Edward~J. Coyne, Hal~L. Feinstein, and Charles~E. Youman.
+\newblock Role-based access control models.
+\newblock \emph{Computer}, 29\penalty0 (2):\penalty0 38--47, 1996.
+\newblock \doi{10.1109/2.485845}.
+
+\bibitem[Valdes and Skinner(2001)]{Valdes2001AlertCorrelation}
+Alfonso Valdes and Keith Skinner.
+\newblock Probabilistic alert correlation.
+\newblock In \emph{Recent Advances in Intrusion Detection}, pages 54--68, 2001.
+\newblock \doi{10.1007/3-540-45474-8_4}.
+
+\bibitem[Zhou et~al.(2007)Zhou, Heckman, Reynolds, Carlson, and
+  Bishop]{Zhou2007AlertCorrelation}
+Jian Zhou, Mark Heckman, Bradley Reynolds, Adam Carlson, and Matt Bishop.
+\newblock Modeling network intrusion detection alerts for correlation.
+\newblock \emph{ACM Transactions on Information and System Security},
+  10\penalty0 (1):\penalty0 1--31, 2007.
+\newblock \doi{10.1145/1210263.1210267}.
+
+\end{thebibliography}

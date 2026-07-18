@@ -9,14 +9,16 @@
 \usepackage{longtable}
 \usepackage{tabularx}
 \usepackage{enumitem}
+\usepackage{titlesec}
 \usepackage{xcolor}
 \usepackage{listings}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
 \usepackage{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
 \hypersetup{colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black}
 \setlist{nosep}
-\setlength{\parskip}{0.45em}
+\setlength{\parskip}{0.25em}
 \setlength{\parindent}{0pt}
 \renewcommand{\contentsname}{Mục lục}
 \renewcommand{\listfigurename}{Danh mục hình}
@@ -24,6 +26,17 @@
 \renewcommand{\figurename}{Hình}
 \renewcommand{\tablename}{Bảng}
 \renewcommand{\chaptername}{Chương}
+\renewcommand{\bibname}{Tài liệu tham khảo}
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\Huge}
+  {\chaptertitlename~\thechapter}
+  {0.25ex}
+  {\Huge}
+\titlespacing*{\chapter}{0pt}{0pt}{1.2ex}
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{0.7em}{}
+\titlespacing*{\section}{0pt}{1.3ex plus .2ex}{0.45ex}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{0.7em}{}
+\titlespacing*{\subsection}{0pt}{1.1ex plus .2ex}{0.35ex}
 \lstdefinestyle{shell}{basicstyle=\ttfamily\small,breaklines=true,frame=single,columns=fullflexible}
 \lstset{style=shell}
 
