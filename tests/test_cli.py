@@ -97,3 +97,22 @@ def test_cli_analyze_supports_context_risk(tmp_path: Path) -> None:
     assert "incidents" in analyzed.stdout
     assert (output_dir / "context_findings.json").exists()
     assert (output_dir / "incidents.json").exists()
+
+
+def test_cli_exports_nova_audit_events(tmp_path: Path) -> None:
+    db_path = tmp_path / "rbac.db"
+    output_path = tmp_path / "nova-events.csv"
+    initialized = _run("init-db", "--db", str(db_path), "--seed", "data/rbac_seed.json")
+
+    exported = _run(
+        "export-audit-events",
+        "--db",
+        str(db_path),
+        "--output",
+        str(output_path),
+    )
+
+    assert initialized.returncode == 0
+    assert exported.returncode == 0
+    assert "Exported" in exported.stdout
+    assert output_path.exists()

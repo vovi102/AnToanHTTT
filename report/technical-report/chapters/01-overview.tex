@@ -29,16 +29,32 @@ Demo Nova Bank tập trung vào bài toán phân tách nhiệm vụ trong phê d
 dịch. Ở chế độ kiểm soát cơ bản, một Teller có thể tạo và hoàn tất giao dịch.
 Khi áp dụng chính sách RBAC, Teller bị backend từ chối khi truy cập nghiệp vụ
 phê duyệt; chỉ Controller có quyền tương ứng. Các request được cho phép, từ
-chối và thay đổi chính sách đều được ghi vào audit log.
+chối và thay đổi chính sách đều được ghi vào audit log. Adapter audit chuyển
+các bản ghi xác thực và phân quyền này thành Event chuẩn hóa, nhờ đó quyết định
+của Nova Bank có thể đi qua cùng pipeline phát hiện và báo cáo. Log request của
+gateway vẫn là nguồn riêng cho SQL Injection vì audit nghiệp vụ không lưu toàn
+bộ payload HTTP.
+
+\section{Đóng góp kỹ thuật}
+
+Báo cáo có bốn đóng góp có thể kiểm chứng. Thứ nhất, một mô hình RBAC có
+enforcement ở API và policy separation of duties cho luồng phê duyệt giao dịch.
+Thứ hai, một pipeline rule-based có hợp đồng Event, evidence, risk score và
+artifact tái lập. Thứ ba, adapter nối audit log Nova Bank với pipeline cùng
+integration test đi từ thao tác nghiệp vụ tới alert. Thứ tư, phương pháp đánh
+giá mở rộng gồm bộ regression, holdout 300 Event có manifest, metric theo Event
+và campaign, cùng phân tích độ nhạy của luật password guessing.
 
 \section{Ngoài phạm vi}
 
 Đây là Proof of Concept dùng dữ liệu tổng hợp, SQLite cục bộ và luật xác định
 trước. Nó không phải hệ thống ngân hàng triển khai thực tế, SIEM thời gian
 thực hay cơ chế phát hiện dùng machine learning. Kết quả metric chứng minh
-implementation khớp với scenario có nhãn của dự án, không đại diện cho hiệu
-năng trên nhật ký vận hành độc lập. Các giới hạn này được giữ nguyên trong mọi
-diễn giải kết quả ở Chương~\ref{chap:verification}.
+implementation khớp với scenario có nhãn của dự án. Bộ holdout làm giảm việc
+đánh giá chỉ trên 60 Event ban đầu nhưng vẫn là dữ liệu tổng hợp do cùng nhóm
+thiết kế, không đại diện cho hiệu năng trên nhật ký vận hành độc lập. Các giới
+hạn này được giữ nguyên trong mọi diễn giải kết quả ở
+Chương~\ref{chap:verification}.
 
 \section{Tiêu chí hoàn thành}
 

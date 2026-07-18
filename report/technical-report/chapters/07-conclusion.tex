@@ -1,31 +1,37 @@
 \chapter{Kết luận và hướng phát triển}
 
-RBAC Guard kết nối hai lớp kiểm soát thường được tách rời: authorization trả
-lời quyền tại thời điểm request, còn pipeline log đưa quyết định và hành vi vào
-một đầu ra có thể truy vết. Demo Nova Bank làm rõ enforcement tại backend và
-separation of duties; pipeline Python làm rõ parser, rule, scoring, context
-finding và incident. Các artifact CSV/JSON cùng bộ test biến kịch bản demo
-thành kết quả có thể tái lập thay vì chỉ là ảnh giao diện.
+RBAC Guard kết nối hai lớp kiểm soát: authorization quyết định quyền tại thời
+điểm request, còn pipeline log đưa quyết định và hành vi vào artifact có thể
+truy vết. Demo Nova Bank thể hiện enforcement tại backend và separation of
+duties; audit adapter biến bản ghi xác thực/phân quyền thành Event để detector
+xử lý. Integration test từ database tới alert cho thấy hai phần không còn chỉ
+là hai PoC đặt cạnh nhau.
 
-Giới hạn quan trọng là dữ liệu tổng hợp, regex SQL Injection cố định, ngưỡng
-password guessing cố định theo user--IP và heuristic context đơn giản. Dataset
-có nhãn được tạo để kiểm thử scenario mục tiêu, do đó metric đo mức độ phù hợp
-với implementation hiện có chứ không phải chất lượng sản xuất. SQLite, session
-token demo và policy baseline cũng chỉ phù hợp mục đích minh họa.
+Phần đánh giá được mở rộng từ regression 60 Event sang holdout 300 Event có
+manifest, 60 hard negative và 8 campaign password guessing. Trên holdout,
+macro precision đạt 1,0000, recall 0,9333 và F1 0,9630. SQL Injection nhận
+32/40 mẫu và bỏ sót tám biến thể encoding/obfuscation. Password guessing đạt
+8/8 campaign ở cấu hình 5 failure/300 giây, nhưng phân tích độ nhạy chứng minh
+ngưỡng thấp hơn tạo false positive còn ngưỡng/cửa sổ không phù hợp có thể làm
+recall về 0. Vì vậy cấu hình mặc định là một giả định scenario, không phải
+ngưỡng tối ưu cho mọi hệ thống.
 
-Đặc biệt, baseline chỉ có 60 Event và chưa tách một tập hold-out độc lập với
-việc thiết kế rule. Các Event benign chưa chứa đủ trường hợp gần với tấn công
-nhưng hợp lệ để ước lượng false positive trong vận hành. Password guessing được
-chấm theo Event dù hệ thống phát alert theo chuỗi; còn context-risk mới minh
-họa finding và incident mà chưa có nhãn để tính metric ở hai cấp này. Những
-giới hạn đó yêu cầu diễn giải F1 như chỉ số regression của scenario tổng hợp,
-không phải khả năng tổng quát hóa sang nhật ký độc lập.
+Các giới hạn còn lại là dữ liệu tổng hợp do cùng nhóm xây dựng, số campaign
+nhỏ, thiếu nhãn độc lập cho context finding/incident, regex cố định và thiếu
+baseline cạnh tranh. Holdout độc lập về quy trình sinh và được tạo sau khi đóng
+băng rule, nhưng chưa độc lập về nguồn vận hành. SQLite, token phiên demo,
+audit log sửa được và source IP sentinel cũng giới hạn khả năng suy rộng. Risk
+score chỉ xếp ưu tiên minh bạch, không được đọc như xác suất tấn công.
 
-Các bước phát triển tiếp theo nên bắt đầu bằng log đã ẩn danh, có nhãn độc lập
-và nhiều khoảng thời gian, đồng thời tách tập thiết kế rule với tập hold-out.
-Đánh giá nên bao gồm hard negative, metric theo Event--alert--incident, false
-positive, false negative, độ trễ và chi phí triage. Khi có bằng chứng vận hành,
-hệ thống có thể mở rộng schema/provenance log, quản lý rule và ngưỡng theo cấu
-hình, streaming ingestion, tích hợp SIEM, RBAC hierarchy hoặc mô hình phát hiện
-bổ sung. Mỗi bước cần giữ nguyên nguyên tắc của nguyên mẫu: kết quả phải giải
-thích được và tái lập từ input công bố.
+Hướng phát triển ưu tiên gồm bốn bước. Thứ nhất, thu thập log đã ẩn danh theo
+quy trình phê duyệt, gắn provenance và nhãn bởi người đánh giá độc lập. Thứ hai,
+đánh giá theo nhiều khoảng thời gian với class imbalance thực, hard negative,
+false alert trên đơn vị thời gian, độ trễ và chi phí triage. Thứ ba, mở rộng
+password spraying/credential stuffing và so sánh regex SQL Injection với
+baseline khác dưới cùng protocol. Thứ tư, chuyển audit sang collector chống
+sửa đổi, bổ sung client IP/request ID, streaming ingestion và tích hợp SIEM.
+
+Trong phạm vi học phần, kết quả hỗ trợ kết luận rằng nguyên mẫu đáp ứng các mục
+tiêu thiết kế, kiểm soát và tái lập đã đặt ra. Nó chưa hỗ trợ kết luận rằng hệ
+thống sẵn sàng triển khai trong ngân hàng. Việc phân tách rõ hai mức kết luận
+này là điều kiện để các số đo kỹ thuật có ý nghĩa và không vượt quá bằng chứng.

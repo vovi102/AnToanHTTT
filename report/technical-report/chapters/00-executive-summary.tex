@@ -1,0 +1,31 @@
+\chapter*{Tóm tắt báo cáo}
+\addcontentsline{toc}{chapter}{Tóm tắt báo cáo}
+
+Báo cáo trình bày thiết kế và hiện thực một nguyên mẫu gồm hai lớp kiểm soát
+bổ sung cho nhau. Lớp phòng ngừa sử dụng Role-Based Access Control (RBAC) để
+buộc quyền tại backend của ứng dụng Nova Bank và minh họa separation of duties
+giữa Teller và Controller. Lớp giám sát chuẩn hóa nhật ký thành Event, áp dụng
+luật giải thích được để phát hiện chỉ báo SQL Injection, password guessing và
+truy cập trái phép, sau đó chấm điểm, tương quan và xuất bằng chứng dưới dạng
+CSV/JSON. Audit log của Nova Bank được nối với pipeline bằng một adapter thay
+vì chỉ được mô tả như hướng phát triển.
+
+Đánh giá gồm ba tầng. Bộ regression 60 Event kiểm tra tính ổn định của các
+scenario ban đầu. Bộ holdout tổng hợp 300 Event được sinh bằng quy trình và
+manifest riêng, gồm 180 benign, 40 SQL Injection, 40 password guessing và 40
+unauthorized access; trong đó 60 Event là hard negative. Trên holdout, macro
+precision đạt 1,0000, macro recall 0,9333 và macro F1 0,9630. SQL Injection
+bỏ sót 8 biến thể encoding/obfuscation; password guessing phát hiện đủ 8 chiến
+dịch, nhưng phân tích độ nhạy cho thấy kết quả thay đổi mạnh khi ngưỡng chuyển
+từ 3 sang 5 hoặc 7 lần thất bại. Bộ context-risk 14 Event được dùng để kiểm
+chứng khả năng giữ quan hệ Event--Alert--Incident, chưa dùng để tuyên bố độ
+chính xác thống kê.
+
+Kết quả chứng minh nguyên mẫu có thể tái lập, có enforcement tại backend và có
+đường truy vết từ quyết định nghiệp vụ tới cảnh báo. Tuy nhiên, toàn bộ dữ liệu
+đánh giá vẫn là dữ liệu tổng hợp, holdout chỉ độc lập về quy trình chứ chưa độc
+lập về nguồn vận hành, và risk score là thang ưu tiên theo luật chứ không phải
+xác suất tấn công. Vì vậy kết luận phù hợp nhất là hệ thống đáp ứng mục tiêu
+đồ án và tạo nền tảng thử nghiệm có kiểm soát; trước khi triển khai thực tế cần
+đánh giá trên log đã ẩn danh, có nhãn độc lập, nhiều thời kỳ và baseline cạnh
+tranh.

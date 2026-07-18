@@ -20,3 +20,5 @@ artifacts/*
 !artifacts/alerts.json
 !artifacts/run_metadata.json
 !artifacts/metrics.json
+!artifacts/holdout_metrics.json
+!artifacts/holdout_sensitivity.json

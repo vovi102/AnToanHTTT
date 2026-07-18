@@ -27,7 +27,8 @@ Giao diện & Công dụng \\
 \texttt{rbac-guard init-db} & Tạo SQLite schema và nạp seed RBAC có kiểm tra tham chiếu. \\
 \texttt{rbac-guard check-access} & Trả lời một user có quyền resource:action hay không. \\
 \texttt{rbac-guard analyze} & Parse log, phát hiện, chấm điểm và ghi artifact; nhận tùy chọn \texttt{--context-risk}. \\
-\texttt{rbac-guard evaluate} & Đối chiếu event ID với expected label và sinh confusion matrix/metric. \\
+\texttt{rbac-guard evaluate} & Đối chiếu event ID với expected label; tùy chọn manifest để tính thêm metric campaign. \\
+\texttt{rbac-guard export-audit-events} & Chuyển audit Nova Bank thành CSV Event cho pipeline. \\
 \texttt{GET /health} & Kiểm tra FastAPI đang lắng nghe và database được chọn. \\
 \texttt{/auth/*}, \texttt{/users}, \texttt{/transactions} & Cung cấp xác thực, quản trị nhân viên và nghiệp vụ giao dịch có kiểm soát RBAC. \\
 \path{/approvals/{reference}} & Bề mặt kiểm chứng trực tiếp separation of duties. \\
@@ -50,6 +51,23 @@ uv sync --extra api
 uv run uvicorn rbac_guard.api:app --host 127.0.0.1 --port 8000
 cd web && npm install && npm run dev
 \end{lstlisting}
+
+Quy trình đánh giá holdout được tự động hóa bởi
+\path{scripts/generate_holdout_dataset.py} và
+\path{scripts/run_holdout_sensitivity.py}. Script sinh dữ liệu dùng thứ tự
+và giá trị cố định, ghi manifest cùng phân tầng; script độ nhạy chạy lưới ngưỡng
+3/5/7 và cửa sổ 60/300/600 giây. Hai artifact metric được giữ trong repository
+để bảng kết quả có thể đối chiếu với đầu ra máy thay vì số nhập tay.
+
+\section{Kiểm thử đường tích hợp Nova Bank--pipeline}
+
+Integration test khởi tạo database, tạo năm lần login thất bại và một lần
+Teller truy cập quyền phê duyệt bị từ chối. Adapter xuất toàn bộ audit theo thứ
+tự tăng dần; parser đọc lại file; application service phân tích và phải tạo cả
+\texttt{password\_guessing} lẫn \texttt{unauthorized\_access}. Test CLI riêng
+kiểm tra lệnh export tạo file có thể parse. Đây là bằng chứng tích hợp tối thiểu
+giữa hai phần của dự án; SQL Injection vẫn cần log HTTP vì audit Nova Bank
+không giữ raw request.
 
 \section{Kịch bản demo Nova Bank}
 

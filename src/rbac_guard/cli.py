@@ -5,6 +5,7 @@ from pathlib import Path
 import sqlite3
 import sys
 
+from rbac_guard.audit_adapter import export_audit_events
 from rbac_guard.metrics import evaluate_artifacts
 from rbac_guard.parser import InputFileError
 from rbac_guard.rbac import RBACRepository
@@ -40,6 +41,13 @@ def _parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--alerts", type=Path, required=True)
     evaluate.add_argument("--events", type=Path, required=True)
     evaluate.add_argument("--output", type=Path, required=True)
+    evaluate.add_argument("--manifest", type=Path)
+
+    export_audit = commands.add_parser(
+        "export-audit-events", help="export Nova Bank audit records as normalized events"
+    )
+    export_audit.add_argument("--db", type=Path, required=True)
+    export_audit.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -73,12 +81,17 @@ def main(argv: list[str] | None = None) -> int:
                 message += f"; {len(result.incidents)} incidents"
             print(message)
         elif arguments.command == "evaluate":
-            metrics = evaluate_artifacts(arguments.events, arguments.alerts, arguments.output)
+            metrics = evaluate_artifacts(
+                arguments.events, arguments.alerts, arguments.output, arguments.manifest
+            )
             macro = metrics["macro_average"]
             print(
                 f"Macro precision={macro['precision']:.4f}; "
                 f"recall={macro['recall']:.4f}; f1={macro['f1']:.4f}"
             )
+        elif arguments.command == "export-audit-events":
+            count = export_audit_events(arguments.db, arguments.output)
+            print(f"Exported {count} audit events to {arguments.output}")
         return 0
     except (FileNotFoundError, InputFileError, KeyError, sqlite3.Error, ValueError) as error:
         print(f"error: {error}", file=sys.stderr)

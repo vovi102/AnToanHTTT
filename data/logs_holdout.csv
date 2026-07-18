@@ -1,0 +1,301 @@
+event_id,timestamp,event_type,user,ip,resource,action,status,request,details,expected_label
+holdout-001,2026-07-01T01:00:20+07:00,access,teller01,203.0.113.2,accounts,read,allowed,GET /accounts?page=0,frozen hold-out scenario,benign
+holdout-002,2026-07-01T01:00:40+07:00,access,teller01,203.0.113.3,accounts,update,allowed,GET /accounts?page=1,frozen hold-out scenario,benign
+holdout-003,2026-07-01T01:01:00+07:00,access,auditor01,203.0.113.4,audit_logs,read,allowed,GET /audit_logs?page=2,frozen hold-out scenario,benign
+holdout-004,2026-07-01T01:01:20+07:00,access,admin01,203.0.113.5,users,delete,allowed,GET /users?page=3,frozen hold-out scenario,benign
+holdout-005,2026-07-01T01:01:40+07:00,access,teller01,203.0.113.6,accounts,read,allowed,GET /accounts?page=4,frozen hold-out scenario,benign
+holdout-006,2026-07-01T01:02:00+07:00,access,teller01,203.0.113.7,accounts,update,allowed,GET /accounts?page=5,frozen hold-out scenario,benign
+holdout-007,2026-07-01T01:02:20+07:00,access,auditor01,203.0.113.8,audit_logs,read,allowed,GET /audit_logs?page=6,frozen hold-out scenario,benign
+holdout-008,2026-07-01T01:02:40+07:00,access,admin01,203.0.113.9,users,delete,allowed,GET /users?page=7,frozen hold-out scenario,benign
+holdout-009,2026-07-01T01:03:00+07:00,access,teller01,203.0.113.10,accounts,read,allowed,GET /accounts?page=8,frozen hold-out scenario,benign
+holdout-010,2026-07-01T01:03:20+07:00,access,teller01,203.0.113.11,accounts,update,allowed,GET /accounts?page=9,frozen hold-out scenario,benign
+holdout-011,2026-07-01T01:03:40+07:00,access,auditor01,203.0.113.12,audit_logs,read,allowed,GET /audit_logs?page=10,frozen hold-out scenario,benign
+holdout-012,2026-07-01T01:04:00+07:00,access,admin01,203.0.113.13,users,delete,allowed,GET /users?page=11,frozen hold-out scenario,benign
+holdout-013,2026-07-01T01:04:20+07:00,access,teller01,203.0.113.14,accounts,read,allowed,GET /accounts?page=12,frozen hold-out scenario,benign
+holdout-014,2026-07-01T01:04:40+07:00,access,teller01,203.0.113.15,accounts,update,allowed,GET /accounts?page=13,frozen hold-out scenario,benign
+holdout-015,2026-07-01T01:05:00+07:00,access,auditor01,203.0.113.16,audit_logs,read,allowed,GET /audit_logs?page=14,frozen hold-out scenario,benign
+holdout-016,2026-07-01T01:05:20+07:00,access,admin01,203.0.113.17,users,delete,allowed,GET /users?page=15,frozen hold-out scenario,benign
+holdout-017,2026-07-01T01:05:40+07:00,access,teller01,203.0.113.18,accounts,read,allowed,GET /accounts?page=16,frozen hold-out scenario,benign
+holdout-018,2026-07-01T01:06:00+07:00,access,teller01,203.0.113.19,accounts,update,allowed,GET /accounts?page=17,frozen hold-out scenario,benign
+holdout-019,2026-07-01T01:06:20+07:00,access,auditor01,203.0.113.20,audit_logs,read,allowed,GET /audit_logs?page=18,frozen hold-out scenario,benign
+holdout-020,2026-07-01T01:06:40+07:00,access,admin01,203.0.113.21,users,delete,allowed,GET /users?page=19,frozen hold-out scenario,benign
+holdout-021,2026-07-01T01:07:00+07:00,access,teller01,203.0.113.22,accounts,read,allowed,GET /accounts?page=20,frozen hold-out scenario,benign
+holdout-022,2026-07-01T01:07:20+07:00,access,teller01,203.0.113.23,accounts,update,allowed,GET /accounts?page=21,frozen hold-out scenario,benign
+holdout-023,2026-07-01T01:07:40+07:00,access,auditor01,203.0.113.24,audit_logs,read,allowed,GET /audit_logs?page=22,frozen hold-out scenario,benign
+holdout-024,2026-07-01T01:08:00+07:00,access,admin01,203.0.113.25,users,delete,allowed,GET /users?page=23,frozen hold-out scenario,benign
+holdout-025,2026-07-01T01:08:20+07:00,access,teller01,203.0.113.26,accounts,read,allowed,GET /accounts?page=24,frozen hold-out scenario,benign
+holdout-026,2026-07-01T01:08:40+07:00,access,teller01,203.0.113.27,accounts,update,allowed,GET /accounts?page=25,frozen hold-out scenario,benign
+holdout-027,2026-07-01T01:09:00+07:00,access,auditor01,203.0.113.28,audit_logs,read,allowed,GET /audit_logs?page=26,frozen hold-out scenario,benign
+holdout-028,2026-07-01T01:09:20+07:00,access,admin01,203.0.113.29,users,delete,allowed,GET /users?page=27,frozen hold-out scenario,benign
+holdout-029,2026-07-01T01:09:40+07:00,access,teller01,203.0.113.30,accounts,read,allowed,GET /accounts?page=28,frozen hold-out scenario,benign
+holdout-030,2026-07-01T01:10:00+07:00,access,teller01,203.0.113.31,accounts,update,allowed,GET /accounts?page=29,frozen hold-out scenario,benign
+holdout-031,2026-07-01T01:10:20+07:00,access,auditor01,203.0.113.32,audit_logs,read,allowed,GET /audit_logs?page=30,frozen hold-out scenario,benign
+holdout-032,2026-07-01T01:10:40+07:00,access,admin01,203.0.113.33,users,delete,allowed,GET /users?page=31,frozen hold-out scenario,benign
+holdout-033,2026-07-01T01:11:00+07:00,access,teller01,203.0.113.34,accounts,read,allowed,GET /accounts?page=32,frozen hold-out scenario,benign
+holdout-034,2026-07-01T01:11:20+07:00,access,teller01,203.0.113.35,accounts,update,allowed,GET /accounts?page=33,frozen hold-out scenario,benign
+holdout-035,2026-07-01T01:11:40+07:00,access,auditor01,203.0.113.36,audit_logs,read,allowed,GET /audit_logs?page=34,frozen hold-out scenario,benign
+holdout-036,2026-07-01T01:12:00+07:00,access,admin01,203.0.113.37,users,delete,allowed,GET /users?page=35,frozen hold-out scenario,benign
+holdout-037,2026-07-01T01:12:20+07:00,access,teller01,203.0.113.38,accounts,read,allowed,GET /accounts?page=36,frozen hold-out scenario,benign
+holdout-038,2026-07-01T01:12:40+07:00,access,teller01,203.0.113.39,accounts,update,allowed,GET /accounts?page=37,frozen hold-out scenario,benign
+holdout-039,2026-07-01T01:13:00+07:00,access,auditor01,203.0.113.40,audit_logs,read,allowed,GET /audit_logs?page=38,frozen hold-out scenario,benign
+holdout-040,2026-07-01T01:13:20+07:00,access,admin01,203.0.113.41,users,delete,allowed,GET /users?page=39,frozen hold-out scenario,benign
+holdout-041,2026-07-01T01:13:40+07:00,access,teller01,203.0.113.42,accounts,read,allowed,GET /accounts?page=40,frozen hold-out scenario,benign
+holdout-042,2026-07-01T01:14:00+07:00,access,teller01,203.0.113.43,accounts,update,allowed,GET /accounts?page=41,frozen hold-out scenario,benign
+holdout-043,2026-07-01T01:14:20+07:00,access,auditor01,203.0.113.44,audit_logs,read,allowed,GET /audit_logs?page=42,frozen hold-out scenario,benign
+holdout-044,2026-07-01T01:14:40+07:00,access,admin01,203.0.113.45,users,delete,allowed,GET /users?page=43,frozen hold-out scenario,benign
+holdout-045,2026-07-01T01:15:00+07:00,access,teller01,203.0.113.46,accounts,read,allowed,GET /accounts?page=44,frozen hold-out scenario,benign
+holdout-046,2026-07-01T01:15:20+07:00,access,teller01,203.0.113.47,accounts,update,allowed,GET /accounts?page=45,frozen hold-out scenario,benign
+holdout-047,2026-07-01T01:15:40+07:00,access,auditor01,203.0.113.48,audit_logs,read,allowed,GET /audit_logs?page=46,frozen hold-out scenario,benign
+holdout-048,2026-07-01T01:16:00+07:00,access,admin01,203.0.113.49,users,delete,allowed,GET /users?page=47,frozen hold-out scenario,benign
+holdout-049,2026-07-01T01:16:20+07:00,access,teller01,203.0.113.50,accounts,read,allowed,GET /accounts?page=48,frozen hold-out scenario,benign
+holdout-050,2026-07-01T01:16:40+07:00,access,teller01,203.0.113.51,accounts,update,allowed,GET /accounts?page=49,frozen hold-out scenario,benign
+holdout-051,2026-07-01T01:17:00+07:00,access,auditor01,203.0.113.52,audit_logs,read,allowed,GET /audit_logs?page=50,frozen hold-out scenario,benign
+holdout-052,2026-07-01T01:17:20+07:00,access,admin01,203.0.113.53,users,delete,allowed,GET /users?page=51,frozen hold-out scenario,benign
+holdout-053,2026-07-01T01:17:40+07:00,access,teller01,203.0.113.54,accounts,read,allowed,GET /accounts?page=52,frozen hold-out scenario,benign
+holdout-054,2026-07-01T01:18:00+07:00,access,teller01,203.0.113.55,accounts,update,allowed,GET /accounts?page=53,frozen hold-out scenario,benign
+holdout-055,2026-07-01T01:18:20+07:00,access,auditor01,203.0.113.56,audit_logs,read,allowed,GET /audit_logs?page=54,frozen hold-out scenario,benign
+holdout-056,2026-07-01T01:18:40+07:00,access,admin01,203.0.113.57,users,delete,allowed,GET /users?page=55,frozen hold-out scenario,benign
+holdout-057,2026-07-01T01:19:00+07:00,access,teller01,203.0.113.58,accounts,read,allowed,GET /accounts?page=56,frozen hold-out scenario,benign
+holdout-058,2026-07-01T01:19:20+07:00,access,teller01,203.0.113.59,accounts,update,allowed,GET /accounts?page=57,frozen hold-out scenario,benign
+holdout-059,2026-07-01T01:19:40+07:00,access,auditor01,203.0.113.60,audit_logs,read,allowed,GET /audit_logs?page=58,frozen hold-out scenario,benign
+holdout-060,2026-07-01T01:20:00+07:00,access,admin01,203.0.113.61,users,delete,allowed,GET /users?page=59,frozen hold-out scenario,benign
+holdout-061,2026-07-01T01:20:20+07:00,access,teller01,203.0.113.62,accounts,read,allowed,GET /accounts?page=60,frozen hold-out scenario,benign
+holdout-062,2026-07-01T01:20:40+07:00,access,teller01,203.0.113.63,accounts,update,allowed,GET /accounts?page=61,frozen hold-out scenario,benign
+holdout-063,2026-07-01T01:21:00+07:00,access,auditor01,203.0.113.64,audit_logs,read,allowed,GET /audit_logs?page=62,frozen hold-out scenario,benign
+holdout-064,2026-07-01T01:21:20+07:00,access,admin01,203.0.113.65,users,delete,allowed,GET /users?page=63,frozen hold-out scenario,benign
+holdout-065,2026-07-01T01:21:40+07:00,access,teller01,203.0.113.66,accounts,read,allowed,GET /accounts?page=64,frozen hold-out scenario,benign
+holdout-066,2026-07-01T01:22:00+07:00,access,teller01,203.0.113.67,accounts,update,allowed,GET /accounts?page=65,frozen hold-out scenario,benign
+holdout-067,2026-07-01T01:22:20+07:00,access,auditor01,203.0.113.68,audit_logs,read,allowed,GET /audit_logs?page=66,frozen hold-out scenario,benign
+holdout-068,2026-07-01T01:22:40+07:00,access,admin01,203.0.113.69,users,delete,allowed,GET /users?page=67,frozen hold-out scenario,benign
+holdout-069,2026-07-01T01:23:00+07:00,access,teller01,203.0.113.70,accounts,read,allowed,GET /accounts?page=68,frozen hold-out scenario,benign
+holdout-070,2026-07-01T01:23:20+07:00,access,teller01,203.0.113.71,accounts,update,allowed,GET /accounts?page=69,frozen hold-out scenario,benign
+holdout-071,2026-07-01T01:23:40+07:00,access,auditor01,203.0.113.72,audit_logs,read,allowed,GET /audit_logs?page=70,frozen hold-out scenario,benign
+holdout-072,2026-07-01T01:24:00+07:00,access,admin01,203.0.113.73,users,delete,allowed,GET /users?page=71,frozen hold-out scenario,benign
+holdout-073,2026-07-01T01:24:20+07:00,access,teller01,203.0.113.74,accounts,read,allowed,GET /accounts?page=72,frozen hold-out scenario,benign
+holdout-074,2026-07-01T01:24:40+07:00,access,teller01,203.0.113.75,accounts,update,allowed,GET /accounts?page=73,frozen hold-out scenario,benign
+holdout-075,2026-07-01T01:25:00+07:00,access,auditor01,203.0.113.76,audit_logs,read,allowed,GET /audit_logs?page=74,frozen hold-out scenario,benign
+holdout-076,2026-07-01T01:25:20+07:00,access,admin01,203.0.113.77,users,delete,allowed,GET /users?page=75,frozen hold-out scenario,benign
+holdout-077,2026-07-01T01:25:40+07:00,access,teller01,203.0.113.78,accounts,read,allowed,GET /accounts?page=76,frozen hold-out scenario,benign
+holdout-078,2026-07-01T01:26:00+07:00,access,teller01,203.0.113.79,accounts,update,allowed,GET /accounts?page=77,frozen hold-out scenario,benign
+holdout-079,2026-07-01T01:26:20+07:00,access,auditor01,203.0.113.80,audit_logs,read,allowed,GET /audit_logs?page=78,frozen hold-out scenario,benign
+holdout-080,2026-07-01T01:26:40+07:00,access,admin01,203.0.113.81,users,delete,allowed,GET /users?page=79,frozen hold-out scenario,benign
+holdout-081,2026-07-01T01:27:00+07:00,access,teller01,203.0.113.82,accounts,read,allowed,GET /accounts?page=80,frozen hold-out scenario,benign
+holdout-082,2026-07-01T01:27:20+07:00,access,teller01,203.0.113.83,accounts,update,allowed,GET /accounts?page=81,frozen hold-out scenario,benign
+holdout-083,2026-07-01T01:27:40+07:00,access,auditor01,203.0.113.84,audit_logs,read,allowed,GET /audit_logs?page=82,frozen hold-out scenario,benign
+holdout-084,2026-07-01T01:28:00+07:00,access,admin01,203.0.113.85,users,delete,allowed,GET /users?page=83,frozen hold-out scenario,benign
+holdout-085,2026-07-01T01:28:20+07:00,access,teller01,203.0.113.86,accounts,read,allowed,GET /accounts?page=84,frozen hold-out scenario,benign
+holdout-086,2026-07-01T01:28:40+07:00,access,teller01,203.0.113.87,accounts,update,allowed,GET /accounts?page=85,frozen hold-out scenario,benign
+holdout-087,2026-07-01T01:29:00+07:00,access,auditor01,203.0.113.88,audit_logs,read,allowed,GET /audit_logs?page=86,frozen hold-out scenario,benign
+holdout-088,2026-07-01T01:29:20+07:00,access,admin01,203.0.113.89,users,delete,allowed,GET /users?page=87,frozen hold-out scenario,benign
+holdout-089,2026-07-01T01:29:40+07:00,access,teller01,203.0.113.90,accounts,read,allowed,GET /accounts?page=88,frozen hold-out scenario,benign
+holdout-090,2026-07-01T01:30:00+07:00,access,teller01,203.0.113.91,accounts,update,allowed,GET /accounts?page=89,frozen hold-out scenario,benign
+holdout-091,2026-07-01T01:30:20+07:00,access,auditor01,203.0.113.92,audit_logs,read,allowed,GET /audit_logs?page=90,frozen hold-out scenario,benign
+holdout-092,2026-07-01T01:30:40+07:00,access,admin01,203.0.113.93,users,delete,allowed,GET /users?page=91,frozen hold-out scenario,benign
+holdout-093,2026-07-01T01:31:00+07:00,access,teller01,203.0.113.94,accounts,read,allowed,GET /accounts?page=92,frozen hold-out scenario,benign
+holdout-094,2026-07-01T01:31:20+07:00,access,teller01,203.0.113.95,accounts,update,allowed,GET /accounts?page=93,frozen hold-out scenario,benign
+holdout-095,2026-07-01T01:31:40+07:00,access,auditor01,203.0.113.96,audit_logs,read,allowed,GET /audit_logs?page=94,frozen hold-out scenario,benign
+holdout-096,2026-07-01T01:32:00+07:00,access,admin01,203.0.113.97,users,delete,allowed,GET /users?page=95,frozen hold-out scenario,benign
+holdout-097,2026-07-01T01:32:20+07:00,access,teller01,203.0.113.98,accounts,read,allowed,GET /accounts?page=96,frozen hold-out scenario,benign
+holdout-098,2026-07-01T01:32:40+07:00,access,teller01,203.0.113.99,accounts,update,allowed,GET /accounts?page=97,frozen hold-out scenario,benign
+holdout-099,2026-07-01T01:33:00+07:00,access,auditor01,203.0.113.100,audit_logs,read,allowed,GET /audit_logs?page=98,frozen hold-out scenario,benign
+holdout-100,2026-07-01T01:33:20+07:00,access,admin01,203.0.113.101,users,delete,allowed,GET /users?page=99,frozen hold-out scenario,benign
+holdout-101,2026-07-01T01:33:40+07:00,access,teller01,203.0.113.102,accounts,read,allowed,GET /accounts?page=100,frozen hold-out scenario,benign
+holdout-102,2026-07-01T01:34:00+07:00,access,teller01,203.0.113.103,accounts,update,allowed,GET /accounts?page=101,frozen hold-out scenario,benign
+holdout-103,2026-07-01T01:34:20+07:00,access,auditor01,203.0.113.104,audit_logs,read,allowed,GET /audit_logs?page=102,frozen hold-out scenario,benign
+holdout-104,2026-07-01T01:34:40+07:00,access,admin01,203.0.113.105,users,delete,allowed,GET /users?page=103,frozen hold-out scenario,benign
+holdout-105,2026-07-01T01:35:00+07:00,access,teller01,203.0.113.106,accounts,read,allowed,GET /accounts?page=104,frozen hold-out scenario,benign
+holdout-106,2026-07-01T01:35:20+07:00,access,teller01,203.0.113.107,accounts,update,allowed,GET /accounts?page=105,frozen hold-out scenario,benign
+holdout-107,2026-07-01T01:35:40+07:00,access,auditor01,203.0.113.108,audit_logs,read,allowed,GET /audit_logs?page=106,frozen hold-out scenario,benign
+holdout-108,2026-07-01T01:36:00+07:00,access,admin01,203.0.113.109,users,delete,allowed,GET /users?page=107,frozen hold-out scenario,benign
+holdout-109,2026-07-01T01:36:20+07:00,access,teller01,203.0.113.110,accounts,read,allowed,GET /accounts?page=108,frozen hold-out scenario,benign
+holdout-110,2026-07-01T01:36:40+07:00,access,teller01,203.0.113.111,accounts,update,allowed,GET /accounts?page=109,frozen hold-out scenario,benign
+holdout-111,2026-07-01T01:37:00+07:00,access,auditor01,203.0.113.112,audit_logs,read,allowed,GET /audit_logs?page=110,frozen hold-out scenario,benign
+holdout-112,2026-07-01T01:37:20+07:00,access,admin01,203.0.113.113,users,delete,allowed,GET /users?page=111,frozen hold-out scenario,benign
+holdout-113,2026-07-01T01:37:40+07:00,access,teller01,203.0.113.114,accounts,read,allowed,GET /accounts?page=112,frozen hold-out scenario,benign
+holdout-114,2026-07-01T01:38:00+07:00,access,teller01,203.0.113.115,accounts,update,allowed,GET /accounts?page=113,frozen hold-out scenario,benign
+holdout-115,2026-07-01T01:38:20+07:00,access,auditor01,203.0.113.116,audit_logs,read,allowed,GET /audit_logs?page=114,frozen hold-out scenario,benign
+holdout-116,2026-07-01T01:38:40+07:00,access,admin01,203.0.113.117,users,delete,allowed,GET /users?page=115,frozen hold-out scenario,benign
+holdout-117,2026-07-01T01:39:00+07:00,access,teller01,203.0.113.118,accounts,read,allowed,GET /accounts?page=116,frozen hold-out scenario,benign
+holdout-118,2026-07-01T01:39:20+07:00,access,teller01,203.0.113.119,accounts,update,allowed,GET /accounts?page=117,frozen hold-out scenario,benign
+holdout-119,2026-07-01T01:39:40+07:00,access,auditor01,203.0.113.120,audit_logs,read,allowed,GET /audit_logs?page=118,frozen hold-out scenario,benign
+holdout-120,2026-07-01T01:40:00+07:00,access,admin01,203.0.113.121,users,delete,allowed,GET /users?page=119,frozen hold-out scenario,benign
+holdout-121,2026-07-01T01:40:20+07:00,access,teller01,203.0.113.122,accounts,read,allowed,GET /search?q=select account type,frozen hold-out scenario,benign
+holdout-122,2026-07-01T01:40:40+07:00,access,teller01,203.0.113.123,accounts,read,allowed,GET /docs?q=union customer records,frozen hold-out scenario,benign
+holdout-123,2026-07-01T01:41:00+07:00,access,teller01,203.0.113.124,accounts,read,allowed,GET /ui?q=drop-down menu,frozen hold-out scenario,benign
+holdout-124,2026-07-01T01:41:20+07:00,access,teller01,203.0.113.125,accounts,read,allowed,GET /math?q=or 1 equals 1,frozen hold-out scenario,benign
+holdout-125,2026-07-01T01:41:40+07:00,access,teller01,203.0.113.126,accounts,read,allowed,POST /notes text=customer said delete later,frozen hold-out scenario,benign
+holdout-126,2026-07-01T01:42:00+07:00,access,teller01,203.0.113.127,accounts,read,allowed,GET /search?q=select account type,frozen hold-out scenario,benign
+holdout-127,2026-07-01T01:42:20+07:00,access,teller01,203.0.113.128,accounts,read,allowed,GET /docs?q=union customer records,frozen hold-out scenario,benign
+holdout-128,2026-07-01T01:42:40+07:00,access,teller01,203.0.113.129,accounts,read,allowed,GET /ui?q=drop-down menu,frozen hold-out scenario,benign
+holdout-129,2026-07-01T01:43:00+07:00,access,teller01,203.0.113.130,accounts,read,allowed,GET /math?q=or 1 equals 1,frozen hold-out scenario,benign
+holdout-130,2026-07-01T01:43:20+07:00,access,teller01,203.0.113.131,accounts,read,allowed,POST /notes text=customer said delete later,frozen hold-out scenario,benign
+holdout-131,2026-07-01T01:43:40+07:00,access,teller01,203.0.113.132,accounts,read,allowed,GET /search?q=select account type,frozen hold-out scenario,benign
+holdout-132,2026-07-01T01:44:00+07:00,access,teller01,203.0.113.133,accounts,read,allowed,GET /docs?q=union customer records,frozen hold-out scenario,benign
+holdout-133,2026-07-01T01:44:20+07:00,access,teller01,203.0.113.134,accounts,read,allowed,GET /ui?q=drop-down menu,frozen hold-out scenario,benign
+holdout-134,2026-07-01T01:44:40+07:00,access,teller01,203.0.113.135,accounts,read,allowed,GET /math?q=or 1 equals 1,frozen hold-out scenario,benign
+holdout-135,2026-07-01T01:45:00+07:00,access,teller01,203.0.113.136,accounts,read,allowed,POST /notes text=customer said delete later,frozen hold-out scenario,benign
+holdout-136,2026-07-01T01:45:20+07:00,access,teller01,203.0.113.137,accounts,read,allowed,GET /search?q=select account type,frozen hold-out scenario,benign
+holdout-137,2026-07-01T01:45:40+07:00,access,teller01,203.0.113.138,accounts,read,allowed,GET /docs?q=union customer records,frozen hold-out scenario,benign
+holdout-138,2026-07-01T01:46:00+07:00,access,teller01,203.0.113.139,accounts,read,allowed,GET /ui?q=drop-down menu,frozen hold-out scenario,benign
+holdout-139,2026-07-01T01:46:20+07:00,access,teller01,203.0.113.140,accounts,read,allowed,GET /math?q=or 1 equals 1,frozen hold-out scenario,benign
+holdout-140,2026-07-01T01:46:40+07:00,access,teller01,203.0.113.141,accounts,read,allowed,POST /notes text=customer said delete later,frozen hold-out scenario,benign
+holdout-141,2026-07-01T01:47:00+07:00,access,teller01,203.0.113.142,accounts,read,allowed,GET /search?q=select account type,frozen hold-out scenario,benign
+holdout-142,2026-07-01T01:47:20+07:00,access,teller01,203.0.113.143,accounts,read,allowed,GET /docs?q=union customer records,frozen hold-out scenario,benign
+holdout-143,2026-07-01T01:47:40+07:00,access,teller01,203.0.113.144,accounts,read,allowed,GET /ui?q=drop-down menu,frozen hold-out scenario,benign
+holdout-144,2026-07-01T01:48:00+07:00,access,teller01,203.0.113.145,accounts,read,allowed,GET /math?q=or 1 equals 1,frozen hold-out scenario,benign
+holdout-145,2026-07-01T01:48:20+07:00,access,teller01,203.0.113.146,accounts,read,allowed,POST /notes text=customer said delete later,frozen hold-out scenario,benign
+holdout-146,2026-07-01T01:48:40+07:00,access,teller01,203.0.113.147,accounts,read,allowed,GET /search?q=select account type,frozen hold-out scenario,benign
+holdout-147,2026-07-01T01:49:00+07:00,access,teller01,203.0.113.148,accounts,read,allowed,GET /docs?q=union customer records,frozen hold-out scenario,benign
+holdout-148,2026-07-01T01:49:20+07:00,access,teller01,203.0.113.149,accounts,read,allowed,GET /ui?q=drop-down menu,frozen hold-out scenario,benign
+holdout-149,2026-07-01T01:49:40+07:00,access,teller01,203.0.113.150,accounts,read,allowed,GET /math?q=or 1 equals 1,frozen hold-out scenario,benign
+holdout-150,2026-07-01T01:50:00+07:00,access,teller01,203.0.113.151,accounts,read,allowed,POST /notes text=customer said delete later,frozen hold-out scenario,benign
+holdout-151,2026-07-01T01:50:20+07:00,access,teller01,203.0.113.152,accounts,read,allowed,GET /search?q=select account type,frozen hold-out scenario,benign
+holdout-152,2026-07-01T01:50:40+07:00,access,teller01,203.0.113.153,accounts,read,allowed,GET /docs?q=union customer records,frozen hold-out scenario,benign
+holdout-153,2026-07-01T01:51:00+07:00,access,teller01,203.0.113.154,accounts,read,allowed,GET /ui?q=drop-down menu,frozen hold-out scenario,benign
+holdout-154,2026-07-01T01:51:20+07:00,access,teller01,203.0.113.155,accounts,read,allowed,GET /math?q=or 1 equals 1,frozen hold-out scenario,benign
+holdout-155,2026-07-01T01:51:40+07:00,access,teller01,203.0.113.156,accounts,read,allowed,POST /notes text=customer said delete later,frozen hold-out scenario,benign
+holdout-156,2026-07-01T01:52:00+07:00,access,teller01,203.0.113.157,accounts,read,allowed,GET /search?q=select account type,frozen hold-out scenario,benign
+holdout-157,2026-07-01T01:52:20+07:00,access,teller01,203.0.113.158,accounts,read,allowed,GET /docs?q=union customer records,frozen hold-out scenario,benign
+holdout-158,2026-07-01T01:52:40+07:00,access,teller01,203.0.113.159,accounts,read,allowed,GET /ui?q=drop-down menu,frozen hold-out scenario,benign
+holdout-159,2026-07-01T01:53:00+07:00,access,teller01,203.0.113.160,accounts,read,allowed,GET /math?q=or 1 equals 1,frozen hold-out scenario,benign
+holdout-160,2026-07-01T01:53:20+07:00,access,teller01,203.0.113.161,accounts,read,allowed,POST /notes text=customer said delete later,frozen hold-out scenario,benign
+holdout-161,2026-07-01T01:53:40+07:00,authentication,ordinary0,198.51.100.10,session,login,failed,POST /auth/login,ordinary retry 1/4,benign
+holdout-162,2026-07-01T01:54:00+07:00,authentication,ordinary0,198.51.100.10,session,login,failed,POST /auth/login,ordinary retry 2/4,benign
+holdout-163,2026-07-01T01:54:20+07:00,authentication,ordinary0,198.51.100.10,session,login,failed,POST /auth/login,ordinary retry 3/4,benign
+holdout-164,2026-07-01T01:54:40+07:00,authentication,ordinary0,198.51.100.10,session,login,failed,POST /auth/login,ordinary retry 4/4,benign
+holdout-165,2026-07-01T01:55:00+07:00,authentication,ordinary1,198.51.100.11,session,login,failed,POST /auth/login,ordinary retry 1/4,benign
+holdout-166,2026-07-01T01:55:20+07:00,authentication,ordinary1,198.51.100.11,session,login,failed,POST /auth/login,ordinary retry 2/4,benign
+holdout-167,2026-07-01T01:55:40+07:00,authentication,ordinary1,198.51.100.11,session,login,failed,POST /auth/login,ordinary retry 3/4,benign
+holdout-168,2026-07-01T01:56:00+07:00,authentication,ordinary1,198.51.100.11,session,login,failed,POST /auth/login,ordinary retry 4/4,benign
+holdout-169,2026-07-01T01:56:20+07:00,authentication,ordinary2,198.51.100.12,session,login,failed,POST /auth/login,ordinary retry 1/4,benign
+holdout-170,2026-07-01T01:56:40+07:00,authentication,ordinary2,198.51.100.12,session,login,failed,POST /auth/login,ordinary retry 2/4,benign
+holdout-171,2026-07-01T01:57:00+07:00,authentication,ordinary2,198.51.100.12,session,login,failed,POST /auth/login,ordinary retry 3/4,benign
+holdout-172,2026-07-01T01:57:20+07:00,authentication,ordinary2,198.51.100.12,session,login,failed,POST /auth/login,ordinary retry 4/4,benign
+holdout-173,2026-07-01T01:57:40+07:00,authentication,ordinary3,198.51.100.13,session,login,failed,POST /auth/login,ordinary retry 1/4,benign
+holdout-174,2026-07-01T01:58:00+07:00,authentication,ordinary3,198.51.100.13,session,login,failed,POST /auth/login,ordinary retry 2/4,benign
+holdout-175,2026-07-01T01:58:20+07:00,authentication,ordinary3,198.51.100.13,session,login,failed,POST /auth/login,ordinary retry 3/4,benign
+holdout-176,2026-07-01T01:58:40+07:00,authentication,ordinary3,198.51.100.13,session,login,failed,POST /auth/login,ordinary retry 4/4,benign
+holdout-177,2026-07-01T01:59:00+07:00,authentication,ordinary4,198.51.100.14,session,login,failed,POST /auth/login,ordinary retry 1/4,benign
+holdout-178,2026-07-01T01:59:20+07:00,authentication,ordinary4,198.51.100.14,session,login,failed,POST /auth/login,ordinary retry 2/4,benign
+holdout-179,2026-07-01T01:59:40+07:00,authentication,ordinary4,198.51.100.14,session,login,failed,POST /auth/login,ordinary retry 3/4,benign
+holdout-180,2026-07-01T02:00:00+07:00,authentication,ordinary4,198.51.100.14,session,login,failed,POST /auth/login,ordinary retry 4/4,benign
+holdout-181,2026-07-01T02:00:20+07:00,access,teller01,203.0.113.182,accounts,read,allowed,GET /accounts?id=' OR 1=1 --,frozen hold-out scenario,sql_injection
+holdout-182,2026-07-01T02:00:40+07:00,access,teller01,203.0.113.183,accounts,read,allowed,GET /search?q=1 UNION SELECT password FROM users,frozen hold-out scenario,sql_injection
+holdout-183,2026-07-01T02:01:00+07:00,access,teller01,203.0.113.184,accounts,read,allowed,POST /transfer note=1; DROP TABLE audit_logs,frozen hold-out scenario,sql_injection
+holdout-184,2026-07-01T02:01:20+07:00,access,teller01,203.0.113.185,accounts,read,allowed,GET /profile?name=admin'--,frozen hold-out scenario,sql_injection
+holdout-185,2026-07-01T02:01:40+07:00,access,teller01,203.0.113.186,accounts,read,allowed,GET /accounts?id=' OR 1=1 --,frozen hold-out scenario,sql_injection
+holdout-186,2026-07-01T02:02:00+07:00,access,teller01,203.0.113.187,accounts,read,allowed,GET /search?q=1 UNION SELECT password FROM users,frozen hold-out scenario,sql_injection
+holdout-187,2026-07-01T02:02:20+07:00,access,teller01,203.0.113.188,accounts,read,allowed,POST /transfer note=1; DROP TABLE audit_logs,frozen hold-out scenario,sql_injection
+holdout-188,2026-07-01T02:02:40+07:00,access,teller01,203.0.113.189,accounts,read,allowed,GET /profile?name=admin'--,frozen hold-out scenario,sql_injection
+holdout-189,2026-07-01T02:03:00+07:00,access,teller01,203.0.113.190,accounts,read,allowed,GET /accounts?id=' OR 1=1 --,frozen hold-out scenario,sql_injection
+holdout-190,2026-07-01T02:03:20+07:00,access,teller01,203.0.113.191,accounts,read,allowed,GET /search?q=1 UNION SELECT password FROM users,frozen hold-out scenario,sql_injection
+holdout-191,2026-07-01T02:03:40+07:00,access,teller01,203.0.113.192,accounts,read,allowed,POST /transfer note=1; DROP TABLE audit_logs,frozen hold-out scenario,sql_injection
+holdout-192,2026-07-01T02:04:00+07:00,access,teller01,203.0.113.193,accounts,read,allowed,GET /profile?name=admin'--,frozen hold-out scenario,sql_injection
+holdout-193,2026-07-01T02:04:20+07:00,access,teller01,203.0.113.194,accounts,read,allowed,GET /accounts?id=' OR 1=1 --,frozen hold-out scenario,sql_injection
+holdout-194,2026-07-01T02:04:40+07:00,access,teller01,203.0.113.195,accounts,read,allowed,GET /search?q=1 UNION SELECT password FROM users,frozen hold-out scenario,sql_injection
+holdout-195,2026-07-01T02:05:00+07:00,access,teller01,203.0.113.196,accounts,read,allowed,POST /transfer note=1; DROP TABLE audit_logs,frozen hold-out scenario,sql_injection
+holdout-196,2026-07-01T02:05:20+07:00,access,teller01,203.0.113.197,accounts,read,allowed,GET /profile?name=admin'--,frozen hold-out scenario,sql_injection
+holdout-197,2026-07-01T02:05:40+07:00,access,teller01,203.0.113.198,accounts,read,allowed,GET /accounts?id=' OR 1=1 --,frozen hold-out scenario,sql_injection
+holdout-198,2026-07-01T02:06:00+07:00,access,teller01,203.0.113.199,accounts,read,allowed,GET /search?q=1 UNION SELECT password FROM users,frozen hold-out scenario,sql_injection
+holdout-199,2026-07-01T02:06:20+07:00,access,teller01,203.0.113.200,accounts,read,allowed,POST /transfer note=1; DROP TABLE audit_logs,frozen hold-out scenario,sql_injection
+holdout-200,2026-07-01T02:06:40+07:00,access,teller01,203.0.113.1,accounts,read,allowed,GET /profile?name=admin'--,frozen hold-out scenario,sql_injection
+holdout-201,2026-07-01T02:07:00+07:00,access,teller01,203.0.113.2,accounts,read,allowed,GET /accounts?id=' OR 1=1 --,frozen hold-out scenario,sql_injection
+holdout-202,2026-07-01T02:07:20+07:00,access,teller01,203.0.113.3,accounts,read,allowed,GET /search?q=1 UNION SELECT password FROM users,frozen hold-out scenario,sql_injection
+holdout-203,2026-07-01T02:07:40+07:00,access,teller01,203.0.113.4,accounts,read,allowed,POST /transfer note=1; DROP TABLE audit_logs,frozen hold-out scenario,sql_injection
+holdout-204,2026-07-01T02:08:00+07:00,access,teller01,203.0.113.5,accounts,read,allowed,GET /profile?name=admin'--,frozen hold-out scenario,sql_injection
+holdout-205,2026-07-01T02:08:20+07:00,access,teller01,203.0.113.6,accounts,read,allowed,GET /accounts?id=' OR 1=1 --,frozen hold-out scenario,sql_injection
+holdout-206,2026-07-01T02:08:40+07:00,access,teller01,203.0.113.7,accounts,read,allowed,GET /search?q=1 UNION SELECT password FROM users,frozen hold-out scenario,sql_injection
+holdout-207,2026-07-01T02:09:00+07:00,access,teller01,203.0.113.8,accounts,read,allowed,POST /transfer note=1; DROP TABLE audit_logs,frozen hold-out scenario,sql_injection
+holdout-208,2026-07-01T02:09:20+07:00,access,teller01,203.0.113.9,accounts,read,allowed,GET /profile?name=admin'--,frozen hold-out scenario,sql_injection
+holdout-209,2026-07-01T02:09:40+07:00,access,teller01,203.0.113.10,accounts,read,allowed,GET /accounts?id=' OR 1=1 --,frozen hold-out scenario,sql_injection
+holdout-210,2026-07-01T02:10:00+07:00,access,teller01,203.0.113.11,accounts,read,allowed,GET /search?q=1 UNION SELECT password FROM users,frozen hold-out scenario,sql_injection
+holdout-211,2026-07-01T02:10:20+07:00,access,teller01,203.0.113.12,accounts,read,allowed,POST /transfer note=1; DROP TABLE audit_logs,frozen hold-out scenario,sql_injection
+holdout-212,2026-07-01T02:10:40+07:00,access,teller01,203.0.113.13,accounts,read,allowed,GET /profile?name=admin'--,frozen hold-out scenario,sql_injection
+holdout-213,2026-07-01T02:11:00+07:00,access,teller01,203.0.113.14,accounts,read,allowed,GET /accounts?id=1%27%20OR%201%3D1,frozen hold-out scenario,sql_injection
+holdout-214,2026-07-01T02:11:20+07:00,access,teller01,203.0.113.15,accounts,read,allowed,GET /search?q=UNION/**/SELECT+password+FROM+users,frozen hold-out scenario,sql_injection
+holdout-215,2026-07-01T02:11:40+07:00,access,teller01,203.0.113.16,accounts,read,allowed,GET /accounts?id=1%27%20OR%201%3D1,frozen hold-out scenario,sql_injection
+holdout-216,2026-07-01T02:12:00+07:00,access,teller01,203.0.113.17,accounts,read,allowed,GET /search?q=UNION/**/SELECT+password+FROM+users,frozen hold-out scenario,sql_injection
+holdout-217,2026-07-01T02:12:20+07:00,access,teller01,203.0.113.18,accounts,read,allowed,GET /accounts?id=1%27%20OR%201%3D1,frozen hold-out scenario,sql_injection
+holdout-218,2026-07-01T02:12:40+07:00,access,teller01,203.0.113.19,accounts,read,allowed,GET /search?q=UNION/**/SELECT+password+FROM+users,frozen hold-out scenario,sql_injection
+holdout-219,2026-07-01T02:13:00+07:00,access,teller01,203.0.113.20,accounts,read,allowed,GET /accounts?id=1%27%20OR%201%3D1,frozen hold-out scenario,sql_injection
+holdout-220,2026-07-01T02:13:20+07:00,access,teller01,203.0.113.21,accounts,read,allowed,GET /search?q=UNION/**/SELECT+password+FROM+users,frozen hold-out scenario,sql_injection
+holdout-221,2026-07-01T02:13:40+07:00,authentication,target0,198.51.100.100,session,login,failed,POST /auth/login,campaign attempt 1/5,password_guessing
+holdout-222,2026-07-01T02:14:00+07:00,authentication,target0,198.51.100.100,session,login,failed,POST /auth/login,campaign attempt 2/5,password_guessing
+holdout-223,2026-07-01T02:14:20+07:00,authentication,target0,198.51.100.100,session,login,failed,POST /auth/login,campaign attempt 3/5,password_guessing
+holdout-224,2026-07-01T02:14:40+07:00,authentication,target0,198.51.100.100,session,login,failed,POST /auth/login,campaign attempt 4/5,password_guessing
+holdout-225,2026-07-01T02:15:00+07:00,authentication,target0,198.51.100.100,session,login,failed,POST /auth/login,campaign attempt 5/5,password_guessing
+holdout-226,2026-07-01T02:15:20+07:00,authentication,target1,198.51.100.101,session,login,failed,POST /auth/login,campaign attempt 1/5,password_guessing
+holdout-227,2026-07-01T02:15:40+07:00,authentication,target1,198.51.100.101,session,login,failed,POST /auth/login,campaign attempt 2/5,password_guessing
+holdout-228,2026-07-01T02:16:00+07:00,authentication,target1,198.51.100.101,session,login,failed,POST /auth/login,campaign attempt 3/5,password_guessing
+holdout-229,2026-07-01T02:16:20+07:00,authentication,target1,198.51.100.101,session,login,failed,POST /auth/login,campaign attempt 4/5,password_guessing
+holdout-230,2026-07-01T02:16:40+07:00,authentication,target1,198.51.100.101,session,login,failed,POST /auth/login,campaign attempt 5/5,password_guessing
+holdout-231,2026-07-01T02:17:00+07:00,authentication,target2,198.51.100.102,session,login,failed,POST /auth/login,campaign attempt 1/5,password_guessing
+holdout-232,2026-07-01T02:17:20+07:00,authentication,target2,198.51.100.102,session,login,failed,POST /auth/login,campaign attempt 2/5,password_guessing
+holdout-233,2026-07-01T02:17:40+07:00,authentication,target2,198.51.100.102,session,login,failed,POST /auth/login,campaign attempt 3/5,password_guessing
+holdout-234,2026-07-01T02:18:00+07:00,authentication,target2,198.51.100.102,session,login,failed,POST /auth/login,campaign attempt 4/5,password_guessing
+holdout-235,2026-07-01T02:18:20+07:00,authentication,target2,198.51.100.102,session,login,failed,POST /auth/login,campaign attempt 5/5,password_guessing
+holdout-236,2026-07-01T02:18:40+07:00,authentication,target3,198.51.100.103,session,login,failed,POST /auth/login,campaign attempt 1/5,password_guessing
+holdout-237,2026-07-01T02:19:00+07:00,authentication,target3,198.51.100.103,session,login,failed,POST /auth/login,campaign attempt 2/5,password_guessing
+holdout-238,2026-07-01T02:19:20+07:00,authentication,target3,198.51.100.103,session,login,failed,POST /auth/login,campaign attempt 3/5,password_guessing
+holdout-239,2026-07-01T02:19:40+07:00,authentication,target3,198.51.100.103,session,login,failed,POST /auth/login,campaign attempt 4/5,password_guessing
+holdout-240,2026-07-01T02:20:00+07:00,authentication,target3,198.51.100.103,session,login,failed,POST /auth/login,campaign attempt 5/5,password_guessing
+holdout-241,2026-07-01T02:20:20+07:00,authentication,target4,198.51.100.104,session,login,failed,POST /auth/login,campaign attempt 1/5,password_guessing
+holdout-242,2026-07-01T02:20:40+07:00,authentication,target4,198.51.100.104,session,login,failed,POST /auth/login,campaign attempt 2/5,password_guessing
+holdout-243,2026-07-01T02:21:00+07:00,authentication,target4,198.51.100.104,session,login,failed,POST /auth/login,campaign attempt 3/5,password_guessing
+holdout-244,2026-07-01T02:21:20+07:00,authentication,target4,198.51.100.104,session,login,failed,POST /auth/login,campaign attempt 4/5,password_guessing
+holdout-245,2026-07-01T02:21:40+07:00,authentication,target4,198.51.100.104,session,login,failed,POST /auth/login,campaign attempt 5/5,password_guessing
+holdout-246,2026-07-01T02:22:00+07:00,authentication,target5,198.51.100.105,session,login,failed,POST /auth/login,campaign attempt 1/5,password_guessing
+holdout-247,2026-07-01T02:22:20+07:00,authentication,target5,198.51.100.105,session,login,failed,POST /auth/login,campaign attempt 2/5,password_guessing
+holdout-248,2026-07-01T02:22:40+07:00,authentication,target5,198.51.100.105,session,login,failed,POST /auth/login,campaign attempt 3/5,password_guessing
+holdout-249,2026-07-01T02:23:00+07:00,authentication,target5,198.51.100.105,session,login,failed,POST /auth/login,campaign attempt 4/5,password_guessing
+holdout-250,2026-07-01T02:23:20+07:00,authentication,target5,198.51.100.105,session,login,failed,POST /auth/login,campaign attempt 5/5,password_guessing
+holdout-251,2026-07-01T02:23:40+07:00,authentication,target6,198.51.100.106,session,login,failed,POST /auth/login,campaign attempt 1/5,password_guessing
+holdout-252,2026-07-01T02:24:00+07:00,authentication,target6,198.51.100.106,session,login,failed,POST /auth/login,campaign attempt 2/5,password_guessing
+holdout-253,2026-07-01T02:24:20+07:00,authentication,target6,198.51.100.106,session,login,failed,POST /auth/login,campaign attempt 3/5,password_guessing
+holdout-254,2026-07-01T02:24:40+07:00,authentication,target6,198.51.100.106,session,login,failed,POST /auth/login,campaign attempt 4/5,password_guessing
+holdout-255,2026-07-01T02:25:00+07:00,authentication,target6,198.51.100.106,session,login,failed,POST /auth/login,campaign attempt 5/5,password_guessing
+holdout-256,2026-07-01T02:25:20+07:00,authentication,target7,198.51.100.107,session,login,failed,POST /auth/login,campaign attempt 1/5,password_guessing
+holdout-257,2026-07-01T02:25:40+07:00,authentication,target7,198.51.100.107,session,login,failed,POST /auth/login,campaign attempt 2/5,password_guessing
+holdout-258,2026-07-01T02:26:00+07:00,authentication,target7,198.51.100.107,session,login,failed,POST /auth/login,campaign attempt 3/5,password_guessing
+holdout-259,2026-07-01T02:26:20+07:00,authentication,target7,198.51.100.107,session,login,failed,POST /auth/login,campaign attempt 4/5,password_guessing
+holdout-260,2026-07-01T02:26:40+07:00,authentication,target7,198.51.100.107,session,login,failed,POST /auth/login,campaign attempt 5/5,password_guessing
+holdout-261,2026-07-01T02:27:00+07:00,access,teller01,203.0.113.62,users,delete,denied,POST /users/delete,frozen hold-out scenario,unauthorized_access
+holdout-262,2026-07-01T02:27:20+07:00,access,auditor01,203.0.113.63,accounts,update,denied,POST /accounts/update,frozen hold-out scenario,unauthorized_access
+holdout-263,2026-07-01T02:27:40+07:00,access,disabled01,203.0.113.64,accounts,read,denied,POST /accounts/read,frozen hold-out scenario,unauthorized_access
+holdout-264,2026-07-01T02:28:00+07:00,access,teller01,203.0.113.65,audit_logs,read,denied,POST /audit_logs/read,frozen hold-out scenario,unauthorized_access
+holdout-265,2026-07-01T02:28:20+07:00,access,teller01,203.0.113.66,users,delete,denied,POST /users/delete,frozen hold-out scenario,unauthorized_access
+holdout-266,2026-07-01T02:28:40+07:00,access,auditor01,203.0.113.67,accounts,update,denied,POST /accounts/update,frozen hold-out scenario,unauthorized_access
+holdout-267,2026-07-01T02:29:00+07:00,access,disabled01,203.0.113.68,accounts,read,denied,POST /accounts/read,frozen hold-out scenario,unauthorized_access
+holdout-268,2026-07-01T02:29:20+07:00,access,teller01,203.0.113.69,audit_logs,read,denied,POST /audit_logs/read,frozen hold-out scenario,unauthorized_access
+holdout-269,2026-07-01T02:29:40+07:00,access,teller01,203.0.113.70,users,delete,denied,POST /users/delete,frozen hold-out scenario,unauthorized_access
+holdout-270,2026-07-01T02:30:00+07:00,access,auditor01,203.0.113.71,accounts,update,denied,POST /accounts/update,frozen hold-out scenario,unauthorized_access
+holdout-271,2026-07-01T02:30:20+07:00,access,disabled01,203.0.113.72,accounts,read,denied,POST /accounts/read,frozen hold-out scenario,unauthorized_access
+holdout-272,2026-07-01T02:30:40+07:00,access,teller01,203.0.113.73,audit_logs,read,denied,POST /audit_logs/read,frozen hold-out scenario,unauthorized_access
+holdout-273,2026-07-01T02:31:00+07:00,access,teller01,203.0.113.74,users,delete,denied,POST /users/delete,frozen hold-out scenario,unauthorized_access
+holdout-274,2026-07-01T02:31:20+07:00,access,auditor01,203.0.113.75,accounts,update,denied,POST /accounts/update,frozen hold-out scenario,unauthorized_access
+holdout-275,2026-07-01T02:31:40+07:00,access,disabled01,203.0.113.76,accounts,read,denied,POST /accounts/read,frozen hold-out scenario,unauthorized_access
+holdout-276,2026-07-01T02:32:00+07:00,access,teller01,203.0.113.77,audit_logs,read,denied,POST /audit_logs/read,frozen hold-out scenario,unauthorized_access
+holdout-277,2026-07-01T02:32:20+07:00,access,teller01,203.0.113.78,users,delete,denied,POST /users/delete,frozen hold-out scenario,unauthorized_access
+holdout-278,2026-07-01T02:32:40+07:00,access,auditor01,203.0.113.79,accounts,update,denied,POST /accounts/update,frozen hold-out scenario,unauthorized_access
+holdout-279,2026-07-01T02:33:00+07:00,access,disabled01,203.0.113.80,accounts,read,denied,POST /accounts/read,frozen hold-out scenario,unauthorized_access
+holdout-280,2026-07-01T02:33:20+07:00,access,teller01,203.0.113.81,audit_logs,read,denied,POST /audit_logs/read,frozen hold-out scenario,unauthorized_access
+holdout-281,2026-07-01T02:33:40+07:00,access,teller01,203.0.113.82,users,delete,denied,POST /users/delete,frozen hold-out scenario,unauthorized_access
+holdout-282,2026-07-01T02:34:00+07:00,access,auditor01,203.0.113.83,accounts,update,denied,POST /accounts/update,frozen hold-out scenario,unauthorized_access
+holdout-283,2026-07-01T02:34:20+07:00,access,disabled01,203.0.113.84,accounts,read,denied,POST /accounts/read,frozen hold-out scenario,unauthorized_access
+holdout-284,2026-07-01T02:34:40+07:00,access,teller01,203.0.113.85,audit_logs,read,denied,POST /audit_logs/read,frozen hold-out scenario,unauthorized_access
+holdout-285,2026-07-01T02:35:00+07:00,access,teller01,203.0.113.86,users,delete,denied,POST /users/delete,frozen hold-out scenario,unauthorized_access
+holdout-286,2026-07-01T02:35:20+07:00,access,auditor01,203.0.113.87,accounts,update,denied,POST /accounts/update,frozen hold-out scenario,unauthorized_access
+holdout-287,2026-07-01T02:35:40+07:00,access,disabled01,203.0.113.88,accounts,read,denied,POST /accounts/read,frozen hold-out scenario,unauthorized_access
+holdout-288,2026-07-01T02:36:00+07:00,access,teller01,203.0.113.89,audit_logs,read,denied,POST /audit_logs/read,frozen hold-out scenario,unauthorized_access
+holdout-289,2026-07-01T02:36:20+07:00,access,teller01,203.0.113.90,users,delete,denied,POST /users/delete,frozen hold-out scenario,unauthorized_access
+holdout-290,2026-07-01T02:36:40+07:00,access,auditor01,203.0.113.91,accounts,update,denied,POST /accounts/update,frozen hold-out scenario,unauthorized_access
+holdout-291,2026-07-01T02:37:00+07:00,access,disabled01,203.0.113.92,accounts,read,denied,POST /accounts/read,frozen hold-out scenario,unauthorized_access
+holdout-292,2026-07-01T02:37:20+07:00,access,teller01,203.0.113.93,audit_logs,read,denied,POST /audit_logs/read,frozen hold-out scenario,unauthorized_access
+holdout-293,2026-07-01T02:37:40+07:00,access,teller01,203.0.113.94,users,delete,denied,POST /users/delete,frozen hold-out scenario,unauthorized_access
+holdout-294,2026-07-01T02:38:00+07:00,access,auditor01,203.0.113.95,accounts,update,denied,POST /accounts/update,frozen hold-out scenario,unauthorized_access
+holdout-295,2026-07-01T02:38:20+07:00,access,disabled01,203.0.113.96,accounts,read,denied,POST /accounts/read,frozen hold-out scenario,unauthorized_access
+holdout-296,2026-07-01T02:38:40+07:00,access,teller01,203.0.113.97,audit_logs,read,denied,POST /audit_logs/read,frozen hold-out scenario,unauthorized_access
+holdout-297,2026-07-01T02:39:00+07:00,access,teller01,203.0.113.98,users,delete,denied,POST /users/delete,frozen hold-out scenario,unauthorized_access
+holdout-298,2026-07-01T02:39:20+07:00,access,auditor01,203.0.113.99,accounts,update,denied,POST /accounts/update,frozen hold-out scenario,unauthorized_access
+holdout-299,2026-07-01T02:39:40+07:00,access,disabled01,203.0.113.100,accounts,read,denied,POST /accounts/read,frozen hold-out scenario,unauthorized_access
+holdout-300,2026-07-01T02:40:00+07:00,access,teller01,203.0.113.101,audit_logs,read,denied,POST /audit_logs/read,frozen hold-out scenario,unauthorized_access

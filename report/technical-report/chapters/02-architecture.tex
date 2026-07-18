@@ -3,16 +3,18 @@
 
 \section{Tổng quan thành phần}
 
-Hình~\ref{fig:architecture} tách hệ thống thành hai luồng. Luồng nghiệp vụ
+Hình~\ref{fig:architecture} tách hệ thống thành hai luồng có điểm nối. Luồng nghiệp vụ
 Nova Bank phục vụ người dùng tương tác qua trình duyệt; Next.js chỉ trình bày
 và gọi API, còn FastAPI xác thực, kiểm tra quyền và ghi dữ liệu vào SQLite.
 Luồng giám sát nhận file log, chuẩn hóa chúng thành Event, thực thi các rule,
 chấm điểm và ghi artifact. Cùng một repository RBAC được dùng làm nguồn sự
-thật của quyết định quyền trong cả hai luồng.
+thật của quyết định quyền trong cả hai luồng. Audit adapter đọc bản ghi Nova
+Bank theo thứ tự thời gian và xuất CSV đúng hợp đồng parser, tạo đường đi
+end-to-end từ quyết định nghiệp vụ tới detector.
 
 \begin{figure}[htbp]
 \centering
-\input{figures/system-architecture}
+\resizebox{\textwidth}{!}{\input{figures/system-architecture}}
 \caption{Kiến trúc RBAC Guard và demo Nova Bank.}
 \label{fig:architecture}
 \end{figure}
@@ -30,6 +32,7 @@ Next.js & Đăng nhập, quản trị nhân viên, thao tác giao dịch, xem ph
 FastAPI & Kiểm tra Bearer token, áp dụng dependency phân quyền, thực thi chính sách phê duyệt và ghi audit log. \\
 SQLite/\\ RBACRepository & Lưu user, role, permission, session, giao dịch, chính sách demo và lịch sử hoạt động. \\
 CLI/Service & Khởi tạo DB, kiểm tra quyền, điều phối một lần phân tích và đánh giá alert theo nhãn kỳ vọng. \\
+Audit adapter & Chuyển bản ghi xác thực/phân quyền của Nova Bank thành Event chuẩn hóa mà không gắn nhãn đánh giá. \\
 Parser và rules & Chuẩn hóa CSV/JSON, cô lập dòng lỗi và phát hiện SQL Injection, password guessing, unauthorized access. \\
 Reporter & Ghi nguyên tử alert, metadata, context finding và incident dưới dạng CSV/JSON. \\
 \bottomrule
@@ -52,3 +55,20 @@ Trong Nova Bank, quyền có phạm vi đọc giao dịch riêng và toàn bộ
 (\texttt{read\_own}/\texttt{read\_all}); quyền \texttt{transactions:approve}
 thuộc Controller. Cách biểu diễn này cho phép API quyết định phạm vi dữ liệu
 và quyền thao tác từ cùng nguồn dữ liệu, không tin cậy role do frontend gửi lên.
+
+\section{Tích hợp audit log với pipeline}
+
+Lệnh \texttt{export-audit-events} nhận database Nova Bank và tạo file CSV có
+cùng schema với log đầu vào. Một bản ghi login được ánh xạ thành Event
+\texttt{authentication}; các quyết định permission, policy và nghiệp vụ được
+ánh xạ thành \texttt{authorization}. Outcome \texttt{denied} được giữ nguyên
+để \texttt{UnauthorizedAccessRule} có thể kết hợp dấu vết ứng dụng với ma trận
+quyền hiện tại. Adapter không ghi \texttt{expected\_label}, vì dữ liệu tích hợp
+không được dùng làm ground truth.
+
+Thiết kế này tạo một seam rõ ràng thay vì để detector phụ thuộc trực tiếp vào
+schema nội bộ của Nova Bank. Nếu sau này audit schema bổ sung client IP, request
+ID hoặc service name, adapter có thể mở rộng phép ánh xạ mà không đổi rule.
+Giới hạn hiện tại là source IP dùng sentinel \texttt{nova-bank-local}; do đó
+không nên dùng audit export này để đánh giá các luật phụ thuộc IP cho tới khi
+API thu thập địa chỉ nguồn đáng tin cậy.
