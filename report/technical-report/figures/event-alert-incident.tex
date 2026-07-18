@@ -1,0 +1,19 @@
+\begin{tikzpicture}[
+  node distance=9mm and 8mm,
+  box/.style={draw, rounded corners, align=center, minimum height=11mm, minimum width=28mm, fill=blue!6},
+  optional/.style={draw, rounded corners, align=center, minimum height=11mm, minimum width=28mm, fill=orange!12},
+  flow/.style={-Latex, thick}
+]
+\node[box] (event) {CSV / JSON\\Event};
+\node[box, right=of event] (parser) {Parser\\validation};
+\node[box, right=of parser] (rules) {Rule engine\\RBAC check};
+\node[box, right=of rules] (alert) {Alert\\score + severity};
+\node[optional, below=of rules] (context) {Context profiler\\IP, giờ, resource, denial};
+\node[optional, below=of alert] (incident) {Incident\\grouping + triage};
+\draw[flow] (event) -- (parser);
+\draw[flow] (parser) -- (rules);
+\draw[flow] (rules) -- (alert);
+\draw[flow] (parser) -- (context);
+\draw[flow] (context) -- (alert);
+\draw[flow] (alert) -- (incident);
+\end{tikzpicture}

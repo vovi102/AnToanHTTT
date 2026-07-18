@@ -1,0 +1,29 @@
+\chapter{Lệnh tái lập}
+\label{app:reproduction}
+
+Khởi tạo cơ sở dữ liệu, kiểm tra quyền, phân tích baseline và tính metric:
+
+\begin{lstlisting}[language=bash]
+uv run rbac-guard init-db --db demo.db --seed data/rbac_seed.json
+uv run rbac-guard check-access --db demo.db --user teller01 --resource accounts --action read
+uv run rbac-guard analyze --db demo.db --log data/logs_demo.csv --config config/default.toml --output /tmp/rbac-baseline
+uv run rbac-guard evaluate --alerts /tmp/rbac-baseline/alerts.json --events data/logs_demo.csv --output /tmp/rbac-baseline/metrics.json
+\end{lstlisting}
+
+Chạy mở rộng context-risk vào một thư mục output riêng:
+
+\begin{lstlisting}[language=bash]
+uv run rbac-guard analyze --db demo.db --log data/logs_risk_demo.csv --config config/default.toml --output /tmp/rbac-context --context-risk
+\end{lstlisting}
+
+Khởi động demo Nova Bank:
+
+\begin{lstlisting}[language=bash]
+uv sync --extra api
+uv run uvicorn rbac_guard.api:app --host 127.0.0.1 --port 8000
+cd web && npm install && npm run dev
+\end{lstlisting}
+
+Mở \texttt{http://127.0.0.1:8000/health} trước, sau đó mở
+\texttt{http://localhost:3000}. Tài khoản mẫu, dữ liệu giao dịch và cách đặt
+lại trạng thái được mô tả trong \path{DEMO_RBAC_NOVA_BANK.md}.

@@ -1,0 +1,56 @@
+\chapter{Pipeline phân tích nhật ký}
+
+\section{Hợp đồng đầu vào và xử lý lỗi}
+
+Parser nhận CSV hoặc JSON và chuẩn hóa về Event có các trường
+\texttt{event\_id}, timestamp, event type, user, IP, resource, action, status,
+request, details và \texttt{expected\_label}. Ba event type hợp lệ là
+authentication, access và authorization. Header thiếu, loại file không hỗ trợ
+hoặc schema cấp file sai bị từ chối; các dòng có timestamp sai được gom thành
+\texttt{RowError} để dòng hợp lệ còn lại vẫn tiếp tục được xử lý.
+
+Trường \texttt{expected\_label} chỉ có trong dataset đánh giá. Detection engine
+không đọc nó khi tạo dự đoán, nhờ đó việc tính metric về sau không làm rò nhãn
+vào quá trình phát hiện.
+
+\section{Rule nền và chấm điểm}
+
+\texttt{SQLInjectionRule} dùng các regex được compile sẵn và dừng tại pattern
+đầu tiên khớp với mỗi event. \texttt{PasswordGuessingRule} nhóm authentication
+failure theo cặp user--IP, sắp xếp thời gian và tạo finding khi số lần thất bại
+đạt ngưỡng trong cửa sổ cấu hình. \texttt{UnauthorizedAccessRule} chỉ xét
+access/authorization có user, gọi RBAC repository và kết hợp quyền thực tế với
+status denied trong log.
+
+Risk scorer đặt điểm nền 45 cho SQL Injection, 40 cho password guessing và 50
+cho unauthorized access. Điểm cộng bị giới hạn cho confidence, số lần lặp và
+trạng thái RBAC từ chối; tổng luôn nằm trong khoảng 0--100. Severity là Medium
+từ 30, High từ 60 và Critical từ 85 theo \texttt{config/default.toml}.
+
+\section{Context-risk và incident}
+
+Khi bật \texttt{--context-risk}, \texttt{BehaviorProfiler} duyệt Event theo
+thời gian để nhận diện ngoài giờ, IP mới của người dùng, tài nguyên chưa từng
+truy cập thành công và ba lần từ chối trong cửa sổ cấu hình. Đây là heuristic
+phục vụ triage, không phải một bộ phân loại được đánh giá độc lập.
+
+Sau scoring, các alert cùng user--IP được phân vùng theo khoảng thời gian. Mỗi
+incident giữ alert ID, event ID, loại rủi ro, tín hiệu ngữ cảnh và evidence có
+thứ tự ổn định. Điểm incident là điểm alert lớn nhất cộng session-chain bonus,
+sau đó bị giới hạn 100. Luồng này được minh họa ở Hình~\ref{fig:event-alert}.
+
+\begin{figure}[htbp]
+\centering
+\input{figures/event-alert-incident}
+\caption{Luồng từ Event sang Alert và Incident trong chế độ context-risk.}
+\label{fig:event-alert}
+\end{figure}
+
+\section{Artifact đầu ra}
+
+Mỗi lần phân tích sinh \texttt{alerts.csv}, \texttt{alerts.json} và
+\texttt{run\_metadata.json}. Khi context-risk được bật, reporter còn tạo file
+finding ngữ cảnh và hai file incident ở cả CSV lẫn JSON. Reporter ghi tệp tạm
+rồi replace, tránh để lại artifact dở dang khi ghi lỗi. Lệnh evaluate nhận
+alerts và event có nhãn để sinh \texttt{metrics.json}; người viết báo cáo không
+chỉnh sửa thủ công các tệp này.

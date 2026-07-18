@@ -1,0 +1,21 @@
+\chapter{Kết luận và hướng phát triển}
+
+RBAC Guard kết nối hai lớp kiểm soát thường được tách rời: authorization trả
+lời quyền tại thời điểm request, còn pipeline log đưa quyết định và hành vi vào
+một đầu ra có thể truy vết. Demo Nova Bank làm rõ enforcement tại backend và
+separation of duties; pipeline Python làm rõ parser, rule, scoring, context
+finding và incident. Các artifact CSV/JSON cùng bộ test biến kịch bản demo
+thành kết quả có thể tái lập thay vì chỉ là ảnh giao diện.
+
+Giới hạn quan trọng là dữ liệu tổng hợp, regex SQL Injection cố định, ngưỡng
+password guessing cố định theo user--IP và heuristic context đơn giản. Dataset
+có nhãn được tạo để kiểm thử scenario mục tiêu, do đó metric đo mức độ phù hợp
+với implementation hiện có chứ không phải chất lượng sản xuất. SQLite, session
+token demo và policy baseline cũng chỉ phù hợp mục đích minh họa.
+
+Các bước phát triển tiếp theo nên bắt đầu bằng log đã ẩn danh, có nhãn độc lập
+và nhiều khoảng thời gian để đo false positive, false negative, độ trễ và chi
+phí triage. Khi có bằng chứng vận hành, hệ thống có thể mở rộng schema/provenance
+log, quản lý rule và ngưỡng theo cấu hình, streaming ingestion, tích hợp SIEM,
+RBAC hierarchy hoặc mô hình phát hiện bổ sung. Mỗi bước cần giữ nguyên nguyên
+tắc của nguyên mẫu: kết quả phải giải thích được và tái lập từ input công bố.

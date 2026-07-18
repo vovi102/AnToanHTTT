@@ -1,0 +1,50 @@
+\chapter{Tổng quan và phạm vi}
+
+\section{Mục tiêu}
+
+RBAC Guard là nguyên mẫu kiểm soát truy cập theo vai trò kết hợp với phân tích
+nhật ký bảo mật dựa trên luật. Dự án có hai bề mặt sử dụng bổ sung cho nhau.
+Phần thứ nhất là pipeline Python nhận log CSV hoặc JSON, đối chiếu quyền trong
+SQLite, tạo cảnh báo và xuất artifact có thể tái lập. Phần thứ hai là demo Nova
+Bank gồm giao diện Next.js và API FastAPI, dùng để thể hiện xác thực, kiểm tra
+quyền ở backend, phân tách nhiệm vụ và audit trail trong một luồng giao dịch
+có thể trình diễn.
+
+Mục tiêu kỹ thuật của hệ thống là trả lời ba câu hỏi vận hành: ai được phép làm
+gì trên tài nguyên nào; sự kiện nào có dấu hiệu rủi ro; và bằng chứng nào giải
+thích một quyết định từ chối hoặc một cảnh báo. Hệ thống ưu tiên tính minh bạch:
+mỗi alert giữ rule, event nguồn, evidence, điểm rủi ro và severity thay vì chỉ
+trả về một nhãn tổng quát.
+
+\section{Phạm vi}
+
+Pipeline phát hiện ba nhóm rủi ro nền: dữ liệu đầu vào mang dấu hiệu SQL
+Injection, nhiều lần đăng nhập thất bại trong cửa sổ thời gian và truy cập
+không được mô hình RBAC cấp quyền. Khi bật chế độ context-risk, hệ thống bổ
+sung các tín hiệu hoạt động ngoài giờ, IP mới, tài nguyên hiếm và từ chối lặp
+lại; các alert liên quan còn có thể được gom thành incident theo cặp người
+dùng--IP và cửa sổ thời gian.
+
+Demo Nova Bank tập trung vào bài toán phân tách nhiệm vụ trong phê duyệt giao
+dịch. Ở chế độ kiểm soát cơ bản, một Teller có thể tạo và hoàn tất giao dịch.
+Khi áp dụng chính sách RBAC, Teller bị backend từ chối khi truy cập nghiệp vụ
+phê duyệt; chỉ Controller có quyền tương ứng. Các request được cho phép, từ
+chối và thay đổi chính sách đều được ghi vào audit log.
+
+\section{Ngoài phạm vi}
+
+Đây là Proof of Concept dùng dữ liệu tổng hợp, SQLite cục bộ và luật xác định
+trước. Nó không phải hệ thống ngân hàng triển khai thực tế, SIEM thời gian
+thực hay cơ chế phát hiện dùng machine learning. Kết quả metric chứng minh
+implementation khớp với scenario có nhãn của dự án, không đại diện cho hiệu
+năng trên nhật ký vận hành độc lập. Các giới hạn này được giữ nguyên trong mọi
+diễn giải kết quả ở Chương~\ref{chap:verification}.
+
+\section{Tiêu chí hoàn thành}
+
+Một lần chạy hợp lệ phải có thể khởi tạo dữ liệu RBAC, phân tích log, sinh
+alert và đánh giá bằng đúng lệnh CLI được công bố. Với demo web, quyền phải
+được kiểm tra bởi FastAPI thay vì chỉ ẩn nút ở giao diện; việc truy cập trực
+tiếp URL phê duyệt của Teller sau khi áp dụng separation of duties phải trả về
+HTTP 403 và không thay đổi trạng thái giao dịch. Toàn bộ các điều kiện này có
+unit test, integration test hoặc kịch bản trình diễn tương ứng.

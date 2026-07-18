@@ -1,0 +1,72 @@
+\chapter{Kiểm thử và kết quả}
+\label{chap:verification}
+
+\section{Chiến lược kiểm thử}
+
+Bộ test Python bao phủ parser, config, RBAC repository, rule detection,
+scoring, context profiler, reporter, application service, API và CLI. Test
+integration chạy từ input dataset tới artifact; test subprocess kiểm tra exit
+code và thông báo CLI không lộ traceback. Frontend dùng Vitest để kiểm tra
+access control presentation, transaction/approval flow, copy sản phẩm và các
+helper hiển thị. Next.js build là checkpoint bổ sung cho route và type kiểm
+tra ở cấp ứng dụng.
+
+Các lệnh chất lượng lõi là:
+
+\begin{lstlisting}[language=bash]
+uv run pytest -q --cov=rbac_guard --cov-report=term-missing --cov-fail-under=85
+cd web && npm test && npm run build
+\end{lstlisting}
+
+\section{Kết quả baseline}
+
+Dataset \texttt{data/logs\_demo.csv} chứa 60 Event hợp lệ: 30 benign, 10 SQL
+Injection, 10 password guessing và 10 unauthorized access. Cấu hình dùng năm
+lần đăng nhập lỗi trong 300 giây; evaluate đối chiếu event ID với nhãn kỳ vọng
+sau khi analyze hoàn tất. Run metadata ghi nhận 20 alert và không có dòng lỗi.
+Password guessing sinh một alert cấp chuỗi nhưng alert đó mang 10 event ID, do
+đó metric vẫn đánh giá đúng mười Event tấn công.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lrrrrrrr}
+\toprule
+Risk type & TP & FP & FN & TN & Precision & Recall & F1 \\
+\midrule
+SQL Injection & 9 & 0 & 1 & 50 & 1.0000 & 0.9000 & 0.9474 \\
+Password guessing & 10 & 0 & 0 & 50 & 1.0000 & 1.0000 & 1.0000 \\
+Unauthorized access & 10 & 0 & 0 & 50 & 1.0000 & 1.0000 & 1.0000 \\
+Macro average & -- & -- & -- & -- & 1.0000 & 0.9667 & 0.9825 \\
+\bottomrule
+\end{tabular}
+\caption{Kết quả baseline được lấy từ \texttt{artifacts/metrics.json}.}
+\label{tab:baseline}
+\end{table}
+
+Kết quả cho thấy các rule password guessing và unauthorized access khớp hoàn
+toàn với scenario đã thiết kế. SQL Injection bỏ sót một biến thể trong mười
+event, minh họa trade-off của regex: bổ sung pattern có thể tăng recall nhưng
+cũng có nguy cơ tạo false positive. Không diễn giải bảng này là bằng chứng về
+khả năng tổng quát trên log thực tế.
+
+\section{Kết quả context-risk}
+
+Dataset \texttt{data/logs\_risk\_demo.csv} có 14 Event hợp lệ. Khi bật
+\texttt{--context-risk}, run tạo 15 alert, 10 context finding và 3 incident.
+Finding gồm sáu tín hiệu ngoài giờ, hai tài nguyên hiếm, một IP mới và một
+cụm từ chối lặp lại. Một Event có thể mang nhiều finding, vì vậy chúng là bằng
+chứng ưu tiên hóa triage chứ không phải mẫu độc lập để tính precision/recall.
+
+Incident nhiều tín hiệu nhất gắn với \texttt{teller01} từ IP
+\texttt{198.51.100.50} trong 22:00--22:05. Nó liên kết sáu Event với mười
+alert: đăng nhập lỗi, IP mới, hoạt động ngoài giờ, tài nguyên hiếm và thao tác
+\texttt{users:delete} bị RBAC từ chối. Điểm lớn nhất cộng chain bonus tạo 99,
+tương ứng Critical. Case này cho thấy cách hệ thống giữ quan hệ từ incident về
+alert và Event gốc để nhà phân tích có thể kiểm chứng evidence.
+
+\section{Tái lập số liệu}
+
+Số liệu không được nhập tay. Lệnh analyze sinh artifact, sau đó evaluate sinh
+metric; cùng input và cấu hình tạo alert ID ổn định từ rule ID và event ID. Các
+lệnh đầy đủ nằm ở Phụ lục~\ref{app:reproduction}. Khi cần lấy số liệu mới,
+nên ghi ra thư mục output riêng thay vì chỉnh sửa các artifact mẫu trong repo.

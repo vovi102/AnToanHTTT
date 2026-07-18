@@ -1,0 +1,39 @@
+\chapter{Thiết kế kiểm soát bảo mật}
+
+\section{Xác thực và phiên}
+
+Endpoint \texttt{/auth/login} xác thực username và password qua repository.
+Khi thành công, backend tạo session token và trả về thông tin user cùng role;
+khi thất bại, backend ghi sự kiện audit nhưng không tiết lộ tài khoản nào tồn
+tại. Frontend đặt token trong \texttt{sessionStorage}, vì vậy mỗi tab có phiên
+riêng phục vụ kịch bản demo đồng thời Admin, Teller và Controller. Các endpoint
+có bảo vệ dùng Bearer token; token thiếu, sai hoặc hết hiệu lực nhận HTTP 401.
+
+\section{Phân quyền tại backend}
+
+FastAPI đóng gói kiểm tra quyền qua dependency \texttt{require\_permission}.
+Dependency này gọi \texttt{RBACRepository.has\_permission}, ghi một audit event
+cho cả quyết định allowed và denied, sau đó chỉ cho handler chạy khi quyền hợp
+lệ. Ví dụ, quản lý user đòi \texttt{users:manage}, xem audit log đòi
+\texttt{audit\_logs:read}, còn tạo giao dịch đòi \texttt{transactions:create}.
+Do enforcement nằm ở API, người dùng không thể vượt quyền bằng cách mở URL hay
+gửi request trực tiếp ngoài giao diện.
+
+\section{Separation of duties}
+
+Chính sách phê duyệt có hai chế độ. \emph{Baseline} giữ một bypass có chủ đích
+để Teller có thể duyệt, tạo đối chứng cho bài trình diễn. \emph{RBAC} loại bỏ
+bypass này: request xem hoặc phê duyệt hồ sơ gọi policy enforcement, chỉ cho
+phép role có \texttt{transactions:approve}. Teller truy cập URL
+\texttt{/approvals/\{reference\}} sau khi chuyển sang RBAC nhận HTTP 403; giao
+dịch vẫn pending và không phát sinh approver.
+
+\section{Audit trail và tính nhất quán}
+
+Mỗi thao tác có ý nghĩa bảo mật được lưu kèm actor, resource, action, outcome,
+thời điểm và, khi có, mã giao dịch. Với phê duyệt, repository xử lý trạng thái
+giao dịch theo thao tác nguyên tử. Nếu giao dịch đã được xử lý, API trả HTTP
+409 và audit outcome \texttt{conflict}; do đó kết quả không phụ thuộc vào việc
+người dùng bấm lại nút hoặc nhiều request đến sát nhau. Audit log không thay
+thế pipeline phân tích file, nhưng cung cấp bằng chứng nghiệp vụ cho demo và
+là nguồn có thể được tích hợp trong bước phát triển tiếp theo.

@@ -1,0 +1,54 @@
+\chapter{Kiến trúc hệ thống}
+\label{chap:architecture}
+
+\section{Tổng quan thành phần}
+
+Hình~\ref{fig:architecture} tách hệ thống thành hai luồng. Luồng nghiệp vụ
+Nova Bank phục vụ người dùng tương tác qua trình duyệt; Next.js chỉ trình bày
+và gọi API, còn FastAPI xác thực, kiểm tra quyền và ghi dữ liệu vào SQLite.
+Luồng giám sát nhận file log, chuẩn hóa chúng thành Event, thực thi các rule,
+chấm điểm và ghi artifact. Cùng một repository RBAC được dùng làm nguồn sự
+thật của quyết định quyền trong cả hai luồng.
+
+\begin{figure}[htbp]
+\centering
+\input{figures/system-architecture}
+\caption{Kiến trúc RBAC Guard và demo Nova Bank.}
+\label{fig:architecture}
+\end{figure}
+
+\section{Các thành phần chính}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{p{0.23\textwidth}X}
+\toprule
+Thành phần & Trách nhiệm \\
+\midrule
+Next.js & Đăng nhập, quản trị nhân viên, thao tác giao dịch, xem phê duyệt và hiển thị phản hồi quyền. \\
+FastAPI & Kiểm tra Bearer token, áp dụng dependency phân quyền, thực thi chính sách phê duyệt và ghi audit log. \\
+SQLite/\\ RBACRepository & Lưu user, role, permission, session, giao dịch, chính sách demo và lịch sử hoạt động. \\
+CLI/Service & Khởi tạo DB, kiểm tra quyền, điều phối một lần phân tích và đánh giá alert theo nhãn kỳ vọng. \\
+Parser và rules & Chuẩn hóa CSV/JSON, cô lập dòng lỗi và phát hiện SQL Injection, password guessing, unauthorized access. \\
+Reporter & Ghi nguyên tử alert, metadata, context finding và incident dưới dạng CSV/JSON. \\
+\bottomrule
+\end{tabularx}
+\caption{Phân chia trách nhiệm giữa các thành phần.}
+\label{tab:components}
+\end{table}
+
+\section{Mô hình dữ liệu RBAC}
+
+Mô hình sử dụng năm quan hệ cốt lõi: \texttt{users}, \texttt{roles},
+\texttt{permissions}, \texttt{user\_roles} và \texttt{role\_permissions}.
+Một permission là cặp \texttt{resource:action}; user được cấp quyền khi đang
+active và tồn tại đường liên kết user--role--permission. Các tên user, tên role
+và cặp resource--action là duy nhất; bảng liên kết có khóa chính ghép và khóa
+ngoại. SQLite được bật foreign key cho mọi kết nối, vì vậy seed lỗi tham chiếu
+sẽ rollback thay vì để lại trạng thái nửa vời.
+
+Trong Nova Bank, quyền có phạm vi đọc giao dịch riêng và toàn bộ
+(\texttt{read\_own}/\texttt{read\_all}); quyền \texttt{transactions:approve}
+thuộc Controller. Cách biểu diễn này cho phép API quyết định phạm vi dữ liệu
+và quyền thao tác từ cùng nguồn dữ liệu, không tin cậy role do frontend gửi lên.
