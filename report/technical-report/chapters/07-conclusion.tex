@@ -13,9 +13,19 @@ có nhãn được tạo để kiểm thử scenario mục tiêu, do đó metric
 với implementation hiện có chứ không phải chất lượng sản xuất. SQLite, session
 token demo và policy baseline cũng chỉ phù hợp mục đích minh họa.
 
+Đặc biệt, baseline chỉ có 60 Event và chưa tách một tập hold-out độc lập với
+việc thiết kế rule. Các Event benign chưa chứa đủ trường hợp gần với tấn công
+nhưng hợp lệ để ước lượng false positive trong vận hành. Password guessing được
+chấm theo Event dù hệ thống phát alert theo chuỗi; còn context-risk mới minh
+họa finding và incident mà chưa có nhãn để tính metric ở hai cấp này. Những
+giới hạn đó yêu cầu diễn giải F1 như chỉ số regression của scenario tổng hợp,
+không phải khả năng tổng quát hóa sang nhật ký độc lập.
+
 Các bước phát triển tiếp theo nên bắt đầu bằng log đã ẩn danh, có nhãn độc lập
-và nhiều khoảng thời gian để đo false positive, false negative, độ trễ và chi
-phí triage. Khi có bằng chứng vận hành, hệ thống có thể mở rộng schema/provenance
-log, quản lý rule và ngưỡng theo cấu hình, streaming ingestion, tích hợp SIEM,
-RBAC hierarchy hoặc mô hình phát hiện bổ sung. Mỗi bước cần giữ nguyên nguyên
-tắc của nguyên mẫu: kết quả phải giải thích được và tái lập từ input công bố.
+và nhiều khoảng thời gian, đồng thời tách tập thiết kế rule với tập hold-out.
+Đánh giá nên bao gồm hard negative, metric theo Event--alert--incident, false
+positive, false negative, độ trễ và chi phí triage. Khi có bằng chứng vận hành,
+hệ thống có thể mở rộng schema/provenance log, quản lý rule và ngưỡng theo cấu
+hình, streaming ingestion, tích hợp SIEM, RBAC hierarchy hoặc mô hình phát hiện
+bổ sung. Mỗi bước cần giữ nguyên nguyên tắc của nguyên mẫu: kết quả phải giải
+thích được và tái lập từ input công bố.

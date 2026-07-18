@@ -49,6 +49,23 @@ event, minh họa trade-off của regex: bổ sung pattern có thể tăng recal
 cũng có nguy cơ tạo false positive. Không diễn giải bảng này là bằng chứng về
 khả năng tổng quát trên log thực tế.
 
+Vì dataset là tập scenario tổng hợp được xây dựng để kiểm chứng các rule hiện
+có, bảng~\ref{tab:baseline} nên được hiểu là kết quả \emph{regression} của
+implementation, không phải benchmark độc lập. Trường \texttt{expected\_label}
+không được detector sử dụng, nên không có rò nhãn trong lúc phát hiện; tuy
+nhiên, tập đánh giá vẫn chưa độc lập với lựa chọn pattern, ngưỡng và kịch bản
+đã thiết kế. Ba mươi Event benign cũng chưa bao phủ các trường hợp ``hard
+negative'' như lỗi đăng nhập hợp lệ lặp lại, IP mới do thay đổi mạng hoặc request
+có từ khóa gần với SQL nhưng không phải tấn công. Do đó, precision bằng 1.0000
+chỉ xác nhận không có cảnh báo sai trong phạm vi scenario này.
+
+Password guessing còn cho thấy khác biệt giữa đơn vị đánh giá và đơn vị cảnh
+báo: mười Event dương thuộc cùng một user--IP và được gom thành một alert cấp
+chuỗi. Vì vậy, mười true positive ở cấp Event không tương đương với mười chiến
+dịch tấn công độc lập. Một đánh giá mở rộng cần báo cáo đồng thời metric theo
+Event, alert và campaign/incident, cùng tập hold-out gồm các biến thể chưa được
+dùng để hình thành rule.
+
 \section{Kết quả context-risk}
 
 Dataset \texttt{data/logs\_risk\_demo.csv} có 14 Event hợp lệ. Khi bật
@@ -56,6 +73,9 @@ Dataset \texttt{data/logs\_risk\_demo.csv} có 14 Event hợp lệ. Khi bật
 Finding gồm sáu tín hiệu ngoài giờ, hai tài nguyên hiếm, một IP mới và một
 cụm từ chối lặp lại. Một Event có thể mang nhiều finding, vì vậy chúng là bằng
 chứng ưu tiên hóa triage chứ không phải mẫu độc lập để tính precision/recall.
+Dataset này cũng chưa có nhãn độc lập ở cấp finding hoặc incident; các con số
+hiện tại xác nhận luồng tương quan và truy vết evidence, chưa định lượng tỷ lệ
+phát hiện đúng hay cảnh báo sai của heuristic ngữ cảnh.
 
 Incident nhiều tín hiệu nhất gắn với \texttt{teller01} từ IP
 \texttt{198.51.100.50} trong 22:00--22:05. Nó liên kết sáu Event với mười
