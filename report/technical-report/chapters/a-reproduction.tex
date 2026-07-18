@@ -16,6 +16,22 @@ Chạy mở rộng context-risk vào một thư mục output riêng:
 uv run rbac-guard analyze --db demo.db --log data/logs_risk_demo.csv --config config/default.toml --output /tmp/rbac-context --context-risk
 \end{lstlisting}
 
+Sinh lại holdout, chạy phân tích, đánh giá theo Event/campaign và lưới độ nhạy:
+
+\begin{lstlisting}[language=bash]
+uv run python scripts/generate_holdout_dataset.py
+uv run rbac-guard analyze --db demo.db --log data/logs_holdout.csv --config config/default.toml --output /tmp/rbac-holdout
+uv run rbac-guard evaluate --alerts /tmp/rbac-holdout/alerts.json --events data/logs_holdout.csv --manifest data/holdout_manifest.json --output /tmp/rbac-holdout/metrics.json
+uv run python scripts/run_holdout_sensitivity.py
+\end{lstlisting}
+
+Xuất audit Nova Bank sang hợp đồng Event và phân tích file kết quả:
+
+\begin{lstlisting}[language=bash]
+uv run rbac-guard export-audit-events --db demo.db --output /tmp/nova-audit.csv
+uv run rbac-guard analyze --db demo.db --log /tmp/nova-audit.csv --config config/default.toml --output /tmp/nova-audit-alerts
+\end{lstlisting}
+
 Khởi động demo Nova Bank:
 
 \begin{lstlisting}[language=bash]

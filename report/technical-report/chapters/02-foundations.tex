@@ -65,6 +65,14 @@ thập, bảo quản và phân tích chúng nhất quán \citep{Kent2006SP80092}
 thực tế là các nguồn log thường không đồng nhất về cột, định dạng thời gian,
 tên user và mức độ chi tiết.
 
+OWASP khuyến nghị ứng dụng ghi nhận thành công/thất bại xác thực, lỗi phân
+quyền và các thay đổi cấu hình có ý nghĩa bảo mật; đồng thời không đưa mật
+khẩu, access token hoặc dữ liệu nhạy cảm không cần thiết vào log
+\citep{OWASPLogging}. Hai yêu cầu này tạo một cân bằng: log phải đủ ngữ cảnh để
+điều tra nhưng không trở thành kho dữ liệu làm tăng hậu quả khi bị lộ. Schema
+Event của dự án vì thế ưu tiên định danh sự kiện, actor, nguồn, hành động, kết
+quả và bằng chứng tối thiểu.
+
 RBAC Guard dùng Event chuẩn hóa làm biên giữa dữ liệu đầu vào và detection
 engine. Event giữ \texttt{event\_id}, timestamp, loại sự kiện, user, IP,
 resource, action, status, request và details. Parser chấp nhận CSV/JSON, xác
@@ -108,7 +116,9 @@ một alert thành một incident đã được xác nhận.
 Password guessing hoặc brute force là chuỗi thử thông tin xác thực lặp lại để
 tìm mật khẩu đúng. ATT\&CK mô tả brute force là kỹ thuật T1110, có thể nhắm vào
 một tài khoản hoặc phân tán qua nhiều tài khoản, IP và khoảng thời gian
-\citep{MITRET1110}. Trong dataset baseline, nguyên mẫu chọn trường hợp đơn
+\citep{MITRET1110}. Kỹ thuật con T1110.001 tách password guessing khỏi password
+spraying và credential stuffing \citep{MITRET1110001}. Trong dataset baseline,
+nguyên mẫu chọn trường hợp đơn
 giản có thể giải thích: nhóm login failure theo cặp $(user, IP)$ và báo động
 khi số lần thất bại đạt ngưỡng trong một cửa sổ thời gian.
 

@@ -250,12 +250,17 @@ class RBACRepository:
                 ),
             )
 
-    def list_audit_logs(self) -> list[dict[str, object]]:
+    def audit_log_records(
+        self, *, descending: bool = False, limit: int | None = None
+    ) -> list[dict[str, object]]:
+        direction = "DESC" if descending else "ASC"
+        limit_clause = " LIMIT ?" if limit is not None else ""
         with self._connect() as connection:
             rows = connection.execute(
-                """SELECT id, created_at, username, role_at_event, resource, action,
-                          outcome, transaction_reference, detail
-                   FROM audit_logs ORDER BY id DESC LIMIT 100"""
+                f"""SELECT id, created_at, username, role_at_event, resource, action,
+                           outcome, transaction_reference, detail
+                    FROM audit_logs ORDER BY id {direction}{limit_clause}""",
+                (limit,) if limit is not None else (),
             ).fetchall()
         return [
             {
@@ -271,6 +276,9 @@ class RBACRepository:
             }
             for row in rows
         ]
+
+    def list_audit_logs(self) -> list[dict[str, object]]:
+        return self.audit_log_records(descending=True, limit=100)
 
     def security_mode(self) -> str:
         with self._connect() as connection:

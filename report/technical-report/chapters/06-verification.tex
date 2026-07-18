@@ -1,31 +1,74 @@
 \chapter{Kiểm thử và kết quả}
 \label{chap:verification}
 
-\section{Chiến lược kiểm thử}
+\section{Câu hỏi và chiến lược đánh giá}
 
-Bộ test Python bao phủ parser, config, RBAC repository, rule detection,
-scoring, context profiler, reporter, application service, API và CLI. Test
-integration chạy từ input dataset tới artifact; test subprocess kiểm tra exit
-code và thông báo CLI không lộ traceback. Frontend dùng Vitest để kiểm tra
-access control presentation, transaction/approval flow, copy sản phẩm và các
-helper hiển thị. Next.js build là checkpoint bổ sung cho route và type kiểm
-tra ở cấp ứng dụng.
+Thực nghiệm trả lời bốn câu hỏi. (RQ1) Các rule có tái hiện đúng scenario đã
+đặc tả không? (RQ2) Kết quả thay đổi thế nào trên một tập holdout lớn hơn, có
+hard negative và biến thể chưa khớp pattern? (RQ3) Luật password guessing nhạy
+ra sao với ngưỡng và cửa sổ thời gian? (RQ4) Audit Nova Bank có thực sự đi qua
+pipeline hay hai phần chỉ cùng tồn tại trong repository?
 
-Các lệnh chất lượng lõi là:
+Bộ test Python bao phủ parser, config, repository, rule detection, scoring,
+context profiler, reporter, service, API, CLI và audit adapter. Integration
+test chạy từ dữ liệu tới artifact; test subprocess kiểm tra exit code và lỗi
+CLI. Frontend dùng Vitest cho access-control presentation và luồng giao dịch;
+Next.js production build kiểm tra route và kiểu ở cấp ứng dụng. Các lệnh chất
+lượng lõi là:
 
 \begin{lstlisting}[language=bash]
 uv run pytest -q --cov=rbac_guard --cov-report=term-missing --cov-fail-under=85
 cd web && npm test && npm run build
 \end{lstlisting}
 
-\section{Kết quả baseline}
+\section{Thiết kế dữ liệu thực nghiệm}
 
-Dataset \texttt{data/logs\_demo.csv} chứa 60 Event hợp lệ: 30 benign, 10 SQL
-Injection, 10 password guessing và 10 unauthorized access. Cấu hình dùng năm
-lần đăng nhập lỗi trong 300 giây; evaluate đối chiếu event ID với nhãn kỳ vọng
-sau khi analyze hoàn tất. Run metadata ghi nhận 20 alert và không có dòng lỗi.
-Password guessing sinh một alert cấp chuỗi nhưng alert đó mang 10 event ID, do
-đó metric vẫn đánh giá đúng mười Event tấn công.
+Ba dataset phục vụ ba mục tiêu khác nhau, được tóm tắt ở
+Bảng~\ref{tab:datasets}. Baseline là regression set: nhỏ nhưng ổn định và gắn
+trực tiếp với scenario ban đầu. Holdout được sinh bởi script riêng sau khi đóng
+băng rule tại commit ghi trong manifest. Sự tách này giảm nguy cơ sửa tay dữ
+liệu để khớp detector, nhưng không tạo ra độc lập thống kê hoàn toàn vì dữ liệu
+vẫn do cùng nhóm và cùng giả định hệ thống xây dựng. Context set kiểm tra đường
+liên kết evidence, không có nhãn finding/incident để tính metric.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{p{0.20\textwidth}rrrrX}
+\toprule
+Dataset & Tổng & Benign & Tấn công & Campaign & Mục đích \\
+\midrule
+Regression & 60 & 30 & 30 & -- & Kiểm tra scenario và chống hồi quy. \\
+Holdout & 300 & 180 & 120 & 88 & Đánh giá mở rộng, hard negative và sensitivity. \\
+Context-risk & 14 & -- & -- & -- & Kiểm tra finding, correlation và truy vết. \\
+\bottomrule
+\end{tabularx}
+\caption{Quy mô và vai trò của các dataset trong báo cáo.}
+\label{tab:datasets}
+\end{table}
+
+Holdout gồm 120 truy cập hợp lệ thông thường; 40 request benign chứa từ gần với
+SQL hoặc ký tự đặc biệt; 20 login failure benign không đủ ngưỡng; 40 SQL
+Injection; 40 login failure thuộc 8 campaign password guessing; và 40 truy cập
+trái phép. Tổng cộng 60 hard negative trực tiếp thách thức regex và threshold.
+Trong 40 SQL Injection, 32 mẫu dùng họ pattern detector đã biết, còn 8 mẫu dùng
+encoding hoặc obfuscation được chủ ý kỳ vọng là khó phát hiện. Manifest giữ
+campaign membership và phân tầng; detector không đọc nhãn hay manifest trong
+giai đoạn tạo alert.
+
+Metric cấp Event dùng TP, FP, FN và TN theo từng risk type. Precision, recall
+và F1 được tính theo định nghĩa chuẩn; macro average là trung bình không trọng
+số qua ba loại rủi ro. Metric campaign xem mỗi nhóm password guessing là một
+đơn vị dương, tránh diễn giải năm Event trong cùng chuỗi như năm cuộc tấn công
+độc lập. Với SQL Injection và unauthorized access, mỗi Event là một campaign
+vì dataset chưa mô hình hóa phiên tấn công đa request cho hai loại này.
+
+\section{Kết quả regression 60 Event}
+
+Run baseline tạo 20 alert và không có RowError. Password guessing sinh một
+alert cấp chuỗi mang 10 event ID, vì vậy metric cấp Event vẫn ghi nhận 10 TP
+nhưng chỉ đại diện cho một campaign. Kết quả trong
+Bảng~\ref{tab:baseline} xác nhận implementation khớp scenario ban đầu.
 
 \begin{table}[htbp]
 \centering
@@ -33,60 +76,125 @@ Password guessing sinh một alert cấp chuỗi nhưng alert đó mang 10 event
 \toprule
 Risk type & TP & FP & FN & TN & Precision & Recall & F1 \\
 \midrule
-SQL Injection & 9 & 0 & 1 & 50 & 1.0000 & 0.9000 & 0.9474 \\
-Password guessing & 10 & 0 & 0 & 50 & 1.0000 & 1.0000 & 1.0000 \\
-Unauthorized access & 10 & 0 & 0 & 50 & 1.0000 & 1.0000 & 1.0000 \\
-Macro average & -- & -- & -- & -- & 1.0000 & 0.9667 & 0.9825 \\
+SQL Injection & 9 & 0 & 1 & 50 & 1,0000 & 0,9000 & 0,9474 \\
+Password guessing & 10 & 0 & 0 & 50 & 1,0000 & 1,0000 & 1,0000 \\
+Unauthorized access & 10 & 0 & 0 & 50 & 1,0000 & 1,0000 & 1,0000 \\
+Macro average & -- & -- & -- & -- & 1,0000 & 0,9667 & 0,9825 \\
 \bottomrule
 \end{tabular}
-\caption{Kết quả baseline được lấy từ \texttt{artifacts/metrics.json}.}
+\caption{Kết quả regression từ \texttt{artifacts/metrics.json}.}
 \label{tab:baseline}
 \end{table}
 
-Kết quả cho thấy các rule password guessing và unauthorized access khớp hoàn
-toàn với scenario đã thiết kế. SQL Injection bỏ sót một biến thể trong mười
-event, minh họa trade-off của regex: bổ sung pattern có thể tăng recall nhưng
-cũng có nguy cơ tạo false positive. Không diễn giải bảng này là bằng chứng về
-khả năng tổng quát trên log thực tế.
+Precision 1,0000 chỉ nói rằng 30 Event benign của tập này không tạo false
+positive. Nó không ước lượng được false-positive rate trong vận hành, nơi tần
+suất và đa dạng benign thường lớn hơn nhiều. Việc SQL Injection bỏ sót một mẫu
+đã cho thấy regex không bao phủ mọi biểu diễn ngay cả trong regression set.
 
-Vì dataset là tập scenario tổng hợp được xây dựng để kiểm chứng các rule hiện
-có, bảng~\ref{tab:baseline} nên được hiểu là kết quả \emph{regression} của
-implementation, không phải benchmark độc lập. Trường \texttt{expected\_label}
-không được detector sử dụng, nên không có rò nhãn trong lúc phát hiện; tuy
-nhiên, tập đánh giá vẫn chưa độc lập với lựa chọn pattern, ngưỡng và kịch bản
-đã thiết kế. Ba mươi Event benign cũng chưa bao phủ các trường hợp ``hard
-negative'' như lỗi đăng nhập hợp lệ lặp lại, IP mới do thay đổi mạng hoặc request
-có từ khóa gần với SQL nhưng không phải tấn công. Do đó, precision bằng 1.0000
-chỉ xác nhận không có cảnh báo sai trong phạm vi scenario này.
+\section{Kết quả holdout 300 Event}
 
-Password guessing còn cho thấy khác biệt giữa đơn vị đánh giá và đơn vị cảnh
-báo: mười Event dương thuộc cùng một user--IP và được gom thành một alert cấp
-chuỗi. Vì vậy, mười true positive ở cấp Event không tương đương với mười chiến
-dịch tấn công độc lập. Một đánh giá mở rộng cần báo cáo đồng thời metric theo
-Event, alert và campaign/incident, cùng tập hold-out gồm các biến thể chưa được
-dùng để hình thành rule.
+Pipeline parse đủ 300 Event, không có dòng lỗi và tạo 80 alert. Kết quả cấp
+Event ở Bảng~\ref{tab:holdout} được lấy trực tiếp từ
+\texttt{artifacts/holdout\_metrics.json}. Macro F1 đạt 0,9630, nhưng mức này
+chịu ảnh hưởng lớn bởi hai rule khớp hoàn toàn với cách sinh scenario. Chỉ SQL
+Injection có false negative: detector nhận 32/40 và bỏ sót 8 biến thể
+encoding/obfuscation.
 
-\section{Kết quả context-risk}
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lrrrrrrr}
+\toprule
+Risk type & TP & FP & FN & TN & Precision & Recall & F1 \\
+\midrule
+SQL Injection & 32 & 0 & 8 & 260 & 1,0000 & 0,8000 & 0,8889 \\
+Password guessing & 40 & 0 & 0 & 260 & 1,0000 & 1,0000 & 1,0000 \\
+Unauthorized access & 40 & 0 & 0 & 260 & 1,0000 & 1,0000 & 1,0000 \\
+Macro average & -- & -- & -- & -- & 1,0000 & 0,9333 & 0,9630 \\
+\bottomrule
+\end{tabular}
+\caption{Kết quả cấp Event trên holdout 300 Event.}
+\label{tab:holdout}
+\end{table}
 
-Dataset \texttt{data/logs\_risk\_demo.csv} có 14 Event hợp lệ. Khi bật
-\texttt{--context-risk}, run tạo 15 alert, 10 context finding và 3 incident.
-Finding gồm sáu tín hiệu ngoài giờ, hai tài nguyên hiếm, một IP mới và một
-cụm từ chối lặp lại. Một Event có thể mang nhiều finding, vì vậy chúng là bằng
-chứng ưu tiên hóa triage chứ không phải mẫu độc lập để tính precision/recall.
-Dataset này cũng chưa có nhãn độc lập ở cấp finding hoặc incident; các con số
-hiện tại xác nhận luồng tương quan và truy vết evidence, chưa định lượng tỷ lệ
-phát hiện đúng hay cảnh báo sai của heuristic ngữ cảnh.
+Ở cấp campaign, password guessing có 8 TP thay vì 40 TP; precision, recall và
+F1 vẫn bằng 1,0000. SQL Injection có 32/40 campaign được phát hiện, còn
+unauthorized access có 40/40. Việc báo cáo cả hai cấp không thay đổi detector,
+nhưng thay đổi ý nghĩa kết luận: hệ thống phát hiện tám chuỗi đoán mật khẩu độc
+lập trong dataset, không phải bốn mươi chiến dịch.
 
-Incident nhiều tín hiệu nhất gắn với \texttt{teller01} từ IP
-\texttt{198.51.100.50} trong 22:00--22:05. Nó liên kết sáu Event với mười
-alert: đăng nhập lỗi, IP mới, hoạt động ngoài giờ, tài nguyên hiếm và thao tác
-\texttt{users:delete} bị RBAC từ chối. Điểm lớn nhất cộng chain bonus tạo 99,
-tương ứng Critical. Case này cho thấy cách hệ thống giữ quan hệ từ incident về
-alert và Event gốc để nhà phân tích có thể kiểm chứng evidence.
+Không có FP trên 60 hard negative là tín hiệu tốt ở phạm vi scenario, nhưng
+chưa đủ để tuyên bố precision trong sản xuất. Dataset không chứa ngôn ngữ tự
+nhiên đa miền, proxy encoding thực, bot traffic, lỗi đồng bộ thời gian hay phân
+phối class mất cân bằng như hệ thống ngân hàng. Các bộ intrusion-detection công
+khai như UNSW-NB15 có quy mô lớn hơn và nhiều họ tấn công
+\citep{UNSWNB15}; tuy nhiên schema network flow của chúng không ánh xạ trực
+tiếp sang Event nghiệp vụ RBAC, nên chỉ phù hợp làm benchmark bổ sung sau khi
+xây adapter và protocol đánh giá rõ ràng.
+
+\section{Phân tích độ nhạy password guessing}
+
+Thí nghiệm chạy chín cấu hình: ngưỡng 3, 5, 7 failure kết hợp cửa sổ 60, 300,
+600 giây. Bảng~\ref{tab:sensitivity} trình bày các cấu hình đại diện; toàn bộ
+lưới nằm trong \path{artifacts/holdout_sensitivity.json}. Các event tấn công
+cách nhau đủ gần để ngưỡng 5 hoạt động với cửa sổ 300/600 giây, nhưng không đủ
+gần cho 60 giây. Ngưỡng 3 phát hiện mọi campaign song biến nhóm retry benign
+thành false positive. Ngưỡng 7 bỏ sót mọi campaign vì mỗi campaign chỉ có năm
+lần thất bại.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{rrrrrrrr}
+\toprule
+Ngưỡng & Cửa sổ & $P_e$ & $R_e$ & $F1_e$ & $P_c$ & $R_c$ & $F1_c$ \\
+\midrule
+3 & 300 s & 0,6667 & 1,0000 & 0,8000 & 0,6154 & 1,0000 & 0,7619 \\
+5 & 60 s  & 0,0000 & 0,0000 & 0,0000 & 0,0000 & 0,0000 & 0,0000 \\
+5 & 300 s & 1,0000 & 1,0000 & 1,0000 & 1,0000 & 1,0000 & 1,0000 \\
+5 & 600 s & 1,0000 & 1,0000 & 1,0000 & 1,0000 & 1,0000 & 1,0000 \\
+7 & 300 s & 0,0000 & 0,0000 & 0,0000 & 0,0000 & 0,0000 & 0,0000 \\
+\bottomrule
+\end{tabular}
+\caption{Độ nhạy theo Event ($e$) và campaign ($c$).}
+\label{tab:sensitivity}
+\end{table}
+
+Kết quả không chứng minh 5/300 là ngưỡng tối ưu phổ quát; nó chỉ là cấu hình
+phù hợp nhất với cấu trúc holdout hiện tại. Trong vận hành cần chọn ngưỡng dựa
+trên phân phối retry hợp lệ, độ trễ chấp nhận được, chi phí điều tra và hành vi
+low-and-slow. Ngoài nhóm theo user--IP, nên đánh giá thêm password spraying
+theo IP--nhiều user và credential stuffing với danh sách tài khoản lớn.
+
+\section{Context-risk và tích hợp Nova Bank}
+
+Dataset context-risk có 14 Event. Run tạo 15 alert, 10 context finding và 3
+incident: sáu tín hiệu ngoài giờ, hai tài nguyên hiếm, một IP mới và một cụm
+từ chối lặp lại. Incident của \texttt{teller01} tại
+\texttt{198.51.100.50} liên kết sáu Event với mười alert và đạt 99 điểm. Một
+Event có thể sinh nhiều finding, nên các số lượng này là kiểm chứng pipeline và
+evidence, không phải mẫu độc lập để tính precision/recall.
+
+Đối với RQ4, integration test tạo audit thực trong database Nova Bank, xuất qua
+adapter, parse lại và xác nhận alert password guessing cùng unauthorized access.
+Test này loại bỏ khoảng trống kiến trúc quan trọng giữa demo và detector. Dù
+vậy, nó mới kiểm tra hai risk type trên một nguồn cục bộ; chưa đo throughput,
+độ trễ, mất log, duplicate delivery hay clock skew của tích hợp streaming.
+
+\section{Đe dọa tới tính hợp lệ}
+
+\emph{Construct validity}: expected label mô tả scenario do nhóm quy ước, chưa
+được chuyên gia độc lập xác nhận; risk score không phải xác suất. \emph{Internal
+validity}: holdout được sinh sau khi rule đóng băng và detector không đọc nhãn,
+nhưng tác giả dataset biết thiết kế rule. \emph{External validity}: dữ liệu tổng
+hợp, SQLite và workload nhỏ không đại diện lưu lượng ngân hàng thực.
+\emph{Conclusion validity}: số campaign còn ít, đặc biệt chỉ 8 campaign password
+guessing, nên không báo confidence interval hay significance test vì chúng sẽ
+tạo cảm giác chắc chắn giả. Những giới hạn này không phủ nhận giá trị regression
+và integration test; chúng giới hạn kết luận ở mức PoC có thể tái lập.
 
 \section{Tái lập số liệu}
 
-Số liệu không được nhập tay. Lệnh analyze sinh artifact, sau đó evaluate sinh
-metric; cùng input và cấu hình tạo alert ID ổn định từ rule ID và event ID. Các
-lệnh đầy đủ nằm ở Phụ lục~\ref{app:reproduction}. Khi cần lấy số liệu mới,
-nên ghi ra thư mục output riêng thay vì chỉnh sửa các artifact mẫu trong repo.
+Dataset holdout, manifest và hai artifact metric được tạo bằng script công bố.
+Alert ID ổn định từ rule ID và event ID; reporter ghi file nguyên tử. Các lệnh
+đầy đủ nằm ở Phụ lục~\ref{app:reproduction}. Khi chạy lại, nên dùng output riêng
+và so sánh JSON thay vì sửa trực tiếp bảng trong tài liệu.

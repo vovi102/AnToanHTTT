@@ -1,0 +1,663 @@
+{
+  "dataset_id": "rbac-guard-holdout-v1",
+  "generated_at": "2026-07-19",
+  "rule_freeze_commit": "fced49c",
+  "provenance": "Deterministic synthetic scenarios generated after freezing baseline rules; labels are not consumed by detection.",
+  "strata": {
+    "benign": 180,
+    "sql_injection": 40,
+    "password_guessing": 40,
+    "unauthorized_access": 40
+  },
+  "hard_negatives": 60,
+  "campaigns": [
+    {
+      "campaign_id": "sqli-01",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-181"
+      ]
+    },
+    {
+      "campaign_id": "sqli-02",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-182"
+      ]
+    },
+    {
+      "campaign_id": "sqli-03",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-183"
+      ]
+    },
+    {
+      "campaign_id": "sqli-04",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-184"
+      ]
+    },
+    {
+      "campaign_id": "sqli-05",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-185"
+      ]
+    },
+    {
+      "campaign_id": "sqli-06",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-186"
+      ]
+    },
+    {
+      "campaign_id": "sqli-07",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-187"
+      ]
+    },
+    {
+      "campaign_id": "sqli-08",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-188"
+      ]
+    },
+    {
+      "campaign_id": "sqli-09",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-189"
+      ]
+    },
+    {
+      "campaign_id": "sqli-10",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-190"
+      ]
+    },
+    {
+      "campaign_id": "sqli-11",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-191"
+      ]
+    },
+    {
+      "campaign_id": "sqli-12",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-192"
+      ]
+    },
+    {
+      "campaign_id": "sqli-13",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-193"
+      ]
+    },
+    {
+      "campaign_id": "sqli-14",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-194"
+      ]
+    },
+    {
+      "campaign_id": "sqli-15",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-195"
+      ]
+    },
+    {
+      "campaign_id": "sqli-16",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-196"
+      ]
+    },
+    {
+      "campaign_id": "sqli-17",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-197"
+      ]
+    },
+    {
+      "campaign_id": "sqli-18",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-198"
+      ]
+    },
+    {
+      "campaign_id": "sqli-19",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-199"
+      ]
+    },
+    {
+      "campaign_id": "sqli-20",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-200"
+      ]
+    },
+    {
+      "campaign_id": "sqli-21",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-201"
+      ]
+    },
+    {
+      "campaign_id": "sqli-22",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-202"
+      ]
+    },
+    {
+      "campaign_id": "sqli-23",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-203"
+      ]
+    },
+    {
+      "campaign_id": "sqli-24",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-204"
+      ]
+    },
+    {
+      "campaign_id": "sqli-25",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-205"
+      ]
+    },
+    {
+      "campaign_id": "sqli-26",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-206"
+      ]
+    },
+    {
+      "campaign_id": "sqli-27",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-207"
+      ]
+    },
+    {
+      "campaign_id": "sqli-28",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-208"
+      ]
+    },
+    {
+      "campaign_id": "sqli-29",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-209"
+      ]
+    },
+    {
+      "campaign_id": "sqli-30",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-210"
+      ]
+    },
+    {
+      "campaign_id": "sqli-31",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-211"
+      ]
+    },
+    {
+      "campaign_id": "sqli-32",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-212"
+      ]
+    },
+    {
+      "campaign_id": "sqli-33",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-213"
+      ]
+    },
+    {
+      "campaign_id": "sqli-34",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-214"
+      ]
+    },
+    {
+      "campaign_id": "sqli-35",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-215"
+      ]
+    },
+    {
+      "campaign_id": "sqli-36",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-216"
+      ]
+    },
+    {
+      "campaign_id": "sqli-37",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-217"
+      ]
+    },
+    {
+      "campaign_id": "sqli-38",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-218"
+      ]
+    },
+    {
+      "campaign_id": "sqli-39",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-219"
+      ]
+    },
+    {
+      "campaign_id": "sqli-40",
+      "risk_type": "sql_injection",
+      "event_ids": [
+        "holdout-220"
+      ]
+    },
+    {
+      "campaign_id": "pg-01",
+      "risk_type": "password_guessing",
+      "event_ids": [
+        "holdout-221",
+        "holdout-222",
+        "holdout-223",
+        "holdout-224",
+        "holdout-225"
+      ]
+    },
+    {
+      "campaign_id": "pg-02",
+      "risk_type": "password_guessing",
+      "event_ids": [
+        "holdout-226",
+        "holdout-227",
+        "holdout-228",
+        "holdout-229",
+        "holdout-230"
+      ]
+    },
+    {
+      "campaign_id": "pg-03",
+      "risk_type": "password_guessing",
+      "event_ids": [
+        "holdout-231",
+        "holdout-232",
+        "holdout-233",
+        "holdout-234",
+        "holdout-235"
+      ]
+    },
+    {
+      "campaign_id": "pg-04",
+      "risk_type": "password_guessing",
+      "event_ids": [
+        "holdout-236",
+        "holdout-237",
+        "holdout-238",
+        "holdout-239",
+        "holdout-240"
+      ]
+    },
+    {
+      "campaign_id": "pg-05",
+      "risk_type": "password_guessing",
+      "event_ids": [
+        "holdout-241",
+        "holdout-242",
+        "holdout-243",
+        "holdout-244",
+        "holdout-245"
+      ]
+    },
+    {
+      "campaign_id": "pg-06",
+      "risk_type": "password_guessing",
+      "event_ids": [
+        "holdout-246",
+        "holdout-247",
+        "holdout-248",
+        "holdout-249",
+        "holdout-250"
+      ]
+    },
+    {
+      "campaign_id": "pg-07",
+      "risk_type": "password_guessing",
+      "event_ids": [
+        "holdout-251",
+        "holdout-252",
+        "holdout-253",
+        "holdout-254",
+        "holdout-255"
+      ]
+    },
+    {
+      "campaign_id": "pg-08",
+      "risk_type": "password_guessing",
+      "event_ids": [
+        "holdout-256",
+        "holdout-257",
+        "holdout-258",
+        "holdout-259",
+        "holdout-260"
+      ]
+    },
+    {
+      "campaign_id": "ua-01",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-261"
+      ]
+    },
+    {
+      "campaign_id": "ua-02",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-262"
+      ]
+    },
+    {
+      "campaign_id": "ua-03",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-263"
+      ]
+    },
+    {
+      "campaign_id": "ua-04",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-264"
+      ]
+    },
+    {
+      "campaign_id": "ua-05",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-265"
+      ]
+    },
+    {
+      "campaign_id": "ua-06",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-266"
+      ]
+    },
+    {
+      "campaign_id": "ua-07",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-267"
+      ]
+    },
+    {
+      "campaign_id": "ua-08",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-268"
+      ]
+    },
+    {
+      "campaign_id": "ua-09",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-269"
+      ]
+    },
+    {
+      "campaign_id": "ua-10",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-270"
+      ]
+    },
+    {
+      "campaign_id": "ua-11",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-271"
+      ]
+    },
+    {
+      "campaign_id": "ua-12",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-272"
+      ]
+    },
+    {
+      "campaign_id": "ua-13",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-273"
+      ]
+    },
+    {
+      "campaign_id": "ua-14",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-274"
+      ]
+    },
+    {
+      "campaign_id": "ua-15",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-275"
+      ]
+    },
+    {
+      "campaign_id": "ua-16",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-276"
+      ]
+    },
+    {
+      "campaign_id": "ua-17",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-277"
+      ]
+    },
+    {
+      "campaign_id": "ua-18",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-278"
+      ]
+    },
+    {
+      "campaign_id": "ua-19",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-279"
+      ]
+    },
+    {
+      "campaign_id": "ua-20",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-280"
+      ]
+    },
+    {
+      "campaign_id": "ua-21",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-281"
+      ]
+    },
+    {
+      "campaign_id": "ua-22",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-282"
+      ]
+    },
+    {
+      "campaign_id": "ua-23",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-283"
+      ]
+    },
+    {
+      "campaign_id": "ua-24",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-284"
+      ]
+    },
+    {
+      "campaign_id": "ua-25",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-285"
+      ]
+    },
+    {
+      "campaign_id": "ua-26",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-286"
+      ]
+    },
+    {
+      "campaign_id": "ua-27",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-287"
+      ]
+    },
+    {
+      "campaign_id": "ua-28",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-288"
+      ]
+    },
+    {
+      "campaign_id": "ua-29",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-289"
+      ]
+    },
+    {
+      "campaign_id": "ua-30",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-290"
+      ]
+    },
+    {
+      "campaign_id": "ua-31",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-291"
+      ]
+    },
+    {
+      "campaign_id": "ua-32",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-292"
+      ]
+    },
+    {
+      "campaign_id": "ua-33",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-293"
+      ]
+    },
+    {
+      "campaign_id": "ua-34",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-294"
+      ]
+    },
+    {
+      "campaign_id": "ua-35",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-295"
+      ]
+    },
+    {
+      "campaign_id": "ua-36",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-296"
+      ]
+    },
+    {
+      "campaign_id": "ua-37",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-297"
+      ]
+    },
+    {
+      "campaign_id": "ua-38",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-298"
+      ]
+    },
+    {
+      "campaign_id": "ua-39",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-299"
+      ]
+    },
+    {
+      "campaign_id": "ua-40",
+      "risk_type": "unauthorized_access",
+      "event_ids": [
+        "holdout-300"
+      ]
+    }
+  ]
+}

@@ -11,10 +11,13 @@
 \node[box, right=of cli] (service) {Application service\\Parser, rules, scorer};
 \node[box, right=of service] (reporter) {Reporter\\CSV/JSON artifact};
 \node[box, below=of service] (logs) {CSV/JSON log\\+ config};
+\node[box, below=of db] (adapter) {Audit adapter};
 \draw[flow] (web) -- node[above, font=\scriptsize]{HTTP} (api);
 \draw[flow] (api) -- (db);
 \draw[flow] (cli) -- (service);
 \draw[flow] (logs) -- (service);
 \draw[flow] (service) -- (reporter);
 \draw[flow] (service.east) to[bend left=18] node[above, font=\scriptsize]{permission check} (db.south);
+\draw[flow] (db) -- (adapter);
+\draw[flow] (adapter) -- node[below, font=\scriptsize]{normalized Event} (service);
 \end{tikzpicture}

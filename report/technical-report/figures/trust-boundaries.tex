@@ -1,0 +1,22 @@
+\begin{tikzpicture}[
+  node distance=8mm and 12mm,
+  box/.style={draw, rounded corners, align=center, minimum height=10mm, minimum width=26mm, fill=blue!6},
+  store/.style={draw, cylinder, shape border rotate=90, aspect=0.28, align=center, minimum height=13mm, minimum width=18mm, fill=orange!14},
+  boundary/.style={draw, dashed, rounded corners, inner sep=6mm},
+  flow/.style={-Latex, thick}
+]
+\node[box] (browser) {Trình duyệt /\ HTTP client};
+\node[box, below=of browser] (log) {CSV/JSON log\ không tin cậy};
+\node[box, right=22mm of browser] (api) {FastAPI\ xác thực + RBAC};
+\node[box, below=of api] (engine) {Parser + rules\ scoring + correlation};
+\node[store, right=22mm of api] (db) {SQLite\ nghiệp vụ + audit};
+\node[store, below=of db] (artifact) {Artifact\ CSV/JSON};
+\node[boundary, fit=(browser)(log), label={[font=\scriptsize]above:Vùng bên ngoài}] {};
+\node[boundary, fit=(api)(engine), label={[font=\scriptsize]above:Vùng thực thi chính sách}] {};
+\node[boundary, fit=(db)(artifact), label={[font=\scriptsize]above:Vùng lưu trữ cục bộ}] {};
+\draw[flow] (browser) -- node[above, font=\scriptsize]{request/token} (api);
+\draw[flow] (api) -- node[above, font=\scriptsize]{transaction/audit} (db);
+\draw[flow] (log) -- node[below, font=\scriptsize]{validate} (engine);
+\draw[flow] (db) -- node[right, font=\scriptsize]{adapter} (artifact);
+\draw[flow] (artifact) -- node[below, font=\scriptsize]{Event} (engine);
+\end{tikzpicture}

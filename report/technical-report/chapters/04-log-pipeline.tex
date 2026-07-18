@@ -27,12 +27,30 @@ cho unauthorized access. Điểm cộng bị giới hạn cho confidence, số l
 trạng thái RBAC từ chối; tổng luôn nằm trong khoảng 0--100. Severity là Medium
 từ 30, High từ 60 và Critical từ 85 theo \texttt{config/default.toml}.
 
+Với finding nền, công thức được hiện thực là:
+\[
+S=\min\left(100,\;B+\operatorname{round}(20c)
+  +\min(15,3\max(0,n-1))+15I_{denied}\right),
+\]
+trong đó $B$ là điểm nền, $c\in[0,1]$ là confidence do rule gán, $n$ là số
+Event lặp lại và $I_{denied}$ bằng 1 khi repository xác nhận RBAC từ chối.
+Ví dụ, một unauthorized access với confidence 0,9 và quyết định denied nhận
+$50+18+15=83$ điểm, tương ứng High. Công thức giúp giải thích thứ tự ưu tiên,
+nhưng không được hiệu chỉnh từ tần suất thực tế; 83 điểm không có nghĩa xác
+suất tấn công là 83\%.
+
 \section{Context-risk và incident}
 
 Khi bật \texttt{--context-risk}, \texttt{BehaviorProfiler} duyệt Event theo
 thời gian để nhận diện ngoài giờ, IP mới của người dùng, tài nguyên chưa từng
 truy cập thành công và ba lần từ chối trong cửa sổ cấu hình. Đây là heuristic
 phục vụ triage, không phải một bộ phân loại được đánh giá độc lập.
+
+Finding ngữ cảnh dùng $S_c=\min(100,25+\operatorname{round}(20c)+b)$, với
+$b$ là bonus theo loại tín hiệu. Cách tách công thức tránh làm context signal
+trông như một finding nền đã được rule xác nhận. Các ngưỡng severity và bonus
+là giả định thiết kế công bố trong cấu hình; muốn dùng trong vận hành phải hiệu
+chỉnh trên workload và chi phí triage của tổ chức.
 
 Sau scoring, các alert cùng user--IP được phân vùng theo khoảng thời gian. Mỗi
 incident giữ alert ID, event ID, loại rủi ro, tín hiệu ngữ cảnh và evidence có
@@ -52,5 +70,8 @@ Mỗi lần phân tích sinh \texttt{alerts.csv}, \texttt{alerts.json} và
 \texttt{run\_metadata.json}. Khi context-risk được bật, reporter còn tạo file
 finding ngữ cảnh và hai file incident ở cả CSV lẫn JSON. Reporter ghi tệp tạm
 rồi replace, tránh để lại artifact dở dang khi ghi lỗi. Lệnh evaluate nhận
-alerts và event có nhãn để sinh \texttt{metrics.json}; người viết báo cáo không
-chỉnh sửa thủ công các tệp này.
+alerts và Event có nhãn để sinh \texttt{metrics.json}; khi có
+\texttt{--manifest}, nó còn tính metric theo campaign. Người viết báo cáo không
+chỉnh sửa thủ công các tệp này. Manifest giữ nguồn gốc, phân tầng dữ liệu, hard
+negative, campaign ID và commit đóng băng rule để tránh nhầm dataset với
+artifact được tạo sau phân tích.

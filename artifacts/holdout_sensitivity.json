@@ -1,0 +1,92 @@
+[
+  {
+    "failures": 3,
+    "window_seconds": 60,
+    "event_precision": 0.6667,
+    "event_recall": 1.0,
+    "event_f1": 0.8,
+    "campaign_precision": 0.6154,
+    "campaign_recall": 1.0,
+    "campaign_f1": 0.7619
+  },
+  {
+    "failures": 3,
+    "window_seconds": 300,
+    "event_precision": 0.6667,
+    "event_recall": 1.0,
+    "event_f1": 0.8,
+    "campaign_precision": 0.6154,
+    "campaign_recall": 1.0,
+    "campaign_f1": 0.7619
+  },
+  {
+    "failures": 3,
+    "window_seconds": 600,
+    "event_precision": 0.6667,
+    "event_recall": 1.0,
+    "event_f1": 0.8,
+    "campaign_precision": 0.6154,
+    "campaign_recall": 1.0,
+    "campaign_f1": 0.7619
+  },
+  {
+    "failures": 5,
+    "window_seconds": 60,
+    "event_precision": 0.0,
+    "event_recall": 0.0,
+    "event_f1": 0.0,
+    "campaign_precision": 0.0,
+    "campaign_recall": 0.0,
+    "campaign_f1": 0.0
+  },
+  {
+    "failures": 5,
+    "window_seconds": 300,
+    "event_precision": 1.0,
+    "event_recall": 1.0,
+    "event_f1": 1.0,
+    "campaign_precision": 1.0,
+    "campaign_recall": 1.0,
+    "campaign_f1": 1.0
+  },
+  {
+    "failures": 5,
+    "window_seconds": 600,
+    "event_precision": 1.0,
+    "event_recall": 1.0,
+    "event_f1": 1.0,
+    "campaign_precision": 1.0,
+    "campaign_recall": 1.0,
+    "campaign_f1": 1.0
+  },
+  {
+    "failures": 7,
+    "window_seconds": 60,
+    "event_precision": 0.0,
+    "event_recall": 0.0,
+    "event_f1": 0.0,
+    "campaign_precision": 0.0,
+    "campaign_recall": 0.0,
+    "campaign_f1": 0.0
+  },
+  {
+    "failures": 7,
+    "window_seconds": 300,
+    "event_precision": 0.0,
+    "event_recall": 0.0,
+    "event_f1": 0.0,
+    "campaign_precision": 0.0,
+    "campaign_recall": 0.0,
+    "campaign_f1": 0.0
+  },
+  {
+    "failures": 7,
+    "window_seconds": 600,
+    "event_precision": 0.0,
+    "event_recall": 0.0,
+    "event_f1": 0.0,
+    "campaign_precision": 0.0,
+    "campaign_recall": 0.0,
+    "campaign_f1": 0.0
+  }
+]

@@ -1,0 +1,95 @@
+\chapter{Mô hình đe dọa và ranh giới tin cậy}
+\label{chap:threat-model}
+
+\section{Tài sản và mục tiêu bảo vệ}
+
+Các tài sản chính gồm danh tính và phiên đăng nhập; quan hệ user--role--permission;
+trạng thái và mã tham chiếu giao dịch; audit trail; log đầu vào; cấu hình rule;
+và artifact cảnh báo. Mục tiêu bảo mật là ngăn người dùng thực hiện nghiệp vụ
+không được cấp quyền, ngăn một Teller tự hoàn tất giao dịch trong chế độ RBAC,
+giữ đủ bằng chứng để giải thích quyết định và không để dữ liệu log không tin
+cậy làm hỏng toàn bộ một lần phân tích.
+
+Đối thủ được giả định có thể gửi request HTTP trực tiếp, bỏ qua giao diện,
+đoán mật khẩu, chèn chuỗi bất thường vào tham số, dùng tài khoản hợp lệ nhưng
+thiếu quyền, hoặc cung cấp file log có dòng sai định dạng. Đối thủ không được
+giả định đã kiểm soát máy chủ FastAPI, tiến trình phân tích hay file SQLite.
+Nếu các thành phần này bị chiếm quyền, audit log cục bộ và artifact không còn
+đảm bảo tính toàn vẹn; PoC chưa có append-only storage, chữ ký số hay remote
+attestation để chống lại kịch bản đó.
+
+\section{Ranh giới tin cậy và luồng dữ liệu}
+
+Hình~\ref{fig:trust-boundaries} chỉ ra ba vùng. Trình duyệt và file log nằm
+ngoài vùng tin cậy; mọi token, URL, field CSV/JSON và request text đều phải
+được xem là dữ liệu không tin cậy. FastAPI và pipeline là vùng thực thi chính
+sách. SQLite cùng artifact là vùng lưu trữ cục bộ: chỉ được tin cậy khi quyền
+hệ điều hành và máy chủ chưa bị phá vỡ. Ranh giới này giải thích vì sao ẩn nút
+ở frontend không phải kiểm soát quyền, và vì sao parser phải xác thực schema
+trước khi rule xử lý dữ liệu.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{\input{figures/trust-boundaries}}
+\caption{Ranh giới tin cậy và các điểm kiểm soát của nguyên mẫu.}
+\label{fig:trust-boundaries}
+\end{figure}
+
+Audit logging cần ghi nhận sự kiện xác thực, thất bại phân quyền và thay đổi
+chính sách, đồng thời tránh ghi mật khẩu, token phiên và dữ liệu ngân hàng nhạy
+cảm vào log \citep{OWASPLogging}. Bởi vậy adapter Nova Bank chỉ xuất các field
+cần cho phân tích: thời điểm, actor, resource, action và outcome. Nó không xuất
+password hay token; trường IP dùng giá trị nguồn cục bộ khi audit schema hiện
+tại chưa lưu địa chỉ client. SQL Injection tiếp tục được phân tích từ log
+gateway/request riêng, vì đưa nguyên payload vào audit nghiệp vụ sẽ làm tăng
+rủi ro lưu dữ liệu nhạy cảm và log injection.
+
+\section{Ánh xạ đe dọa sang kiểm soát}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{p{0.25\textwidth}p{0.28\textwidth}X}
+\toprule
+Đe dọa & Kiểm soát hiện có & Phần dư rủi ro \\
+\midrule
+Bỏ qua giao diện để phê duyệt & Bearer token, permission dependency và policy tại FastAPI & Token demo và SQLite chưa phù hợp triển khai phân tán. \\
+Teller tự tạo và tự duyệt & Separation of duties; Controller giữ quyền approve & Admin vẫn có thể đổi policy; cần governance và dual control cho thay đổi chính sách. \\
+Đoán mật khẩu & Audit đăng nhập lỗi, luật theo user--IP/cửa sổ & Có thể né ngưỡng bằng password spraying, đổi IP hoặc low-and-slow. \\
+SQL Injection & Prepared query ở repository; luật giám sát request log & Regex có thể bỏ sót encoding và không chứng minh truy vấn đã thực thi. \\
+Truy cập trái phép & RBAC lookup kết hợp outcome denied & Sai seed quyền hoặc tài khoản máy chủ bị chiếm có thể làm quyết định sai. \\
+Log lỗi hoặc độc hại & Schema validation, RowError và output nguyên tử & Chưa có chữ ký, chống sửa đổi, quota hoặc kiểm soát log injection đầy đủ. \\
+\bottomrule
+\end{tabularx}
+\caption{Ánh xạ các đe dọa chính sang kiểm soát và rủi ro còn lại.}
+\label{tab:threat-controls}
+\end{table}
+
+Mô hình đe dọa giới hạn cách đọc kết quả: detector đánh giá chỉ báo quan sát
+được trong log, còn enforcement quyết định một request có được phép hay không.
+Một alert SQL Injection không đồng nghĩa dữ liệu đã bị truy xuất; tương tự,
+một request bị RBAC từ chối là bằng chứng kiểm soát hoạt động, không phải bằng
+chứng tài khoản chắc chắn đã bị xâm nhập.
+
+\section{Giả định an toàn và tiêu chí kiểm chứng}
+
+Mô hình giả định identity trong Event đã được nguồn log gắn chính xác; đồng hồ
+các thành phần không lệch đến mức làm sai cửa sổ tương quan; cấu hình và seed
+RBAC được quản trị viên có thẩm quyền cung cấp; và đường dẫn file output không
+bị tiến trình khác thay thế. Đây là các giả định có thể chấp nhận cho môi trường
+đồ án cục bộ nhưng phải trở thành kiểm soát cụ thể khi triển khai: xác thực nguồn
+log, đồng bộ thời gian, quản lý thay đổi cấu hình và phân quyền hệ điều hành.
+
+Mỗi ranh giới có một tiêu chí kiểm chứng tương ứng. Ranh giới HTTP được kiểm
+tra bằng request trực tiếp tới URL phê duyệt và kỳ vọng HTTP 403, đồng thời giao
+dịch vẫn pending. Ranh giới parser được kiểm tra bằng header thiếu, timestamp
+sai và loại file không hỗ trợ; dòng lỗi phải được cô lập hoặc lần chạy phải kết
+thúc có thông báo kiểm soát. Ranh giới lưu trữ được kiểm tra bằng foreign key,
+transaction rollback và phép ghi artifact qua file tạm rồi replace.
+
+Đối với detection, tiêu chí không chỉ là có alert mà còn là khả năng truy ngược
+alert tới rule ID, Event ID và evidence. Đối với audit integration, tiêu chí là
+chuỗi thao tác thật trong Nova Bank được xuất thành Event hợp lệ và tạo alert
+mong đợi mà không cần gắn \texttt{expected\_label}. Các tiêu chí này biến mô
+hình đe dọa thành điều kiện kiểm thử; chúng không loại bỏ rủi ro dư đã nêu trong
+Bảng~\ref{tab:threat-controls}.
