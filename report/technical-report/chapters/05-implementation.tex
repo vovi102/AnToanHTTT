@@ -5,8 +5,8 @@
 Backend được viết bằng Python 3.11. Package \texttt{rbac\_guard} tách parser,
 rules, scoring, reporting, context profiler, repository RBAC, application
 service, CLI và FastAPI adapter thành các module có trách nhiệm riêng. SQLite
-nằm trong thư viện chuẩn; pytest và coverage kiểm thử lõi. Streamlit là giao
-diện tùy chọn để tải log, lọc alert và tải kết quả.
+nằm trong thư viện chuẩn. Streamlit là giao diện tùy chọn để tải log, lọc alert
+và tải kết quả.
 
 Demo Nova Bank dùng FastAPI làm API thật và Next.js 15/React 19 làm giao diện.
 Frontend không lưu business rule hoặc danh sách quyền cứng. Nó gọi API để lấy
@@ -59,15 +59,15 @@ và giá trị cố định, ghi manifest cùng phân tầng; script độ nhạ
 3/5/7 và cửa sổ 60/300/600 giây. Hai artifact metric được giữ trong repository
 để bảng kết quả có thể đối chiếu với đầu ra máy thay vì số nhập tay.
 
-\section{Kiểm thử đường tích hợp Nova Bank--pipeline}
+\section{Thực nghiệm luồng Nova Bank--pipeline}
 
-Integration test khởi tạo database, tạo năm lần login thất bại và một lần
-Teller truy cập quyền phê duyệt bị từ chối. Adapter xuất toàn bộ audit theo thứ
-tự tăng dần; parser đọc lại file; application service phân tích và phải tạo cả
-\texttt{password\_guessing} lẫn \texttt{unauthorized\_access}. Test CLI riêng
-kiểm tra lệnh export tạo file có thể parse. Đây là bằng chứng tích hợp tối thiểu
-giữa hai phần của dự án; SQL Injection vẫn cần log HTTP vì audit Nova Bank
-không giữ raw request.
+Thực nghiệm khởi tạo database, tạo năm lần login thất bại và một lần Teller
+truy cập quyền phê duyệt bị từ chối. Adapter xuất toàn bộ audit theo thứ tự tăng
+dần, parser đọc lại file và application service phân tích để tạo cả
+\texttt{password\_guessing} lẫn \texttt{unauthorized\_access}. File do lệnh
+export sinh ra cũng được đưa trực tiếp qua parser. Đây là bằng chứng tích hợp
+tối thiểu giữa hai phần của dự án; SQL Injection vẫn cần log HTTP vì audit Nova
+Bank không giữ raw request.
 
 \section{Kịch bản demo Nova Bank}
 

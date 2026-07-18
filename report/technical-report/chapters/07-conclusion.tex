@@ -4,8 +4,8 @@ RBAC Guard kết nối hai lớp kiểm soát: authorization quyết định quy
 điểm request, còn pipeline log đưa quyết định và hành vi vào artifact có thể
 truy vết. Demo Nova Bank thể hiện enforcement tại backend và separation of
 duties; audit adapter biến bản ghi xác thực/phân quyền thành Event để detector
-xử lý. Integration test từ database tới alert cho thấy hai phần không còn chỉ
-là hai PoC đặt cạnh nhau.
+xử lý. Thực nghiệm đầu-cuối từ database tới alert cho thấy hai phần không còn
+chỉ là hai PoC đặt cạnh nhau.
 
 Phần đánh giá được mở rộng từ regression 60 Event sang holdout 300 Event có
 manifest, 60 hard negative và 8 campaign password guessing. Trên holdout,
