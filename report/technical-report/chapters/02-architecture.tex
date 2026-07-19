@@ -116,6 +116,57 @@ Auditor hoặc Administrator đọc phạm vi rộng hơn. Permission
 Maker--Checker cụ thể ở API, không phải mô hình Separation of Duty tổng quát;
 schema hiện tại chưa có bảng constraint để biểu diễn xung đột nhiệm vụ.
 
+\subsection{Các bảng hỗ trợ vận hành Nova Bank}
+
+Lớp thứ hai trong Hình~\ref{fig:nova-bank-data-erd} mở rộng Core RBAC bằng dữ
+liệu phiên, giao dịch, audit và cấu hình demo. Chỉ các đường liền trong hình là
+khóa ngoại. \texttt{audit\_logs.username} và \texttt{role\_at\_event} là ảnh
+chụp văn bản tại thời điểm sự kiện; cách lưu này giữ được ngữ cảnh điều tra nếu
+quan hệ role của user thay đổi sau đó, nhưng database không bảo đảm tham chiếu
+cho hai trường này.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{0.95\textwidth}{!}{\input{figures/nova-bank-data-erd}}
+\caption{ERD của lớp dữ liệu hỗ trợ vận hành Nova Bank.}
+\label{fig:nova-bank-data-erd}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{p{0.23\textwidth}p{0.27\textwidth}X}
+\toprule
+Quan hệ & Khóa và ràng buộc chính & Vai trò trong demo \\
+\midrule
+\texttt{sessions} & PK \texttt{token\_hash}; FK \texttt{user\_id} & Lưu token đã băm và thời điểm hết hạn của phiên đăng nhập. \\
+\texttt{transactions} & PK \texttt{id}; UQ \texttt{reference}; hai FK tới \texttt{users}; \texttt{amount\_vnd}>0; status thuộc \texttt{pending}/\texttt{approved} & Lưu giao dịch, người tạo và người phê duyệt tùy chọn. \\
+\texttt{audit\_logs} & PK \texttt{id}; outcome thuộc \texttt{allowed}, \texttt{denied}, \texttt{success}, \texttt{failed}, \texttt{baseline\_bypass} hoặc \texttt{conflict} & Lưu quyết định xác thực, phân quyền, policy và dấu vết giao dịch để xuất sang pipeline. \\
+\texttt{customer\_accounts} & PK \texttt{id} & Dữ liệu khách hàng tối giản phục vụ thao tác đọc/cập nhật trong demo. \\
+\texttt{demo\_settings} & PK \texttt{key} & Lưu chế độ \texttt{baseline}/\texttt{rbac}; miền giá trị được kiểm tra ở tầng repository. \\
+\bottomrule
+\end{tabularx}
+\caption{Từ điển dữ liệu của lớp hỗ trợ Nova Bank.}
+\label{tab:nova-bank-data-schema}
+\end{table}
+
+\subsection{Ràng buộc toàn vẹn và bảo vệ dữ liệu xác thực}
+
+SQLite được bật \texttt{PRAGMA foreign\_keys = ON} trên từng connection. Khóa
+chính ghép ngăn gán trùng user--role và role--permission; các ràng buộc
+\texttt{UNIQUE}, \texttt{CHECK} và \texttt{NOT NULL} loại bỏ trạng thái cấu
+trúc không hợp lệ trước khi logic ứng dụng xử lý. Các câu lệnh nhận dữ liệu động
+dùng placeholder tham số của SQLite thay vì nối chuỗi SQL. Context manager của
+connection bao quanh các thao tác seed và cập nhật nhiều bước để commit khi
+thành công hoặc rollback khi phát sinh ngoại lệ.
+
+Mật khẩu không được lưu trực tiếp: repository tạo salt ngẫu nhiên 16 byte và
+dẫn xuất khóa bằng scrypt với $N=2^{14}$, $r=8$, $p=1$; việc so sánh digest dùng
+hàm constant-time. Token phiên ngẫu nhiên chỉ trả cho client một lần, còn
+database lưu SHA-256 của token cùng \texttt{expires\_at}. Đây là kiểm soát phù
+hợp cho PoC cục bộ; báo cáo không suy rộng thành cơ chế quản lý khóa hoặc phiên
+phân tán ở môi trường production.
+
 \section{Tích hợp audit log với pipeline}
 
 Lệnh \texttt{export-audit-events} nhận database Nova Bank và tạo file CSV có

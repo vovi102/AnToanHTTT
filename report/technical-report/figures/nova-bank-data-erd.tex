@@ -1,0 +1,28 @@
+\begin{tikzpicture}[
+  entity/.style={draw, rounded corners, align=left, font=\scriptsize,
+    inner sep=2.5mm, minimum height=24mm, text width=36mm, fill=orange!9},
+  core/.style={entity, fill=blue!8},
+  link/.style={-Latex, thick},
+  snapshot/.style={-Latex, thick, dashed},
+  note/.style={font=\scriptsize, align=center},
+  node distance=9mm and 17mm
+]
+\node[core] (users) {\textbf{users}\\\underline{id}\\username [UQ]\\status};
+\node[entity, above left=of users] (sessions) {\textbf{sessions}\\
+  \underline{token\_hash}\\user\_id [FK]\\expires\_at};
+\node[entity, right=24mm of users, text width=42mm] (transactions) {\textbf{transactions}\\
+  \underline{id}; reference [UQ]\\created\_by [FK]\\approved\_by [FK, nullable]\\status; amount\_vnd};
+\node[entity, below right=of users, text width=42mm] (audit) {\textbf{audit\_logs}\\
+  \underline{id}\\username; role\_at\_event\\resource; action; outcome\\transaction\_reference};
+\node[entity, below left=of users] (accounts) {\textbf{customer\_accounts}\\
+  \underline{id}\\customer\_name\\phone; address};
+\node[entity, below=18mm of users] (settings) {\textbf{demo\_settings}\\
+  \underline{key}\\value};
+\draw[link] (users) -- node[above left, note]{1:N\\owns} (sessions);
+\draw[link] (users.east) -- node[above, note]{creates 1:N} (transactions.west);
+\draw[link] (users.north east) to[out=35, in=145]
+  node[above, note]{approves 1:N (optional)} (transactions.north west);
+\draw[snapshot] (users) -- node[above, sloped, note]{text snapshot; no FK} (audit);
+\node[note, below=2mm of accounts] {independent reference data};
+\node[note, below=2mm of settings] {independent key--value policy};
+\end{tikzpicture}
