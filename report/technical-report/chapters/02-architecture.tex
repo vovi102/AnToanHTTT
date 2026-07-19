@@ -65,18 +65,109 @@ Reporter & Ghi nguyên tử alert, metadata, context finding và incident dướ
 
 \section{Mô hình dữ liệu RBAC}
 
-Mô hình sử dụng năm quan hệ cốt lõi: \texttt{users}, \texttt{roles},
-\texttt{permissions}, \texttt{user\_roles} và \texttt{role\_permissions}.
-Một permission là cặp \texttt{resource:action}; user được cấp quyền khi đang
-active và tồn tại đường liên kết user--role--permission. Các tên user, tên role
-và cặp resource--action là duy nhất; bảng liên kết có khóa chính ghép và khóa
-ngoại. SQLite được bật foreign key cho mọi kết nối, vì vậy seed lỗi tham chiếu
-sẽ rollback thay vì để lại trạng thái nửa vời.
+Mô hình dữ liệu được chia thành lớp Core RBAC và lớp hỗ trợ vận hành Nova Bank.
+Lớp Core RBAC trong Hình~\ref{fig:rbac-core-erd} gồm năm quan hệ
+\texttt{users}, \texttt{roles}, \texttt{permissions},
+\texttt{user\_roles} và \texttt{role\_permissions}. Hai bảng liên kết chuyển
+hai quan hệ nhiều--nhiều user--role và role--permission thành các quan hệ
+một--nhiều có khóa ngoại rõ ràng. Cấu trúc này tránh gán permission trực tiếp
+cho từng user và giữ role làm đơn vị quản trị chính sách. Các khóa và ràng buộc
+chính của lớp này được tổng hợp trong Bảng~\ref{tab:rbac-core-schema}.
 
-Trong Nova Bank, quyền có phạm vi đọc giao dịch riêng và toàn bộ
-(\texttt{read\_own}/\texttt{read\_all}); quyền \texttt{transactions:approve}
-thuộc Controller. Cách biểu diễn này cho phép API quyết định phạm vi dữ liệu
-và quyền thao tác từ cùng nguồn dữ liệu, không tin cậy role do frontend gửi lên.
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{\input{figures/rbac-core-erd}}
+\caption{ERD của lớp Core RBAC. UQ ký hiệu ràng buộc duy nhất.}
+\label{fig:rbac-core-erd}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{p{0.23\textwidth}p{0.25\textwidth}X}
+\toprule
+Quan hệ & Khóa và ràng buộc chính & Vai trò trong mô hình \\
+\midrule
+\texttt{users} & PK \texttt{id}; UQ \texttt{username}; \texttt{status} thuộc \texttt{active}/\texttt{disabled} & Lưu định danh, trạng thái, tên hiển thị và password hash của người dùng. \\
+\texttt{roles} & PK \texttt{id}; UQ \texttt{name} & Đại diện chức năng nghiệp vụ như Administrator, Teller, Controller và Auditor. \\
+\texttt{permissions} & PK \texttt{id}; UQ(\texttt{resource}, \texttt{action}) & Biểu diễn một quyền dưới dạng cặp tài nguyên--hành động. \\
+\texttt{user\_roles} & PK(\texttt{user\_id}, \texttt{role\_id}); hai FK & Gán role cho user và ngăn một phép gán bị lặp. \\
+\texttt{role\_permissions} & PK(\texttt{role\_id}, \texttt{permission\_id}); hai FK & Gán permission cho role và ngăn một quyền bị cấp lặp. \\
+\bottomrule
+\end{tabularx}
+\caption{Từ điển dữ liệu của lớp Core RBAC.}
+\label{tab:rbac-core-schema}
+\end{table}
+
+Khi API cần kiểm tra quyền, repository lần lượt nối \texttt{users} với
+\texttt{user\_roles}, \texttt{role\_}\allowbreak\texttt{permissions} và
+\texttt{permissions},
+đồng thời lọc theo \texttt{username}, trạng thái
+\texttt{active} và cặp \texttt{resource:action}, rồi chỉ cần xác nhận có ít
+nhất một hàng phù hợp. \texttt{roles} không xuất hiện trực tiếp trong truy vấn
+quyết định vì hai bảng liên kết đã chia sẻ \texttt{role\_id}; bảng này vẫn cần
+thiết để quản trị tên role và hiển thị ma trận quyền. Backend thực hiện truy vấn
+này trước hành động được bảo vệ, do đó việc frontend ẩn nút chỉ cải thiện trải
+nghiệm và không phải là cơ chế phân quyền.
+
+Trong Nova Bank, \texttt{transactions:read\_own} giới hạn Teller ở giao dịch
+do chính họ tạo, còn \texttt{transactions:read\_all} cho phép Controller,
+Auditor hoặc Administrator đọc phạm vi rộng hơn. Permission
+\texttt{transactions:approve} chỉ được seed cho Controller. Đây là chính sách
+Maker--Checker cụ thể ở API, không phải mô hình Separation of Duty tổng quát;
+schema hiện tại chưa có bảng constraint để biểu diễn xung đột nhiệm vụ.
+
+\subsection{Các bảng hỗ trợ vận hành Nova Bank}
+
+Lớp thứ hai trong Hình~\ref{fig:nova-bank-data-erd} mở rộng Core RBAC bằng dữ
+liệu phiên, giao dịch, audit và cấu hình demo. Chỉ các đường liền trong hình là
+khóa ngoại. \texttt{audit\_logs.username} và \texttt{role\_at\_event} là ảnh
+chụp văn bản tại thời điểm sự kiện; cách lưu này giữ được ngữ cảnh điều tra nếu
+quan hệ role của user thay đổi sau đó, nhưng database không bảo đảm tham chiếu
+cho hai trường này. Bảng~\ref{tab:nova-bank-data-schema} tóm tắt vai trò và
+ràng buộc của từng quan hệ hỗ trợ.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{0.95\textwidth}{!}{\input{figures/nova-bank-data-erd}}
+\caption{ERD của lớp dữ liệu hỗ trợ vận hành Nova Bank.}
+\label{fig:nova-bank-data-erd}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{p{0.23\textwidth}p{0.27\textwidth}X}
+\toprule
+Quan hệ & Khóa và ràng buộc chính & Vai trò trong demo \\
+\midrule
+\texttt{sessions} & PK \texttt{token\_hash}; FK \texttt{user\_id} & Lưu token đã băm và thời điểm hết hạn của phiên đăng nhập. \\
+\texttt{transactions} & PK \texttt{id}; UQ \texttt{reference}; hai FK tới \texttt{users}; \texttt{amount\_vnd}>0; status thuộc \texttt{pending}/\texttt{approved} & Lưu giao dịch, người tạo và người phê duyệt tùy chọn. \\
+\texttt{audit\_logs} & PK \texttt{id}; outcome thuộc \texttt{allowed}, \texttt{denied}, \texttt{success}, \texttt{failed}, \texttt{baseline\_bypass} hoặc \texttt{conflict} & Lưu quyết định xác thực, phân quyền, policy và dấu vết giao dịch để xuất sang pipeline. \\
+\texttt{customer\_accounts} & PK \texttt{id} & Dữ liệu khách hàng tối giản phục vụ thao tác đọc/cập nhật trong demo. \\
+\texttt{demo\_settings} & PK \texttt{key} & Lưu chế độ \texttt{baseline}/\texttt{rbac}; miền giá trị được kiểm tra ở tầng repository. \\
+\bottomrule
+\end{tabularx}
+\caption{Từ điển dữ liệu của lớp hỗ trợ Nova Bank.}
+\label{tab:nova-bank-data-schema}
+\end{table}
+
+\subsection{Ràng buộc toàn vẹn và bảo vệ dữ liệu xác thực}
+
+SQLite được bật \texttt{PRAGMA foreign\_keys = ON} trên từng connection. Khóa
+chính ghép ngăn gán trùng user--role và role--permission; các ràng buộc
+\texttt{UNIQUE}, \texttt{CHECK} và \texttt{NOT NULL} loại bỏ trạng thái cấu
+trúc không hợp lệ trước khi logic ứng dụng xử lý. Các câu lệnh nhận dữ liệu động
+dùng placeholder tham số của SQLite thay vì nối chuỗi SQL. Context manager của
+connection bao quanh các thao tác seed và cập nhật nhiều bước để commit khi
+thành công hoặc rollback khi phát sinh ngoại lệ.
+
+Mật khẩu không được lưu trực tiếp: repository tạo salt ngẫu nhiên 16 byte và
+dẫn xuất khóa bằng scrypt với $N=2^{14}$, $r=8$, $p=1$; việc so sánh digest dùng
+hàm constant-time. Token phiên ngẫu nhiên chỉ trả cho client một lần, còn
+database lưu SHA-256 của token cùng \texttt{expires\_at}. Đây là kiểm soát phù
+hợp cho PoC cục bộ; báo cáo không suy rộng thành cơ chế quản lý khóa hoặc phiên
+phân tán ở môi trường production.
 
 \section{Tích hợp audit log với pipeline}
 
