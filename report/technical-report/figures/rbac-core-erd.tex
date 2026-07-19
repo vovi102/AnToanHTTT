@@ -1,0 +1,21 @@
+\begin{tikzpicture}[
+  entity/.style={draw, rounded corners, align=left, font=\scriptsize,
+    inner sep=2.5mm, minimum height=27mm, text width=27mm, fill=blue!5},
+  link/.style={-Latex, thick},
+  node distance=7mm
+]
+\node[entity] (users) {\textbf{users}\\
+  \underline{id}\\username [UQ]\\status\\display\_name\\password\_hash};
+\node[entity, right=of users] (userroles) {\textbf{user\_roles}\\
+  \underline{user\_id} [FK]\\\underline{role\_id} [FK]\\PK(user\_id, role\_id)};
+\node[entity, right=of userroles] (roles) {\textbf{roles}\\
+  \underline{id}\\name [UQ]};
+\node[entity, right=of roles] (rolepermissions) {\textbf{role\_permissions}\\
+  \underline{role\_id} [FK]\\\underline{permission\_id} [FK]\\PK(role\_id, permission\_id)};
+\node[entity, right=of rolepermissions] (permissions) {\textbf{permissions}\\
+  \underline{id}\\resource\\action\\UQ(resource, action)};
+\draw[link] (users) -- node[above, font=\scriptsize]{1:N} (userroles);
+\draw[link] (roles) -- node[above, font=\scriptsize]{1:N} (userroles);
+\draw[link] (roles) -- node[above, font=\scriptsize]{1:N} (rolepermissions);
+\draw[link] (permissions) -- node[above, font=\scriptsize]{1:N} (rolepermissions);
+\end{tikzpicture}

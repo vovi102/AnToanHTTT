@@ -65,18 +65,56 @@ Reporter & Ghi nguyên tử alert, metadata, context finding và incident dướ
 
 \section{Mô hình dữ liệu RBAC}
 
-Mô hình sử dụng năm quan hệ cốt lõi: \texttt{users}, \texttt{roles},
-\texttt{permissions}, \texttt{user\_roles} và \texttt{role\_permissions}.
-Một permission là cặp \texttt{resource:action}; user được cấp quyền khi đang
-active và tồn tại đường liên kết user--role--permission. Các tên user, tên role
-và cặp resource--action là duy nhất; bảng liên kết có khóa chính ghép và khóa
-ngoại. SQLite được bật foreign key cho mọi kết nối, vì vậy seed lỗi tham chiếu
-sẽ rollback thay vì để lại trạng thái nửa vời.
+Mô hình dữ liệu được chia thành lớp Core RBAC và lớp hỗ trợ vận hành Nova Bank.
+Lớp Core RBAC trong Hình~\ref{fig:rbac-core-erd} gồm năm quan hệ
+\texttt{users}, \texttt{roles}, \texttt{permissions},
+\texttt{user\_roles} và \texttt{role\_permissions}. Hai bảng liên kết chuyển
+hai quan hệ nhiều--nhiều user--role và role--permission thành các quan hệ
+một--nhiều có khóa ngoại rõ ràng. Cấu trúc này tránh gán permission trực tiếp
+cho từng user và giữ role làm đơn vị quản trị chính sách.
 
-Trong Nova Bank, quyền có phạm vi đọc giao dịch riêng và toàn bộ
-(\texttt{read\_own}/\texttt{read\_all}); quyền \texttt{transactions:approve}
-thuộc Controller. Cách biểu diễn này cho phép API quyết định phạm vi dữ liệu
-và quyền thao tác từ cùng nguồn dữ liệu, không tin cậy role do frontend gửi lên.
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{\input{figures/rbac-core-erd}}
+\caption{ERD của lớp Core RBAC. UQ ký hiệu ràng buộc duy nhất.}
+\label{fig:rbac-core-erd}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{p{0.23\textwidth}p{0.25\textwidth}X}
+\toprule
+Quan hệ & Khóa và ràng buộc chính & Vai trò trong mô hình \\
+\midrule
+\texttt{users} & PK \texttt{id}; UQ \texttt{username}; \texttt{status} thuộc \texttt{active}/\texttt{disabled} & Lưu định danh, trạng thái, tên hiển thị và password hash của người dùng. \\
+\texttt{roles} & PK \texttt{id}; UQ \texttt{name} & Đại diện chức năng nghiệp vụ như Administrator, Teller, Controller và Auditor. \\
+\texttt{permissions} & PK \texttt{id}; UQ(\texttt{resource}, \texttt{action}) & Biểu diễn một quyền dưới dạng cặp tài nguyên--hành động. \\
+\texttt{user\_roles} & PK(\texttt{user\_id}, \texttt{role\_id}); hai FK & Gán role cho user và ngăn một phép gán bị lặp. \\
+\texttt{role\_permissions} & PK(\texttt{role\_id}, \texttt{permission\_id}); hai FK & Gán permission cho role và ngăn một quyền bị cấp lặp. \\
+\bottomrule
+\end{tabularx}
+\caption{Từ điển dữ liệu của lớp Core RBAC.}
+\label{tab:rbac-core-schema}
+\end{table}
+
+Khi API cần kiểm tra quyền, repository lần lượt nối \texttt{users} với
+\texttt{user\_roles}, \texttt{role\_}\allowbreak\texttt{permissions} và
+\texttt{permissions},
+đồng thời lọc theo \texttt{username}, trạng thái
+\texttt{active} và cặp \texttt{resource:action}, rồi chỉ cần xác nhận có ít
+nhất một hàng phù hợp. \texttt{roles} không xuất hiện trực tiếp trong truy vấn
+quyết định vì hai bảng liên kết đã chia sẻ \texttt{role\_id}; bảng này vẫn cần
+thiết để quản trị tên role và hiển thị ma trận quyền. Backend thực hiện truy vấn
+này trước hành động được bảo vệ, do đó việc frontend ẩn nút chỉ cải thiện trải
+nghiệm và không phải là cơ chế phân quyền.
+
+Trong Nova Bank, \texttt{transactions:read\_own} giới hạn Teller ở giao dịch
+do chính họ tạo, còn \texttt{transactions:read\_all} cho phép Controller,
+Auditor hoặc Administrator đọc phạm vi rộng hơn. Permission
+\texttt{transactions:approve} chỉ được seed cho Controller. Đây là chính sách
+Maker--Checker cụ thể ở API, không phải mô hình Separation of Duty tổng quát;
+schema hiện tại chưa có bảng constraint để biểu diễn xung đột nhiệm vụ.
 
 \section{Tích hợp audit log với pipeline}
 
